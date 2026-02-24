@@ -87,7 +87,21 @@
 
     nav ul a:hover { color: var(--glow); }
 
-    /* HERO */
+    nav ul a.nav-game {
+      color: var(--gold);
+      border: 1px solid rgba(200,168,75,0.3);
+      padding: 4px 12px;
+      border-radius: 3px;
+      transition: all 0.3s;
+    }
+
+    nav ul a.nav-game:hover {
+      color: var(--deep);
+      background: var(--gold);
+      border-color: var(--gold);
+    }
+
+    /* ── HERO — pure dark, no image ── */
     #hero {
       position: relative;
       height: 100vh;
@@ -97,28 +111,24 @@
       justify-content: center;
       text-align: center;
       overflow: hidden;
+      background: var(--deep);
     }
 
-    #hero .hero-bg {
+    /* Deep space radial glow behind the logo */
+    #hero::after {
+      content: '';
       position: absolute;
-      inset: 0;
-      background-image: url('art-astronaut.jpg');
-      background-size: cover;
-      background-position: center top;
-      filter: brightness(0.35) saturate(1.2);
-      transform: scale(1.05);
-      animation: slowzoom 20s ease-in-out infinite alternate;
-    }
-
-    @keyframes slowzoom {
-      from { transform: scale(1.05); }
-      to { transform: scale(1.12); }
-    }
-
-    #hero .hero-overlay {
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(ellipse at center, transparent 30%, var(--deep) 100%);
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(ellipse at center,
+        rgba(74,127,255,0.08) 0%,
+        rgba(74,127,255,0.04) 40%,
+        transparent 70%);
+      pointer-events: none;
+      z-index: 0;
     }
 
     #hero .hero-content {
@@ -129,7 +139,7 @@
 
     @keyframes fadein {
       from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
+      to   { opacity: 1; transform: translateY(0); }
     }
 
     #hero .hero-logo {
@@ -141,7 +151,7 @@
 
     @keyframes logopulse {
       0%, 100% { filter: drop-shadow(0 0 20px rgba(74,127,255,0.7)); }
-      50% { filter: drop-shadow(0 0 35px rgba(111,163,255,0.9)); }
+      50%       { filter: drop-shadow(0 0 40px rgba(111,163,255,0.95)); }
     }
 
     #hero h1 {
@@ -208,7 +218,65 @@
 
     @keyframes bounce {
       0%, 100% { transform: translateX(-50%) translateY(0); }
-      50% { transform: translateX(-50%) translateY(8px); }
+      50%       { transform: translateX(-50%) translateY(8px); }
+    }
+
+    /* ── ASTRONAUT PANEL — her own cinematic section ── */
+    #astronaut-panel {
+      position: relative;
+      width: 100%;
+      height: 85vh;
+      overflow: hidden;
+    }
+
+    #astronaut-panel .astro-bg {
+      position: absolute;
+      inset: 0;
+      background-image: url('art-astronaut.jpg');
+      background-size: cover;
+      background-position: center top;
+      filter: brightness(0.55) saturate(1.2);
+      transform: scale(1.05);
+      animation: slowzoom 20s ease-in-out infinite alternate;
+    }
+
+    @keyframes slowzoom {
+      from { transform: scale(1.05); }
+      to   { transform: scale(1.12); }
+    }
+
+    /* Fade top and bottom into site background for seamless blending */
+    #astronaut-panel::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 30%;
+      background: linear-gradient(to bottom, var(--deep), transparent);
+      z-index: 2;
+    }
+
+    #astronaut-panel::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 40%;
+      background: linear-gradient(to top, var(--deep), transparent);
+      z-index: 2;
+    }
+
+    /* Optional: subtle caption floating at the bottom */
+    #astronaut-panel .astro-caption {
+      position: absolute;
+      bottom: 4rem;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 3;
+      font-family: 'Cinzel', serif;
+      font-size: 0.65rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: rgba(111,163,255,0.5);
+      white-space: nowrap;
     }
 
     /* SECTIONS */
@@ -525,13 +593,12 @@
     <li><a href="#poem">Poem</a></li>
     <li><a href="#about">About</a></li>
     <li><a href="#links">Connect</a></li>
+    <li><a href="sokoban.html" class="nav-game">Game</a></li>
   </ul>
 </nav>
 
-<!-- HERO -->
+<!-- ── HERO — pure dark space, logo breathes alone ── -->
 <section id="hero">
-  <div class="hero-bg"></div>
-  <div class="hero-overlay"></div>
   <div class="hero-content">
     <img class="hero-logo" src="logo.png" alt="Jay Jabiru Logo">
     <h1>Jay Jabiru</h1>
@@ -540,6 +607,12 @@
   </div>
   <div class="scroll-hint">↓ &nbsp; scroll</div>
 </section>
+
+<!-- ── ASTRONAUT PANEL — her own cinematic moment ── -->
+<div id="astronaut-panel">
+  <div class="astro-bg"></div>
+  <div class="astro-caption">Jay Jabiru &nbsp;·&nbsp; Electronic Space Pop</div>
+</div>
 
 <div class="divider"></div>
 

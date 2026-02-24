@@ -1,96 +1,89 @@
 // JAY JABIRU — SOKOBAN LEVELS
 // Notation: # = wall, @ = player, $ = box, . = goal, * = box on goal, + = player on goal, ' ' = floor
 // To add levels: fill the next null slot with your level object.
-// NOTE: Maps from levels 4-5 reconstructed from Jay Jabiru's original designs at sokobanonline.com
-// They may need minor tweaks — verify in-game and adjust box/goal positions if needed.
+// Use sokoban-converter.html to convert levels from sokobanonline.com JSON format.
 
 const LEVELS = [
 
-  // ── LEVEL 1 ── ORBIT STATION ── 1/10 ──────────────────────────────────────
+  // ── LEVEL 1 ── TUTORIAL: ORBIT STATION ── 1/10 ────────────────────────────
   {
-    name: "Orbit Station",
-    description: "First contact. Find your bearings.",
+    name: "Tutorial — Orbit Station",
+    description: "Push boxes onto the diamonds. Boxes can only be pushed, not pulled. The order matters. Well — this first level you could play blind.",
     map:
-`#########
-#   .   #
-#  $ #  #
-#   @   #
-#  ###  #
-#       #
+`    #####
+####    #
+#.##   $#
+#$#.# #.#
+#  $$ .##
+# # ####
+# @ #
+#   #
+#####`
+  },
+
+  // ── LEVEL 2 ── DISORDER IN THE MARTIAN ATTIC ──────────────────────────────
+  {
+    name: "Disorder in the Martian Attic",
+    description: "The last trainee left some boxes unattended. Move the packages to safety before the Mars rats move in. Get to work.",
+    map:
+` ## ####
+#. #   #
+#  # # ##
+# @$   $ #
+#.  ## # #
+#### #   #
+      ####`
+  },
+
+  // ── LEVEL 3 ── WEEKEND FEVER ──────────────────────────────────────────────
+  {
+    name: "Weekend Fever",
+    description: "Yeah, it's Friday. On Mars, a Friday workday only has 1 hour. Let's get this done. The hard Monday work? After the weekend I have the whole team helping me.",
+    map:
+`##########
+# $ $ ..@#
+#..  $$$.#
+#     #  #
+#        #
 #########`
   },
 
-  // ── LEVEL 2 ── NEBULA DRIFT ── 2/10 ───────────────────────────────────────
+  // ── LEVEL 4 ── STRESS TEST ────────────────────────────────────────────────
   {
-    name: "Nebula Drift",
-    description: "Two crates, two destinies.",
+    name: "Stress Test",
+    description: "We are sooo sorry. The whole work force is ill. We are incredibly happy that we can still do it... well, you have to do it, or else you are fired.",
+    map:
+` ########
+#.     .#
+# #@   .#
+# $      #
+# $#$# $ #
+## #  #  #
+#.    #$ #
+#  #  # .#
+ #########`
+  },
+
+  // ── LEVEL 5 ── (SLOT RESERVED) ────────────────────────────────────────────
+  null,
+
+  // ── LEVEL 6 ── DINNER PARTY ── 7/10 ──────────────────────────────────────
+  // Designed by Jay Jabiru via sokobanonline.com
+  {
+    name: "Dinner Party",
+    description: "Today is a bit more relaxed... they said. It's a business dinner and a dissident of the Galactic Empire came. My boss said 'don't worry'. He also said 'clean the kitchen right now and bring everything to order‼'",
     map:
 `##########
-#   ##   #
-# $ .. $ #
-#   ##   #
-#   @    #
-#        #
+#   #    #
+#   # $$ #
+# $$$ #  #
+#  $ $ ..#
+#   # #..#
+# . ..#$ #
+#   ..# $#
+#     # @#
 ##########`
   },
-
-  // ── LEVEL 3 ── DEEP SPACE LOCK ── 3/10 ────────────────────────────────────
-  {
-    name: "Deep Space Lock",
-    description: "Think before you push. Space is unforgiving.",
-    map:
-`###########
-#    #    #
-# $  . $  #
-# ## ## # #
-#    @    #
-#   ...   #
-#  #####  #
-#         #
-###########`
-  },
-
-  // ── LEVEL 4 ── STELLAR COMPOSITION ── 6/10 ────────────────────────────────
-  // Original design by Jay Jabiru — 11 wide × 6 tall
-  // Row 1: 2 boxes top area, 2 goals right side, player far right
-  // Row 2: 2 goals left side, 3 boxes middle-right cluster, 1 goal far right
-  // Row 3: 1 box hanging below cluster
-  {
-    name: "Stellar Composition",
-    description: "Wide open, but space deceives.",
-    map:
-`#############
-# $  $  . .@#
-#..  $$$  . #
-#    $      #
-#           #
-#############`
-  },
-
-  // ── LEVEL 5 ── KATOO CAVERN ── 7/10 ───────────────────────────────────────
-  // Original design by Jay Jabiru — 10 wide × 10 tall
-  // Two-chamber irregular room, player bottom-right
-  // Upper cluster: 2 boxes top-right, 3 boxes mid-left, 2 boxes mid-right
-  // Lower: 1 box bottom-left area, 1 box bottom-right near player
-  // Goals scattered across middle and lower-right
-  {
-    name: "Katoo Cavern",
-    description: "Two chambers. One wrong move echoes through both.",
-    map:
-`############
-##   ###   #
-##   #  $$ #
-# $$$      #
-#   $$  .  #
-#    . . . #
-#  . .     #
-#     $    #
-#       $@ #
-############`
-  },
-
-  // ── LEVEL 6 ── (SLOT RESERVED) ────────────────────────────────────────────
-  null,
 
   // ── LEVEL 7 ── (SLOT RESERVED) ────────────────────────────────────────────
   null,

@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jay Jabiru — Sokoban Level Converter</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Raleway:wght@300;400;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy: #05080f;
+      --blue: #4a7fff;
+      --blue-dim: #2a4fa0;
+      --blue-glow: rgba(74,127,255,0.3);
+      --gold: #c8a84b;
+      --gold-glow: rgba(200,168,75,0.3);
+      --white: #e8eeff;
+      --muted: #6b7a9a;
+      --green: #2a7a40;
+      --green-bright: #4aff80;
+    }
+
+    body {
+      background: var(--navy);
+      color: var(--white);
+      font-family: 'Raleway', sans-serif;
+      min-height: 100vh;
+      padding: 40px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 28px;
+    }
+
+    /* starfield */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        radial-gradient(1px 1px at 12% 18%, rgba(255,255,255,0.5) 0%, transparent 100%),
+        radial-gradient(1px 1px at 34% 72%, rgba(255,255,255,0.4) 0%, transparent 100%),
+        radial-gradient(1px 1px at 56% 30%, rgba(255,255,255,0.3) 0%, transparent 100%),
+        radial-gradient(1px 1px at 78% 55%, rgba(255,255,255,0.5) 0%, transparent 100%),
+        radial-gradient(1px 1px at 90% 10%, rgba(255,255,255,0.4) 0%, transparent 100%),
+        radial-gradient(2px 2px at 22% 45%, rgba(111,163,255,0.3) 0%, transparent 100%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 900px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    header {
+      text-align: center;
+    }
+
+    .eyebrow {
+      font-size: 0.65rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 8px;
+    }
+
+    h1 {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(1.2rem, 3vw, 1.8rem);
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      background: linear-gradient(135deg, var(--white) 40%, var(--blue) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .subtitle {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 6px;
+      letter-spacing: 0.06em;
+    }
+
+    /* PANELS */
+    .panel {
+      background: rgba(10,15,30,0.7);
+      border: 1px solid rgba(74,127,255,0.2);
+      border-radius: 8px;
+      padding: 20px 24px;
+      backdrop-filter: blur(8px);
+    }
+
+    .panel-title {
+      font-family: 'Cinzel', serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--blue);
+      margin-bottom: 12px;
+    }
+
+    textarea {
+      width: 100%;
+      background: rgba(5,8,15,0.8);
+      border: 1px solid rgba(74,127,255,0.2);
+      border-radius: 6px;
+      color: var(--white);
+      font-family: 'Courier New', monospace;
+      font-size: 0.8rem;
+      padding: 14px;
+      resize: vertical;
+      outline: none;
+      line-height: 1.5;
+      transition: border-color 0.2s;
+    }
+
+    textarea:focus { border-color: var(--blue); }
+
+    textarea.output-area {
+      color: var(--green-bright);
+      cursor: text;
+      min-height: 160px;
+    }
+
+    /* BUTTONS */
+    .btn-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    .btn {
+      font-family: 'Cinzel', serif;
+      font-size: 0.68rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding: 9px 20px;
+      border-radius: 4px;
+      border: 1px solid;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: transparent;
+    }
+
+    .btn-blue  { border-color: var(--blue); color: var(--blue); }
+    .btn-blue:hover  { background: rgba(74,127,255,0.15); box-shadow: 0 0 14px var(--blue-glow); }
+    .btn-gold  { border-color: var(--gold); color: var(--gold); }
+    .btn-gold:hover  { background: rgba(200,168,75,0.12); box-shadow: 0 0 14px var(--gold-glow); }
+    .btn-green { border-color: var(--green-bright); color: var(--green-bright); }
+    .btn-green:hover { background: rgba(74,255,128,0.1); }
+
+    /* PREVIEW GRID */
+    #preview-wrap {
+      display: none;
+    }
+
+    #preview-wrap.show { display: block; }
+
+    #preview-grid {
+      display: inline-grid;
+      gap: 2px;
+      margin-top: 12px;
+    }
+
+    .pcell {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      border-radius: 3px;
+    }
+
+    .pc-empty  { background: #080d1a; border: 1px solid #0d1525; }
+    .pc-wall   { background: #1a2445; border: 1px solid #2a3460; }
+    .pc-goal   { background: #0e1830; border: 2px solid #c8a84b; color: #c8a84b; }
+    .pc-box    { background: #4a3008; border: 2px solid #c8a84b; color: #c8a84b; }
+    .pc-player { background: #1a3070; border: 2px solid #4a7fff; color: #6fa3ff; border-radius: 50%; }
+    .pc-boxgoal{ background: #1a4a30; border: 2px solid #4a7fff; color: #4a7fff; }
+
+    /* COPY FEEDBACK */
+    .copy-msg {
+      font-size: 0.7rem;
+      color: var(--green-bright);
+      margin-left: 10px;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .copy-msg.show { opacity: 1; }
+
+    /* INFO */
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .info-item {
+      background: rgba(5,8,15,0.6);
+      border: 1px solid rgba(74,127,255,0.15);
+      border-radius: 6px;
+      padding: 10px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .info-label {
+      font-size: 0.58rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .info-value {
+      font-family: 'Cinzel', serif;
+      font-size: 1rem;
+      color: var(--gold);
+    }
+
+    /* LEGEND */
+    .legend {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+
+    .leg {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.68rem;
+      color: var(--muted);
+    }
+
+    .leg-box {
+      width: 16px;
+      height: 16px;
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+
+    /* ERROR */
+    .error-msg {
+      color: #ff6b6b;
+      font-size: 0.75rem;
+      margin-top: 8px;
+      display: none;
+    }
+
+    .error-msg.show { display: block; }
+
+    /* INSTRUCTIONS */
+    .instructions {
+      font-size: 0.75rem;
+      color: var(--muted);
+      line-height: 1.8;
+      letter-spacing: 0.03em;
+    }
+
+    .instructions strong { color: var(--gold); font-weight: 600; }
+
+    code {
+      background: rgba(74,127,255,0.1);
+      border: 1px solid rgba(74,127,255,0.2);
+      border-radius: 3px;
+      padding: 1px 6px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.78rem;
+      color: var(--blue);
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <header>
+    <div class="eyebrow">Jay Jabiru · Dev Tools</div>
+    <h1>Sokoban Level Converter</h1>
+    <div class="subtitle">Paste JSON from sokobanonline.com → get map string ready for levels.js</div>
+  </header>
+
+  <!-- HOW TO USE -->
+  <div class="panel">
+    <div class="panel-title">How to Use</div>
+    <div class="instructions">
+      <strong>1.</strong> In sokobanonline.com builder, finish your level and click <strong>Save</strong>.<br>
+      <strong>2.</strong> Open your browser console (<code>F12</code>) and go to the <strong>Network</strong> tab, or use the <strong>Actions → Export</strong> button if available. Alternatively, use the level's URL ID and the site's API endpoint.<br>
+      <strong>3.</strong> Paste the raw JSON below and click <strong>Convert</strong>.<br>
+      <strong>4.</strong> Copy the output map string and paste it into the next <code>null</code> slot in <code>levels.js</code>.
+    </div>
+  </div>
+
+  <!-- INPUT -->
+  <div class="panel">
+    <div class="panel-title">① Paste JSON Here</div>
+    <textarea id="json-input" rows="8" placeholder='{"width":10,"height":10,"blocks":[{"type":"DEAD","x":0,"y":0}, ...]}'></textarea>
+    <div class="error-msg" id="error-msg">⚠ Invalid JSON or unrecognised format. Check your paste.</div>
+    <div class="btn-row">
+      <button class="btn btn-blue" onclick="convert()">Convert →</button>
+      <button class="btn btn-gold" onclick="clearAll()">Clear</button>
+    </div>
+  </div>
+
+  <!-- OUTPUT -->
+  <div class="panel">
+    <div class="panel-title">② Map String Output</div>
+    <textarea class="output-area" id="map-output" rows="12" readonly placeholder="Your converted map will appear here..."></textarea>
+    <div class="btn-row">
+      <button class="btn btn-green" onclick="copyMap()">Copy Map</button>
+      <span class="copy-msg" id="copy-msg">✓ Copied!</span>
+    </div>
+
+    <!-- STATS -->
+    <div class="info-grid" id="stats" style="display:none">
+      <div class="info-item">
+        <span class="info-label">Width</span>
+        <span class="info-value" id="stat-w">—</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Height</span>
+        <span class="info-value" id="stat-h">—</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Boxes</span>
+        <span class="info-value" id="stat-boxes">—</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Goals</span>
+        <span class="info-value" id="stat-goals">—</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Player</span>
+        <span class="info-value" id="stat-player">—</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Match</span>
+        <span class="info-value" id="stat-match">—</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- PREVIEW -->
+  <div class="panel" id="preview-wrap">
+    <div class="panel-title">③ Visual Preview</div>
+    <div id="preview-grid"></div>
+    <div class="legend">
+      <div class="leg"><div class="leg-box" style="background:#1a2445;border:1px solid #2a3460"></div> Wall</div>
+      <div class="leg"><div class="leg-box" style="background:#080d1a;border:1px solid #0d1525"></div> Floor</div>
+      <div class="leg"><div class="leg-box" style="background:#0e1830;border:2px solid #c8a84b"></div> Goal</div>
+      <div class="leg"><div class="leg-box" style="background:#4a3008;border:2px solid #c8a84b"></div> Box</div>
+      <div class="leg"><div class="leg-box" style="background:#1a4a30;border:2px solid #4a7fff"></div> Box on Goal</div>
+      <div class="leg"><div class="leg-box" style="background:#1a3070;border:2px solid #4a7fff;border-radius:50%"></div> Player</div>
+    </div>
+  </div>
+
+  <!-- LEVELS.JS SNIPPET -->
+  <div class="panel">
+    <div class="panel-title">④ Ready-to-Paste levels.js Snippet</div>
+    <textarea class="output-area" id="snippet-output" rows="10" readonly placeholder="Full levels.js entry will appear here after conversion..."></textarea>
+    <div class="btn-row">
+      <button class="btn btn-green" onclick="copySnippet()">Copy Snippet</button>
+      <span class="copy-msg" id="copy-msg-2">✓ Copied!</span>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ── TYPE MAP ──────────────────────────────────────────
+const TYPE_MAP = {
+  DEAD:   '#',
+  TARGET: '.',
+  NUMBER: '$',
+  DYLAN:  '@',
+  // sokobanonline also uses these variants:
+  WALL:   '#',
+  BOX:    '$',
+  GOAL:   '.',
+  PLAYER: '@',
+  // box already on goal
+  BOX_ON_GOAL: '*',
+  PLAYER_ON_GOAL: '+',
+};
+
+// ── MAIN CONVERTER ────────────────────────────────────
+function convert() {
+  const raw = document.getElementById('json-input').value.trim();
+  const errEl = document.getElementById('error-msg');
+  errEl.classList.remove('show');
+
+  let data;
+  try { data = JSON.parse(raw); } catch(e) {
+    errEl.textContent = '⚠ Invalid JSON. Check your paste.';
+    errEl.classList.add('show');
+    return;
+  }
+
+  if (!data.width || !data.height || !Array.isArray(data.blocks)) {
+    errEl.textContent = '⚠ JSON missing width, height, or blocks array.';
+    errEl.classList.add('show');
+    return;
+  }
+
+  // Build lookup
+  const lookup = {};
+  data.blocks.forEach(b => { lookup[`${b.x},${b.y}`] = b; });
+
+  // Count elements
+  let boxes = 0, goals = 0, player = false;
+
+  // Build grid
+  const rows = [];
+  for (let y = 0; y < data.height; y++) {
+    let row = '';
+    for (let x = 0; x < data.width; x++) {
+      const b = lookup[`${x},${y}`];
+      if (!b) { row += ' '; continue; }
+      const ch = TYPE_MAP[b.type] || ' ';
+      row += ch;
+      if (ch === '$' || ch === '*') boxes++;
+      if (ch === '.' || ch === '*' || ch === '+') goals++;
+      if (ch === '@' || ch === '+') player = true;
+    }
+    rows.push(row);
+  }
+
+  // Trim trailing whitespace per row
+  const trimmed = rows.map(r => r.trimEnd());
+
+  // Remove fully empty rows from bottom
+  while (trimmed.length && trimmed[trimmed.length-1].trim() === '') trimmed.pop();
+
+  // Find minimum indent and remove it
+  const minIndent = Math.min(
+    ...trimmed.filter(r => r.trim().length > 0)
+              .map(r => r.length - r.trimStart().length)
+  );
+  const final = trimmed.map(r => r.slice(minIndent));
+
+  const mapString = final.join('\n');
+
+  // Output map
+  document.getElementById('map-output').value = mapString;
+
+  // Stats
+  document.getElementById('stat-w').textContent = data.width;
+  document.getElementById('stat-h').textContent = data.height;
+  document.getElementById('stat-boxes').textContent = boxes;
+  document.getElementById('stat-goals').textContent = goals;
+  document.getElementById('stat-player').textContent = player ? '✓' : '✗ MISSING';
+  document.getElementById('stat-match').textContent =
+    boxes === goals ? '✓ ' + boxes + '/' + goals : '✗ ' + boxes + ' boxes / ' + goals + ' goals';
+  document.getElementById('stats').style.display = 'grid';
+
+  // Snippet
+  const snippet =
+`  {
+    name: "Your Level Name",
+    description: "Your description here.",
+    map:
+\`${mapString}\`
+  },`;
+  document.getElementById('snippet-output').value = snippet;
+
+  // Preview
+  renderPreview(final);
+  document.getElementById('preview-wrap').classList.add('show');
+}
+
+// ── PREVIEW RENDERER ──────────────────────────────────
+function renderPreview(rows) {
+  const wrap = document.getElementById('preview-grid');
+  wrap.innerHTML = '';
+
+  const cols = Math.max(...rows.map(r => r.length));
+  wrap.style.gridTemplateColumns = `repeat(${cols}, 32px)`;
+  wrap.style.gridTemplateRows    = `repeat(${rows.length}, 32px)`;
+
+  rows.forEach(row => {
+    for (let c = 0; c < cols; c++) {
+      const ch = row[c] || ' ';
+      const cell = document.createElement('div');
+      cell.className = 'pcell ' + charToClass(ch);
+      cell.textContent = charToIcon(ch);
+      wrap.appendChild(cell);
+    }
+  });
+}
+
+function charToClass(ch) {
+  switch(ch) {
+    case '#': return 'pc-wall';
+    case '.': return 'pc-goal';
+    case '$': return 'pc-box';
+    case '*': return 'pc-boxgoal';
+    case '@': return 'pc-player';
+    case '+': return 'pc-player';
+    default:  return 'pc-empty';
+  }
+}
+
+function charToIcon(ch) {
+  switch(ch) {
+    case '.': return '◇';
+    case '$': return '⬛';
+    case '*': return '✦';
+    case '@': return '☺';
+    case '+': return '☺';
+    default:  return '';
+  }
+}
+
+// ── COPY HELPERS ──────────────────────────────────────
+function copyMap() {
+  const val = document.getElementById('map-output').value;
+  if (!val) return;
+  navigator.clipboard.writeText(val).then(() => flashMsg('copy-msg'));
+}
+
+function copySnippet() {
+  const val = document.getElementById('snippet-output').value;
+  if (!val) return;
+  navigator.clipboard.writeText(val).then(() => flashMsg('copy-msg-2'));
+}
+
+function flashMsg(id) {
+  const el = document.getElementById(id);
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2000);
+}
+
+function clearAll() {
+  document.getElementById('json-input').value = '';
+  document.getElementById('map-output').value = '';
+  document.getElementById('snippet-output').value = '';
+  document.getElementById('stats').style.display = 'none';
+  document.getElementById('preview-wrap').classList.remove('show');
+  document.getElementById('error-msg').classList.remove('show');
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jay Jabiru — Electronic Space Pop</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Raleway:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --deep: #0a0a14;
+      --navy: #0d0d1f;
+      --blue: #1a1a3e;
+      --accent: #4a7fff;
+      --glow: #6fa3ff;
+      --gold: #c8a84b;
+      --white: #f0f0ff;
+      --muted: #8888aa;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--deep);
+      color: var(--white);
+      font-family: 'Raleway', sans-serif;
+      font-weight: 300;
+      overflow-x: hidden;
+    }
+
+    /* STARS BACKGROUND */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        radial-gradient(1px 1px at 10% 15%, rgba(255,255,255,0.6) 0%, transparent 100%),
+        radial-gradient(1px 1px at 25% 40%, rgba(255,255,255,0.4) 0%, transparent 100%),
+        radial-gradient(1px 1px at 40% 10%, rgba(255,255,255,0.5) 0%, transparent 100%),
+        radial-gradient(1px 1px at 55% 60%, rgba(255,255,255,0.3) 0%, transparent 100%),
+        radial-gradient(1px 1px at 70% 25%, rgba(255,255,255,0.6) 0%, transparent 100%),
+        radial-gradient(1px 1px at 85% 75%, rgba(255,255,255,0.4) 0%, transparent 100%),
+        radial-gradient(1px 1px at 15% 80%, rgba(255,255,255,0.5) 0%, transparent 100%),
+        radial-gradient(1px 1px at 90% 45%, rgba(255,255,255,0.3) 0%, transparent 100%),
+        radial-gradient(1px 1px at 60% 85%, rgba(255,255,255,0.4) 0%, transparent 100%),
+        radial-gradient(2px 2px at 35% 55%, rgba(111,163,255,0.4) 0%, transparent 100%),
+        radial-gradient(2px 2px at 75% 15%, rgba(111,163,255,0.3) 0%, transparent 100%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.2rem 3rem;
+      background: linear-gradient(to bottom, rgba(10,10,20,0.95), transparent);
+      backdrop-filter: blur(4px);
+    }
+
+    nav .logo-nav img {
+      height: 48px;
+      filter: drop-shadow(0 0 8px rgba(74,127,255,0.5));
+    }
+
+    nav ul {
+      list-style: none;
+      display: flex;
+      gap: 2.5rem;
+    }
+
+    nav ul a {
+      color: var(--muted);
+      text-decoration: none;
+      font-family: 'Cinzel', serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      transition: color 0.3s;
+    }
+
+    nav ul a:hover { color: var(--glow); }
+
+    /* HERO */
+    #hero {
+      position: relative;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    #hero .hero-bg {
+      position: absolute;
+      inset: 0;
+      background-image: url('art-astronaut.jpg');
+      background-size: cover;
+      background-position: center top;
+      filter: brightness(0.35) saturate(1.2);
+      transform: scale(1.05);
+      animation: slowzoom 20s ease-in-out infinite alternate;
+    }
+
+    @keyframes slowzoom {
+      from { transform: scale(1.05); }
+      to { transform: scale(1.12); }
+    }
+
+    #hero .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at center, transparent 30%, var(--deep) 100%);
+    }
+
+    #hero .hero-content {
+      position: relative;
+      z-index: 2;
+      animation: fadein 2s ease forwards;
+    }
+
+    @keyframes fadein {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    #hero .hero-logo {
+      width: 180px;
+      margin-bottom: 2rem;
+      filter: drop-shadow(0 0 20px rgba(74,127,255,0.7));
+      animation: logopulse 4s ease-in-out infinite;
+    }
+
+    @keyframes logopulse {
+      0%, 100% { filter: drop-shadow(0 0 20px rgba(74,127,255,0.7)); }
+      50% { filter: drop-shadow(0 0 35px rgba(111,163,255,0.9)); }
+    }
+
+    #hero h1 {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(3rem, 8vw, 7rem);
+      font-weight: 900;
+      letter-spacing: 0.15em;
+      line-height: 1;
+      background: linear-gradient(135deg, #fff 0%, var(--glow) 50%, var(--gold) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 1rem;
+    }
+
+    #hero .tagline {
+      font-size: clamp(0.8rem, 2vw, 1rem);
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 3rem;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 0.9rem 2.5rem;
+      border: 1px solid var(--accent);
+      color: var(--white);
+      text-decoration: none;
+      font-family: 'Cinzel', serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--accent);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.3s;
+      z-index: -1;
+    }
+
+    .btn:hover::before { transform: scaleX(1); }
+    .btn:hover { color: var(--deep); border-color: var(--accent); }
+
+    .scroll-hint {
+      position: absolute;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      color: var(--muted);
+      font-size: 0.7rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      animation: bounce 2s ease-in-out infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(8px); }
+    }
+
+    /* SECTIONS */
+    section {
+      position: relative;
+      z-index: 1;
+      padding: 7rem 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .section-label {
+      font-family: 'Cinzel', serif;
+      font-size: 0.65rem;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1rem;
+      display: block;
+    }
+
+    h2 {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 700;
+      margin-bottom: 3rem;
+      color: var(--white);
+    }
+
+    /* DIVIDER */
+    .divider {
+      width: 100%;
+      height: 1px;
+      background: linear-gradient(to right, transparent, var(--accent), transparent);
+      opacity: 0.3;
+      margin: 0 auto;
+    }
+
+    /* MUSIC */
+    #music {
+      position: relative;
+    }
+
+    #music::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: url('art-mermaid.jpg');
+      background-size: cover;
+      background-position: center;
+      filter: brightness(0.1) saturate(0.5);
+      border-radius: 2px;
+    }
+
+    #music > * { position: relative; z-index: 1; }
+
+    .music-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    .track-card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(74,127,255,0.2);
+      padding: 2rem;
+      backdrop-filter: blur(10px);
+      transition: all 0.3s;
+    }
+
+    .track-card:hover {
+      border-color: var(--accent);
+      background: rgba(74,127,255,0.08);
+      transform: translateY(-4px);
+    }
+
+    .track-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+      color: var(--white);
+    }
+
+    .track-card audio {
+      width: 100%;
+      margin-top: 1rem;
+      filter: invert(1) hue-rotate(180deg);
+      opacity: 0.8;
+    }
+
+    .track-note {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-top: 0.8rem;
+      font-style: italic;
+    }
+
+    /* GALLERY */
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+    }
+
+    @media (max-width: 768px) {
+      .gallery-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    .gallery-item {
+      position: relative;
+      overflow: hidden;
+      aspect-ratio: 1;
+      cursor: pointer;
+    }
+
+    .gallery-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.6s ease, filter 0.6s ease;
+      filter: saturate(0.8) brightness(0.9);
+    }
+
+    .gallery-item:hover img {
+      transform: scale(1.08);
+      filter: saturate(1.2) brightness(1);
+    }
+
+    .gallery-item .overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(10,10,20,0.7), transparent);
+      opacity: 0;
+      transition: opacity 0.3s;
+      display: flex;
+      align-items: flex-end;
+      padding: 1rem;
+    }
+
+    .gallery-item:hover .overlay { opacity: 1; }
+
+    /* POEM */
+    #poem {
+      text-align: center;
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 7rem 2rem;
+    }
+
+    .poem-text {
+      font-family: 'Raleway', sans-serif;
+      font-style: italic;
+      font-weight: 300;
+      font-size: clamp(0.95rem, 2vw, 1.1rem);
+      line-height: 2;
+      color: rgba(240,240,255,0.85);
+      white-space: pre-line;
+      text-align: left;
+      display: inline-block;
+    }
+
+    .poem-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1.4rem;
+      margin-bottom: 2.5rem;
+      color: var(--gold);
+      letter-spacing: 0.1em;
+    }
+
+    /* ABOUT */
+    #about .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.6fr;
+      gap: 4rem;
+      align-items: start;
+    }
+
+    @media (max-width: 768px) {
+      #about .about-grid { grid-template-columns: 1fr; }
+      nav ul { display: none; }
+      nav { padding: 1rem 1.5rem; }
+    }
+
+    .about-photo {
+      width: 100%;
+      aspect-ratio: 3/4;
+      object-fit: cover;
+      object-position: top;
+      filter: saturate(0.7) brightness(0.9);
+      border: 1px solid rgba(74,127,255,0.2);
+      transition: filter 0.4s;
+    }
+
+    .about-photo:hover { filter: saturate(1) brightness(1); }
+
+    .about-text p {
+      line-height: 1.9;
+      color: rgba(240,240,255,0.8);
+      margin-bottom: 1.5rem;
+      font-size: 1rem;
+    }
+
+    .about-text .lead {
+      font-size: 1.2rem;
+      font-style: italic;
+      color: var(--white);
+      margin-bottom: 2rem;
+      line-height: 1.7;
+    }
+
+    /* LINKS */
+    #links {
+      text-align: center;
+      padding: 5rem 2rem;
+    }
+
+    .social-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1rem;
+      margin-top: 2.5rem;
+    }
+
+    .social-link {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      padding: 0.9rem 1.8rem;
+      border: 1px solid rgba(74,127,255,0.3);
+      color: var(--muted);
+      text-decoration: none;
+      font-family: 'Cinzel', serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      transition: all 0.3s;
+      background: rgba(255,255,255,0.02);
+    }
+
+    .social-link:hover {
+      border-color: var(--accent);
+      color: var(--white);
+      background: rgba(74,127,255,0.1);
+      transform: translateY(-3px);
+    }
+
+    .social-link svg {
+      width: 16px;
+      height: 16px;
+      fill: currentColor;
+    }
+
+    /* FOOTER */
+    footer {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      padding: 3rem 2rem;
+      border-top: 1px solid rgba(74,127,255,0.1);
+      color: var(--muted);
+      font-size: 0.8rem;
+      letter-spacing: 0.1em;
+    }
+
+    footer a {
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+
+    footer a:hover { color: var(--accent); }
+
+    /* LIGHTBOX */
+    .lightbox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.92);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .lightbox.active { display: flex; }
+
+    .lightbox img {
+      max-width: 90vw;
+      max-height: 90vh;
+      object-fit: contain;
+    }
+
+    .lightbox-close {
+      position: absolute;
+      top: 2rem; right: 2rem;
+      color: white;
+      font-size: 2rem;
+      cursor: pointer;
+      font-family: 'Cinzel', serif;
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="logo-nav" href="#hero">
+    <img src="logo.png" alt="Jay Jabiru">
+  </a>
+  <ul>
+    <li><a href="#music">Music</a></li>
+    <li><a href="#gallery">Art</a></li>
+    <li><a href="#poem">Poem</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#links">Connect</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <img class="hero-logo" src="logo.png" alt="Jay Jabiru Logo">
+    <h1>Jay Jabiru</h1>
+    <p class="tagline">Electronic Space Pop &nbsp;·&nbsp; Jabiru K-Pop &nbsp;·&nbsp; Ancient meets Orbital</p>
+    <a class="btn" href="#music">Enter the Universe</a>
+  </div>
+  <div class="scroll-hint">↓ &nbsp; scroll</div>
+</section>
+
+<div class="divider"></div>
+
+<!-- MUSIC -->
+<section id="music" style="max-width:100%; padding: 7rem 4rem;">
+  <span class="section-label">Listen</span>
+  <h2>Music</h2>
+  <div class="music-grid">
+
+    <div class="track-card">
+      <div class="track-title">Are You for Real?</div>
+      <p class="track-note">Upload your .wav file to hear it here</p>
+      <audio controls>
+        <source src="are-you-for-real.mp3" type="audio/mpeg">
+        Your browser does not support audio.
+      </audio>
+    </div>
+
+    <div class="track-card">
+      <div class="track-title">Warp Closer [Remix]</div>
+      <p class="track-note">Upload your .wav file to hear it here</p>
+      <audio controls>
+        <source src="warp-closer-remix.mp3" type="audio/mpeg">
+        Your browser does not support audio.
+      </audio>
+    </div>
+
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- GALLERY -->
+<section id="gallery">
+  <span class="section-label">Visual Universe</span>
+  <h2>Art</h2>
+  <div class="gallery-grid">
+    <div class="gallery-item" onclick="openLightbox('art-astronaut.jpg')">
+      <img src="art-astronaut.jpg" alt="Astronaut">
+      <div class="overlay"></div>
+    </div>
+    <div class="gallery-item" onclick="openLightbox('art-mermaid.jpg')">
+      <img src="art-mermaid.jpg" alt="Mermaid">
+      <div class="overlay"></div>
+    </div>
+    <div class="gallery-item" onclick="openLightbox('art-cats.jpg')">
+      <img src="art-cats.jpg" alt="Romantic Cats">
+      <div class="overlay"></div>
+    </div>
+    <div class="gallery-item" onclick="openLightbox('art-spacecat.jpg')">
+      <img src="art-spacecat.jpg" alt="Space Cat">
+      <div class="overlay"></div>
+    </div>
+    <div class="gallery-item" onclick="openLightbox('art-peacock.jpg')">
+      <img src="art-peacock.jpg" alt="Peacock">
+      <div class="overlay"></div>
+    </div>
+    <div class="gallery-item" onclick="openLightbox('art-fossa.jpg')">
+      <img src="art-fossa.jpg" alt="Fossa with Key">
+      <div class="overlay"></div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- POEM -->
+<section id="poem">
+  <span class="section-label">Words</span>
+  <div class="poem-title">View from the Ridge</div>
+  <div class="poem-text">Weakly, day's last rays scratch
+sparse horizon of alders, birches,
+heavy lashes breaking silence,
+powerfully clear in essence,
+night-unraveled black wings'
+pure magnificence.
+
+Skillfully poured ink,
+shadow-peeled fine strokes of feathers,
+a free-floating charcoal cry of smoke,
+croaking imprecise complaints,
+knitted seamlessly into the night;
+there he sits —
+  he watches you
+  he tilts his head from left to right
+  his wise shrewd eyes inquire.
+
+Suddenly,
+  from roof top's edge, it falls,
+  quiet drop of swinging black wings
+  with gray slate's sickle:
+  Death's abbot of the night.
+
+Briefly, quite boldly,
+  the curve of phantom's flight
+  to birch's swaying wire.
+
+There jerks, there heaves the birch crown,
+  from claw grip and wing beat.
+
+Wet branches, leaves,
+last quivering, last shimmering,
+of golden fragments,
+the day's last rays' glow of fire.</div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ABOUT -->
+<section id="about">
+  <span class="section-label">The Artist</span>
+  <h2>About</h2>
+  <div class="about-grid">
+    <img class="about-photo" src="photo.jpg" alt="Jay Jabiru">
+    <div class="about-text">
+      <p class="lead">Jay Jabiru makes Jabiru K-Pop charged with ancient instruments, glitch textures and cyberpunk space. You haven't heard anything like it.</p>
+      <p>Jay Jabiru creates a sound built from energetic K-Pop, traditional Asian instruments, and the dark shimmer of cyberpunk space. Shamisen meets synthesizer. Ancient meets orbital. Glitch textures fracture the signal just enough to let something real through.</p>
+      <p>The music explores what connects us and what breaks down between us — relationships, communication, technology's gifts and its costs. It doesn't preach. It pulls you in.</p>
+      <p>Jay Jabiru is a European artist, poet and maker. Influenced by world-builders like Jarre, Björk and Kate Bush, he approaches music the way he approaches everything — with his hands first. He plays tin whistle, ocarina and several flutes, owns a pipa he is stubbornly learning, and builds things from wood, fire and papier-mâché.</p>
+      <p>He speaks English, German and Spanish, and knows enough words in enough other languages to greet strangers on the tram in their own tongue. He is a carpenter, an educator, a chess and Go player, a free climber, and a self-described vegan fisher — certified, never successful. He keeps two pacific parrotlets. All of it ended up in the music.</p>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- LINKS -->
+<section id="links">
+  <span class="section-label">Find Me</span>
+  <h2>Connect</h2>
+  <div class="social-grid">
+
+    <a class="social-link" href="https://youtube.com/@jayjabiru" target="_blank">
+      <svg viewBox="0 0 24 24"><path d="M23.5 6.2s-.3-2-1.2-2.8c-1.1-1.2-2.4-1.2-3-1.3C16.8 2 12 2 12 2s-4.8 0-7.3.2c-.6 0-1.9.1-3 1.3C.8 4.2.5 6.2.5 6.2S.2 8.5.2 10.8v2.1c0 2.3.3 4.6.3 4.6s.3 2 1.2 2.8c1.1 1.2 2.6 1.1 3.3 1.2C7.2 21.7 12 21.8 12 21.8s4.8 0 7.3-.3c.6-.1 1.9-.2 3-1.3.9-.8 1.2-2.8 1.2-2.8s.3-2.3.3-4.6v-2.1c0-2.3-.3-4.6-.3-4.6zM9.7 15.5V8.4l8 3.6-8 3.5z"/></svg>
+      YouTube
+    </a>
+
+    <a class="social-link" href="https://suno.com/@jayjabiru" target="_blank">
+      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
+      Suno
+    </a>
+
+    <a class="social-link" href="https://soundcloud.com/jayjabiru" target="_blank">
+      <svg viewBox="0 0 24 24"><path d="M1.175 12.225c-.017 0-.034.001-.05.004a.44.44 0 0 0-.313.17.44.44 0 0 0-.087.35l.372 2.418-.372 2.16a.44.44 0 0 0 .45.504c.017 0 .034-.001.05-.004.196-.034.35-.204.35-.404V12.63a.44.44 0 0 0-.4-.405zm2.137-1.3c-.03 0-.06.003-.088.008a.574.574 0 0 0-.486.568v5.835a.574.574 0 0 0 .574.574.574.574 0 0 0 .574-.574V11.5a.574.574 0 0 0-.574-.575zm13.69-5.217a5.98 5.98 0 0 0-4.207 1.73 8.17 8.17 0 0 0-1.912-.228c-4.51 0-8.17 3.66-8.17 8.17 0 .107.003.213.008.319h14.28a3.43 3.43 0 0 0 3.43-3.43 3.43 3.43 0 0 0-3.43-3.43z"/></svg>
+      SoundCloud
+    </a>
+
+    <a class="social-link" href="https://tiktok.com/@jayjabiru" target="_blank">
+      <svg viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.29 6.29 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.75a4.85 4.85 0 0 1-1.01-.06z"/></svg>
+      TikTok
+    </a>
+
+    <a class="social-link" href="https://instagram.com/jayjabiru" target="_blank">
+      <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
+      Instagram
+    </a>
+
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>© 2026 Jay Jabiru &nbsp;·&nbsp; All rights reserved &nbsp;·&nbsp; <a href="impressum.html">Impressum</a></p>
+</footer>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <span class="lightbox-close">✕</span>
+  <img id="lightbox-img" src="" alt="">
+</div>
+
+<script>
+  function openLightbox(src) {
+    document.getElementById('lightbox-img').src = src;
+    document.getElementById('lightbox').classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeLightbox() {
+    document.getElementById('lightbox').classList.remove('active');
+    document.body.style.overflow = '';
+  }
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+
+  // Fade in sections on scroll
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.style.opacity = '1';
+        entry.target.style.transform = 'translateY(0)';
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('section:not(#hero)').forEach(section => {
+    section.style.opacity = '0';
+    section.style.transform = 'translateY(30px)';
+    section.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+    observer.observe(section);
+  });
+</script>
+
+</body>
+</html>

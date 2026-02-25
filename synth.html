@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Synth REC — Jay Jabiru</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Share+Tech+Mono&family=Raleway:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --deep: #07080f;
+      --panel: #0d0f1c;
+      --panel2: #111428;
+      --border: rgba(74,127,255,0.2);
+      --accent: #4a7fff;
+      --glow: #6fa3ff;
+      --gold: #c8a84b;
+      --red: #ff4a4a;
+      --green: #4aff8a;
+      --white: #e8ecff;
+      --muted: #5a6080;
+      --mono: 'Share Tech Mono', monospace;
+    }
+
+    body {
+      background: var(--deep);
+      color: var(--white);
+      font-family: 'Raleway', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* SCANLINE EFFECT */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0,0,0,0.03) 2px,
+        rgba(0,0,0,0.03) 4px
+      );
+      pointer-events: none;
+      z-index: 1000;
+    }
+
+    /* NAV */
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      border-bottom: 1px solid var(--border);
+      background: rgba(7,8,15,0.95);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    nav a {
+      color: var(--muted);
+      text-decoration: none;
+      font-family: 'Cinzel', serif;
+      font-size: 0.65rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      transition: color 0.3s;
+    }
+
+    nav a:hover { color: var(--accent); }
+
+    nav img { height: 36px; filter: drop-shadow(0 0 6px rgba(74,127,255,0.4)); }
+
+    /* MAIN CONTAINER */
+    .studio {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem 4rem;
+    }
+
+    .studio-title {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .studio-title h1 {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(1.5rem, 4vw, 2.5rem);
+      letter-spacing: 0.3em;
+      background: linear-gradient(135deg, var(--white), var(--glow), var(--gold));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .studio-title p {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      color: var(--muted);
+      letter-spacing: 0.2em;
+      margin-top: 0.4rem;
+    }
+
+    /* PANEL */
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      padding: 1.5rem;
+      margin-bottom: 1.2rem;
+      position: relative;
+    }
+
+    .panel-label {
+      font-family: var(--mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.3em;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .panel-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* SYNTH SELECTOR */
+    .synth-selector {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .synth-btn {
+      padding: 0.5rem 1.2rem;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .synth-btn.active {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: rgba(74,127,255,0.1);
+      box-shadow: 0 0 10px rgba(74,127,255,0.2);
+    }
+
+    .synth-btn:hover:not(.active) {
+      border-color: rgba(74,127,255,0.4);
+      color: var(--white);
+    }
+
+    /* KEYBOARD */
+    .keyboard-wrap {
+      overflow-x: auto;
+      padding-bottom: 0.5rem;
+    }
+
+    .keyboard {
+      display: flex;
+      position: relative;
+      height: 140px;
+      width: fit-content;
+      margin: 0 auto;
+      gap: 3px;
+    }
+
+    .key {
+      position: relative;
+      cursor: pointer;
+      border-radius: 0 0 4px 4px;
+      transition: all 0.08s;
+      user-select: none;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: center;
+      padding-bottom: 8px;
+    }
+
+    .key.white {
+      width: 48px;
+      height: 140px;
+      background: linear-gradient(to bottom, #d0d8f0, #e8ecff);
+      border: 1px solid #8899cc;
+      color: #334;
+      font-family: var(--mono);
+      font-size: 0.55rem;
+    }
+
+    .key.white:hover, .key.white.active {
+      background: linear-gradient(to bottom, var(--accent), var(--glow));
+      color: var(--deep);
+      box-shadow: 0 4px 20px rgba(74,127,255,0.6);
+      transform: translateY(2px);
+    }
+
+    .key.black {
+      width: 32px;
+      height: 88px;
+      background: linear-gradient(to bottom, #1a1e35, #0d0f1c);
+      border: 1px solid #334;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 0.45rem;
+      margin-left: -18px;
+      margin-right: -18px;
+      z-index: 2;
+    }
+
+    .key.black:hover, .key.black.active {
+      background: linear-gradient(to bottom, var(--accent), #1a2a5e);
+      color: var(--white);
+      box-shadow: 0 4px 15px rgba(74,127,255,0.5);
+      transform: translateY(2px);
+    }
+
+    .key .note-label {
+      font-size: 0.5rem;
+      opacity: 0.7;
+    }
+
+    .key .key-binding {
+      font-size: 0.45rem;
+      opacity: 0.5;
+      margin-top: 2px;
+    }
+
+    /* VOLUME */
+    .controls-row {
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-top: 1rem;
+    }
+
+    .vol-control {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+
+    .vol-label {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      min-width: 60px;
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      width: 120px;
+      height: 3px;
+      background: var(--border);
+      outline: none;
+      border-radius: 2px;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 14px;
+      height: 14px;
+      background: var(--accent);
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 0 8px rgba(74,127,255,0.5);
+    }
+
+    .vol-value {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      color: var(--accent);
+      min-width: 35px;
+    }
+
+    /* BEAT MACHINE */
+    .beat-grid {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .beat-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.4rem;
+      cursor: pointer;
+      background: none;
+      border: none;
+    }
+
+    .beat-pad {
+      width: 70px;
+      height: 70px;
+      border: 1px solid var(--border);
+      background: var(--panel2);
+      border-radius: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      color: var(--muted);
+      transition: all 0.08s;
+      cursor: pointer;
+      user-select: none;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+
+    .beat-pad:hover {
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+
+    .beat-pad.active {
+      background: rgba(200,168,75,0.15);
+      border-color: var(--gold);
+      color: var(--gold);
+      box-shadow: 0 0 15px rgba(200,168,75,0.3);
+      transform: scale(0.96);
+    }
+
+    .beat-pad .pad-key {
+      font-size: 0.5rem;
+      opacity: 0.5;
+    }
+
+    .beat-pad .pad-name {
+      font-size: 0.65rem;
+    }
+
+    /* RECORDING */
+    .rec-controls {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .rec-btn {
+      padding: 0.6rem 1.4rem;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .rec-btn:hover { border-color: var(--accent); color: var(--white); }
+
+    .rec-btn.recording {
+      border-color: var(--red);
+      color: var(--red);
+      background: rgba(255,74,74,0.1);
+      animation: recpulse 1s ease-in-out infinite;
+    }
+
+    @keyframes recpulse {
+      0%, 100% { box-shadow: 0 0 5px rgba(255,74,74,0.3); }
+      50% { box-shadow: 0 0 15px rgba(255,74,74,0.6); }
+    }
+
+    .rec-btn.has-recording {
+      border-color: var(--green);
+      color: var(--green);
+    }
+
+    .rec-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    .rec-status {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      color: var(--muted);
+    }
+
+    .rec-status.recording { color: var(--red); }
+    .rec-status.ready { color: var(--green); }
+
+    /* VU METER */
+    .vu-meter {
+      display: flex;
+      gap: 2px;
+      align-items: flex-end;
+      height: 30px;
+    }
+
+    .vu-bar {
+      width: 4px;
+      background: var(--border);
+      border-radius: 1px;
+      transition: height 0.1s;
+    }
+
+    /* CREDITS */
+    .credits {
+      margin-top: 2rem;
+      padding: 1rem 1.5rem;
+      border: 1px solid rgba(200,168,75,0.15);
+      background: rgba(200,168,75,0.03);
+    }
+
+    .credits p {
+      font-family: var(--mono);
+      font-size: 0.6rem;
+      color: var(--muted);
+      line-height: 1.8;
+      letter-spacing: 0.05em;
+    }
+
+    .credits p strong {
+      color: var(--gold);
+    }
+
+    /* KEYBOARD HINT */
+    .kb-hint {
+      font-family: var(--mono);
+      font-size: 0.6rem;
+      color: var(--muted);
+      text-align: center;
+      margin-top: 0.8rem;
+      letter-spacing: 0.1em;
+    }
+
+    kbd {
+      display: inline-block;
+      padding: 1px 5px;
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      font-family: var(--mono);
+      font-size: 0.55rem;
+      color: var(--accent);
+      background: rgba(74,127,255,0.05);
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html">← Back</a>
+  <a href="index.html"><img src="logo.png" alt="Jay Jabiru"></a>
+  <a href="index.html">jayjabiru.com</a>
+</nav>
+
+<div class="studio">
+
+  <div class="studio-title">
+    <h1>Synth REC</h1>
+    <p>Jay Jabiru · Sound Laboratory · PSS-560 Series</p>
+  </div>
+
+  <!-- SYNTH PANEL -->
+  <div class="panel">
+    <div class="panel-label">Synthesizer</div>
+
+    <div class="synth-selector">
+      <span style="font-family:var(--mono);font-size:0.65rem;color:var(--muted);letter-spacing:0.1em;">SOUND:</span>
+      <button class="synth-btn active" id="btn-synth1" onclick="selectSynth(1)">WOBBLY A — SYNTH 1</button>
+      <button class="synth-btn" id="btn-synth2" onclick="selectSynth(2)">WOBBLY A3 — SYNTH 2</button>
+    </div>
+
+    <div class="keyboard-wrap">
+      <div class="keyboard" id="keyboard"></div>
+    </div>
+
+    <div class="kb-hint">
+      Computer keys: <kbd>A</kbd><kbd>W</kbd><kbd>S</kbd><kbd>E</kbd><kbd>D</kbd><kbd>F</kbd><kbd>T</kbd><kbd>G</kbd><kbd>Y</kbd><kbd>H</kbd><kbd>U</kbd><kbd>J</kbd><kbd>K</kbd>
+      &nbsp;|&nbsp; Beat: <kbd>8</kbd> Bass &nbsp;<kbd>9</kbd> Tom &nbsp;<kbd>0</kbd> Shaker
+    </div>
+
+    <div class="controls-row">
+      <div class="vol-control">
+        <span class="vol-label">SYNTH VOL</span>
+        <input type="range" id="synth-vol" min="0" max="100" value="75" oninput="updateVol('synth', this.value)">
+        <span class="vol-value" id="synth-vol-val">75</span>
+      </div>
+      <div class="vu-meter" id="vu-synth">
+        <div class="vu-bar" style="height:8px;background:var(--accent)"></div>
+        <div class="vu-bar" style="height:12px;background:var(--accent)"></div>
+        <div class="vu-bar" style="height:6px;background:var(--accent)"></div>
+        <div class="vu-bar" style="height:14px;background:var(--accent)"></div>
+        <div class="vu-bar" style="height:5px;background:var(--accent)"></div>
+        <div class="vu-bar" style="height:10px;background:var(--accent)"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BEAT MACHINE -->
+  <div class="panel">
+    <div class="panel-label">Beat Machine</div>
+    <div class="beat-grid">
+
+      <div class="beat-pad" id="pad-bass" onmousedown="triggerBeat('bass')" ontouchstart="triggerBeat('bass')">
+        <span class="pad-name">BASS</span>
+        <span class="pad-key">key: 8</span>
+      </div>
+
+      <div class="beat-pad" id="pad-tom" onmousedown="triggerBeat('tom')" ontouchstart="triggerBeat('tom')">
+        <span class="pad-name">TOM</span>
+        <span class="pad-key">key: 9</span>
+      </div>
+
+      <div class="beat-pad" id="pad-shaker" onmousedown="triggerBeat('shaker')" ontouchstart="triggerBeat('shaker')">
+        <span class="pad-name">SHAKER</span>
+        <span class="pad-key">key: 0</span>
+      </div>
+
+      <div class="vol-control" style="margin-left:1rem;">
+        <span class="vol-label">BEAT VOL</span>
+        <input type="range" id="beat-vol" min="0" max="100" value="80" oninput="updateVol('beat', this.value)">
+        <span class="vol-value" id="beat-vol-val">80</span>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- RECORDING -->
+  <div class="panel">
+    <div class="panel-label">Recording</div>
+    <div class="rec-controls">
+      <button class="rec-btn" id="rec-btn" onclick="toggleRecord()">
+        <div class="rec-dot"></div>
+        <span id="rec-btn-text">RECORD</span>
+      </button>
+      <button class="rec-btn" id="play-btn" onclick="playRecording()" style="display:none;">
+        ▶ PLAY
+      </button>
+      <button class="rec-btn" id="dl-btn" onclick="downloadRecording()" style="display:none;">
+        ↓ DOWNLOAD
+      </button>
+      <button class="rec-btn" id="clear-btn" onclick="clearRecording()" style="display:none;">
+        ✕ CLEAR
+      </button>
+      <span class="rec-status" id="rec-status">Ready</span>
+    </div>
+  </div>
+
+  <!-- CREDITS -->
+  <div class="credits">
+    <p>
+      <strong>Sound Sources — Creative Commons 0 (CC0) — No rights reserved</strong><br>
+      All sounds may be freely used, modified and distributed for any purpose including commercial use.<br><br>
+      <strong>Wobbly Note Single A PSS560 & Boss Chorus</strong> — by Crabflag · freesound.org/people/Crabflag · CC0<br>
+      <strong>Wobbly Note3 Single A PSS560 & Boss Chorus</strong> — by Crabflag · freesound.org/people/Crabflag · CC0<br>
+      <strong>FATTER Bass Stab Single C Mono PSS560</strong> — by Crabflag · freesound.org/people/Crabflag · CC0<br>
+      <strong>PSS560 TOM 3</strong> — by Crabflag · freesound.org/people/Crabflag · CC0<br>
+      <strong>PSS560 Shaker</strong> — by Crabflag · freesound.org/people/Crabflag · CC0<br><br>
+      Instrument: <strong>Yamaha PSS-560 Digital Synthesizer</strong>
+    </p>
+  </div>
+
+</div>
+
+<script>
+// ============================================================
+// AUDIO CONTEXT
+// ============================================================
+let audioCtx = null;
+let synthVol = 0.75;
+let beatVol = 0.80;
+let currentSynth = 1;
+let isRecording = false;
+let mediaRecorder = null;
+let recordedChunks = [];
+let recordingBlob = null;
+let destination = null;
+
+function getCtx() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    destination = audioCtx.createMediaStreamDestination();
+  }
+  return audioCtx;
+}
+
+// ============================================================
+// SOUND BUFFERS
+// ============================================================
+const buffers = {};
+const soundFiles = {
+  synth1: 'WobblyNote_SingleA.wav',
+  synth2: 'WobblyNote3_SingleA.wav',
+  bass:   'FATTER_bass_stab_C.wav',
+  tom:    'PSS560_TOM_3.wav',
+  shaker: 'PSS560_Shaker.wav'
+};
+
+async function loadSound(name, file) {
+  try {
+    const ctx = getCtx();
+    const response = await fetch(file);
+    const arrayBuffer = await response.arrayBuffer();
+    buffers[name] = await ctx.decodeAudioData(arrayBuffer);
+  } catch(e) {
+    console.warn('Could not load', file, e);
+  }
+}
+
+async function loadAll() {
+  getCtx();
+  for (const [name, file] of Object.entries(soundFiles)) {
+    await loadSound(name, file);
+  }
+}
+
+// ============================================================
+// NOTE PLAYBACK — pitch shift via playbackRate
+// ============================================================
+// 13 semitones from C4 to C5
+// Base note is A4 (semitone index 9 in C major scale)
+// A4 = 440Hz. Each semitone = multiply by 2^(1/12)
+
+const notes = [
+  { note: 'C',  semitone: 0,  black: false, key: 'a' },
+  { note: 'C#', semitone: 1,  black: true,  key: 'w' },
+  { note: 'D',  semitone: 2,  black: false, key: 's' },
+  { note: 'D#', semitone: 3,  black: true,  key: 'e' },
+  { note: 'E',  semitone: 4,  black: false, key: 'd' },
+  { note: 'F',  semitone: 5,  black: false, key: 'f' },
+  { note: 'F#', semitone: 6,  black: true,  key: 't' },
+  { note: 'G',  semitone: 7,  black: false, key: 'g' },
+  { note: 'G#', semitone: 8,  black: true,  key: 'y' },
+  { note: 'A',  semitone: 9,  black: false, key: 'h' },
+  { note: 'A#', semitone: 10, black: true,  key: 'u' },
+  { note: 'B',  semitone: 11, black: false, key: 'j' },
+  { note: 'C2', semitone: 12, black: false, key: 'k' },
+];
+
+// Base note of our sample is A4 = semitone 9
+const BASE_SEMITONE = 9;
+
+function playNote(semitone) {
+  const ctx = getCtx();
+  const bufName = currentSynth === 1 ? 'synth1' : 'synth2';
+  const buf = buffers[bufName];
+  if (!buf) return;
+
+  const diff = semitone - BASE_SEMITONE;
+  const rate = Math.pow(2, diff / 12);
+
+  const source = ctx.createBufferSource();
+  source.buffer = buf;
+  source.playbackRate.value = rate;
+
+  const gainNode = ctx.createGain();
+  gainNode.gain.value = synthVol;
+
+  source.connect(gainNode);
+  gainNode.connect(ctx.destination);
+  if (destination) gainNode.connect(destination);
+
+  source.start();
+
+  // VU animation
+  animateVU();
+}
+
+function triggerBeat(type) {
+  const ctx = getCtx();
+  const buf = buffers[type];
+  if (!buf) return;
+
+  const source = ctx.createBufferSource();
+  source.buffer = buf;
+
+  const gainNode = ctx.createGain();
+  gainNode.gain.value = beatVol;
+
+  source.connect(gainNode);
+  gainNode.connect(ctx.destination);
+  if (destination) gainNode.connect(destination);
+
+  source.start();
+
+  // Visual flash
+  const pad = document.getElementById('pad-' + type);
+  if (pad) {
+    pad.classList.add('active');
+    setTimeout(() => pad.classList.remove('active'), 150);
+  }
+}
+
+// ============================================================
+// KEYBOARD BUILD
+// ============================================================
+function buildKeyboard() {
+  const kb = document.getElementById('keyboard');
+  kb.innerHTML = '';
+
+  notes.forEach((n, i) => {
+    const key = document.createElement('div');
+    key.className = 'key ' + (n.black ? 'black' : 'white');
+    key.dataset.semitone = n.semitone;
+    key.dataset.index = i;
+    key.innerHTML = `<span class="note-label">${n.note}</span><span class="key-binding">${n.key.toUpperCase()}</span>`;
+
+    key.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      playNote(n.semitone);
+      key.classList.add('active');
+    });
+    key.addEventListener('mouseup', () => key.classList.remove('active'));
+    key.addEventListener('mouseleave', () => key.classList.remove('active'));
+    key.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      playNote(n.semitone);
+      key.classList.add('active');
+    });
+    key.addEventListener('touchend', () => key.classList.remove('active'));
+
+    kb.appendChild(key);
+  });
+}
+
+// ============================================================
+// KEYBOARD INPUT
+// ============================================================
+const keyMap = {};
+notes.forEach(n => { keyMap[n.key] = n.semitone; });
+
+const beatKeys = { '8': 'bass', '9': 'tom', '0': 'shaker' };
+const activeKeys = new Set();
+
+document.addEventListener('keydown', (e) => {
+  if (e.repeat) return;
+  const k = e.key.toLowerCase();
+
+  if (keyMap[k] !== undefined) {
+    activeKeys.add(k);
+    playNote(keyMap[k]);
+    // Visual
+    const idx = notes.findIndex(n => n.key === k);
+    if (idx >= 0) {
+      const keys = document.querySelectorAll('.key');
+      keys[idx]?.classList.add('active');
+    }
+  }
+
+  if (beatKeys[e.key]) {
+    triggerBeat(beatKeys[e.key]);
+  }
+});
+
+document.addEventListener('keyup', (e) => {
+  const k = e.key.toLowerCase();
+  activeKeys.delete(k);
+  const idx = notes.findIndex(n => n.key === k);
+  if (idx >= 0) {
+    const keys = document.querySelectorAll('.key');
+    keys[idx]?.classList.remove('active');
+  }
+});
+
+// ============================================================
+// SYNTH SELECT
+// ============================================================
+function selectSynth(n) {
+  currentSynth = n;
+  document.getElementById('btn-synth1').classList.toggle('active', n === 1);
+  document.getElementById('btn-synth2').classList.toggle('active', n === 2);
+}
+
+// ============================================================
+// VOLUME
+// ============================================================
+function updateVol(type, val) {
+  const v = val / 100;
+  if (type === 'synth') {
+    synthVol = v;
+    document.getElementById('synth-vol-val').textContent = val;
+  } else {
+    beatVol = v;
+    document.getElementById('beat-vol-val').textContent = val;
+  }
+}
+
+// ============================================================
+// VU METER ANIMATION
+// ============================================================
+function animateVU() {
+  const bars = document.querySelectorAll('#vu-synth .vu-bar');
+  bars.forEach(bar => {
+    const h = Math.floor(Math.random() * 25) + 5;
+    bar.style.height = h + 'px';
+    bar.style.background = h > 20 ? 'var(--gold)' : 'var(--accent)';
+  });
+  setTimeout(() => {
+    bars.forEach(bar => {
+      bar.style.height = Math.floor(Math.random() * 8 + 3) + 'px';
+      bar.style.background = 'var(--accent)';
+    });
+  }, 200);
+}
+
+// ============================================================
+// RECORDING
+// ============================================================
+function toggleRecord() {
+  if (!isRecording) {
+    startRecording();
+  } else {
+    stopRecording();
+  }
+}
+
+function startRecording() {
+  getCtx();
+  if (!destination) return;
+
+  recordedChunks = [];
+  const stream = destination.stream;
+  mediaRecorder = new MediaRecorder(stream);
+
+  mediaRecorder.ondataavailable = (e) => {
+    if (e.data.size > 0) recordedChunks.push(e.data);
+  };
+
+  mediaRecorder.onstop = () => {
+    recordingBlob = new Blob(recordedChunks, { type: 'audio/webm' });
+    document.getElementById('play-btn').style.display = '';
+    document.getElementById('dl-btn').style.display = '';
+    document.getElementById('clear-btn').style.display = '';
+    document.getElementById('rec-status').textContent = 'Recording ready';
+    document.getElementById('rec-status').className = 'rec-status ready';
+  };
+
+  mediaRecorder.start();
+  isRecording = true;
+
+  const btn = document.getElementById('rec-btn');
+  btn.classList.add('recording');
+  document.getElementById('rec-btn-text').textContent = 'STOP';
+  document.getElementById('rec-status').textContent = '● Recording...';
+  document.getElementById('rec-status').className = 'rec-status recording';
+}
+
+function stopRecording() {
+  if (mediaRecorder && isRecording) {
+    mediaRecorder.stop();
+    isRecording = false;
+    const btn = document.getElementById('rec-btn');
+    btn.classList.remove('recording');
+    document.getElementById('rec-btn-text').textContent = 'RECORD';
+  }
+}
+
+function playRecording() {
+  if (!recordingBlob) return;
+  const url = URL.createObjectURL(recordingBlob);
+  const audio = new Audio(url);
+  audio.play();
+}
+
+function downloadRecording() {
+  if (!recordingBlob) return;
+  const url = URL.createObjectURL(recordingBlob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'jayjabiru-recording.webm';
+  a.click();
+}
+
+function clearRecording() {
+  recordingBlob = null;
+  recordedChunks = [];
+  document.getElementById('play-btn').style.display = 'none';
+  document.getElementById('dl-btn').style.display = 'none';
+  document.getElementById('clear-btn').style.display = 'none';
+  document.getElementById('rec-status').textContent = 'Ready';
+  document.getElementById('rec-status').className = 'rec-status';
+}
+
+// ============================================================
+// INIT
+// ============================================================
+buildKeyboard();
+loadAll();
+</script>
+
+</body>
+</html>

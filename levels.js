@@ -68,7 +68,6 @@ const LEVELS = [
   null,
 
   // ── LEVEL 6 ── DINNER PARTY ── 7/10 ──────────────────────────────────────
-  // Designed by Jay Jabiru via sokobanonline.com
   {
     name: "Dinner Party",
     description: "Today is a bit more relaxed... they said. It's a business dinner and a dissident of the Galactic Empire came. My boss said 'don't worry'. He also said 'clean the kitchen right now and bring everything to order‼'",
@@ -94,8 +93,20 @@ const LEVELS = [
   // ── LEVEL 9 ── (SLOT RESERVED) ────────────────────────────────────────────
   null,
 
-  // ── LEVEL 10 ── (SLOT RESERVED) ───────────────────────────────────────────
-  null,
+  // ── LEVEL 10 ── ESCAPE THE TRAP ───────────────────────────────────────────
+  {
+    name: "Escape the Trap",
+    description: "Heck. I must be on their ship. They have put me to sleep somehow. Time to plan my escape.",
+    map:
+`#########
+#.. $ #
+#$$ .$.#
+#@$ $.$.#
+#.$ $$ #
+#$ .... #
+#. $ ####
+######`
+  },
 
 ];
 

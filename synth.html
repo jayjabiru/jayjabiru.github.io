@@ -488,6 +488,9 @@
       <span style="font-family:var(--mono);font-size:0.65rem;color:var(--muted);letter-spacing:0.1em;">SOUND:</span>
       <button class="synth-btn active" id="btn-synth1" onclick="selectSynth(1)">WOBBLY A — SYNTH 1</button>
       <button class="synth-btn" id="btn-synth2" onclick="selectSynth(2)">WOBBLY A3 — SYNTH 2</button>
+      <span style="font-family:var(--mono);font-size:0.65rem;color:var(--muted);letter-spacing:0.1em;margin-left:1rem;">MODE:</span>
+      <button class="synth-btn" id="btn-loop" onclick="toggleLoop()" title="Loop note continuously while key held">⟳ LOOP</button>
+      <button class="synth-btn" id="btn-hold" onclick="toggleHold()" title="Press once to hold note, press again to release">⏸ HOLD</button>
     </div>
 
     <div class="keyboard-wrap">
@@ -660,11 +663,52 @@ const notes = [
 // Base note of our sample is A4 = semitone 9
 const BASE_SEMITONE = 9;
 
+let loopMode = false;
+let holdMode = false;
+const heldNotes = {}; // semitone -> { source, gain }
+
+function toggleLoop() {
+  loopMode = !loopMode;
+  document.getElementById('btn-loop').classList.toggle('active', loopMode);
+}
+
+function toggleHold() {
+  holdMode = !holdMode;
+  document.getElementById('btn-hold').classList.toggle('active', holdMode);
+  if (!holdMode) stopAllHeld();
+}
+
+function stopAllHeld() {
+  Object.keys(heldNotes).forEach(s => stopNote(parseInt(s)));
+}
+
+function stopNote(semitone) {
+  if (heldNotes[semitone]) {
+    try {
+      heldNotes[semitone].gain.gain.setTargetAtTime(0, getCtx().currentTime, 0.05);
+      setTimeout(() => {
+        try { heldNotes[semitone]?.source.stop(); } catch(e) {}
+        delete heldNotes[semitone];
+      }, 150);
+    } catch(e) {
+      delete heldNotes[semitone];
+    }
+  }
+}
+
 function playNote(semitone) {
   const ctx = getCtx();
   const bufName = currentSynth === 1 ? 'synth1' : 'synth2';
   const buf = buffers[bufName];
   if (!buf) return;
+
+  // HOLD MODE: toggle note on/off
+  if (holdMode) {
+    if (heldNotes[semitone]) {
+      stopNote(semitone);
+      return;
+    }
+  }
 
   const diff = semitone - BASE_SEMITONE;
   const rate = Math.pow(2, diff / 12);
@@ -672,6 +716,7 @@ function playNote(semitone) {
   const source = ctx.createBufferSource();
   source.buffer = buf;
   source.playbackRate.value = rate;
+  source.loop = loopMode;
 
   const gainNode = ctx.createGain();
   gainNode.gain.value = synthVol;
@@ -682,8 +727,18 @@ function playNote(semitone) {
 
   source.start();
 
-  // VU animation
+  if (holdMode || loopMode) {
+    heldNotes[semitone] = { source, gain: gainNode };
+  }
+
   animateVU();
+}
+
+function releaseNote(semitone) {
+  // Only release if NOT in hold mode
+  if (!holdMode && loopMode && heldNotes[semitone]) {
+    stopNote(semitone);
+  }
 }
 
 function triggerBeat(type) {
@@ -730,14 +785,14 @@ function buildKeyboard() {
       playNote(n.semitone);
       key.classList.add('active');
     });
-    key.addEventListener('mouseup', () => key.classList.remove('active'));
-    key.addEventListener('mouseleave', () => key.classList.remove('active'));
+    key.addEventListener('mouseup', () => { releaseNote(n.semitone); key.classList.remove('active'); });
+    key.addEventListener('mouseleave', () => { releaseNote(n.semitone); key.classList.remove('active'); });
     key.addEventListener('touchstart', (e) => {
       e.preventDefault();
       playNote(n.semitone);
       key.classList.add('active');
     });
-    key.addEventListener('touchend', () => key.classList.remove('active'));
+    key.addEventListener('touchend', () => { releaseNote(n.semitone); key.classList.remove('active'); });
 
     kb.appendChild(key);
   });
@@ -777,6 +832,7 @@ document.addEventListener('keyup', (e) => {
   activeKeys.delete(k);
   const idx = notes.findIndex(n => n.key === k);
   if (idx >= 0) {
+    releaseNote(notes[idx].semitone);
     const keys = document.querySelectorAll('.key');
     keys[idx]?.classList.remove('active');
   }

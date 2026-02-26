@@ -69,6 +69,32 @@
       filter: drop-shadow(0 0 8px rgba(74,127,255,0.5));
     }
 
+    .logo-nav {
+      position: relative;
+    }
+
+    .visitor-badge {
+      position: absolute;
+      bottom: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(10,10,20,0.95);
+      border: 1px solid rgba(74,127,255,0.3);
+      color: var(--muted);
+      font-family: 'Cinzel', serif;
+      font-size: 0.5rem;
+      letter-spacing: 0.15em;
+      padding: 2px 8px;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+
+    .logo-nav:hover .visitor-badge {
+      opacity: 1;
+    }
+
     nav ul {
       list-style: none;
       display: flex;
@@ -305,6 +331,58 @@
       opacity: 0.8;
     }
 
+    .custom-player {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      margin-top: 1.2rem;
+      user-select: none;
+    }
+
+    .play-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 1px solid var(--accent);
+      background: transparent;
+      color: var(--accent);
+      cursor: pointer;
+      font-size: 0.8rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: all 0.2s;
+    }
+
+    .play-btn:hover { background: rgba(74,127,255,0.15); }
+    .play-btn.playing { border-color: var(--gold); color: var(--gold); }
+
+    .progress-bar {
+      flex: 1;
+      height: 3px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 2px;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 2px;
+      width: 0%;
+      transition: width 0.5s linear;
+      pointer-events: none;
+    }
+
+    .time-display {
+      font-family: 'Cinzel', serif;
+      font-size: 0.6rem;
+      color: var(--muted);
+      min-width: 30px;
+    }
+
     .track-note {
       font-size: 0.8rem;
       color: var(--muted);
@@ -523,6 +601,7 @@
 <nav>
   <a class="logo-nav" href="#hero">
     <img src="logo.png" alt="Jay Jabiru">
+    <div class="visitor-badge" id="visitor-badge">—</div>
   </a>
   <ul>
     <li><a href="#music">Music</a></li>
@@ -558,20 +637,20 @@
 
     <div class="track-card">
       <div class="track-title">Are You for Real?</div>
-      <p class="track-note">Upload your .wav file to hear it here</p>
-      <audio controls>
-        <source src="are-you-for-real.mp3" type="audio/mpeg">
-        Your browser does not support audio.
-      </audio>
+      <div class="custom-player" id="player-1" data-src="are-you-for-real.mp3">
+        <button class="play-btn" onclick="toggleTrack('player-1')">▶</button>
+        <div class="progress-bar"><div class="progress-fill" id="fill-1"></div></div>
+        <span class="time-display" id="time-1">0:00</span>
+      </div>
     </div>
 
     <div class="track-card">
       <div class="track-title">Warp Closer [Remix]</div>
-      <p class="track-note">Upload your .wav file to hear it here</p>
-      <audio controls>
-        <source src="warp-closer-remix.mp3" type="audio/mpeg">
-        Your browser does not support audio.
-      </audio>
+      <div class="custom-player" id="player-2" data-src="warp-closer-remix.mp3">
+        <button class="play-btn" onclick="toggleTrack('player-2')">▶</button>
+        <div class="progress-bar"><div class="progress-fill" id="fill-2"></div></div>
+        <span class="time-display" id="time-2">0:00</span>
+      </div>
     </div>
 
   </div>
@@ -750,12 +829,93 @@ the day's last rays' glow of fire.</div>
     });
   }, { threshold: 0.1 });
 
+  // Visitor counter (localStorage — unique per browser)
+  try {
+    const key = 'jj_visited';
+    const countKey = 'jj_count';
+    let count = parseInt(localStorage.getItem(countKey) || '0');
+    if (!localStorage.getItem(key)) {
+      count++;
+      localStorage.setItem(key, '1');
+      localStorage.setItem(countKey, count);
+    }
+    document.getElementById('visitor-badge').textContent = count;
+  } catch(e) {}
+
   document.querySelectorAll('section:not(#hero)').forEach(section => {
     section.style.opacity = '0';
     section.style.transform = 'translateY(30px)';
     section.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
     observer.observe(section);
   });
+
+  // ── CUSTOM AUDIO PLAYERS (no download button) ──
+  const players = {};
+
+  function toggleTrack(id) {
+    const el = document.getElementById(id);
+    const src = el.dataset.src;
+
+    // Stop all other players
+    Object.keys(players).forEach(pid => {
+      if (pid !== id && players[pid]) {
+        players[pid].pause();
+        players[pid].currentTime = 0;
+        document.querySelector('#' + pid + ' .play-btn').textContent = '▶';
+        document.querySelector('#' + pid + ' .play-btn').classList.remove('playing');
+        document.querySelector('#' + pid + ' .progress-fill').style.width = '0%';
+      }
+    });
+
+    if (!players[id]) {
+      players[id] = new Audio(src);
+      // Prevent right-click save
+      players[id].oncontextmenu = () => false;
+
+      players[id].addEventListener('timeupdate', () => {
+        const pct = (players[id].currentTime / players[id].duration) * 100 || 0;
+        const fillId = id.replace('player-', 'fill-');
+        const timeId = id.replace('player-', 'time-');
+        document.getElementById(fillId).style.width = pct + '%';
+        const s = Math.floor(players[id].currentTime);
+        document.getElementById(timeId).textContent = Math.floor(s/60) + ':' + String(s%60).padStart(2,'0');
+      });
+
+      players[id].addEventListener('ended', () => {
+        document.querySelector('#' + id + ' .play-btn').textContent = '▶';
+        document.querySelector('#' + id + ' .play-btn').classList.remove('playing');
+        document.getElementById(id.replace('player-','fill-')).style.width = '0%';
+      });
+    }
+
+    const btn = document.querySelector('#' + id + ' .play-btn');
+    if (players[id].paused) {
+      players[id].play();
+      btn.textContent = '❚❚';
+      btn.classList.add('playing');
+    } else {
+      players[id].pause();
+      btn.textContent = '▶';
+      btn.classList.remove('playing');
+    }
+  }
+
+  // Progress bar click to seek
+  document.querySelectorAll('.progress-bar').forEach(bar => {
+    bar.addEventListener('click', (e) => {
+      const id = bar.closest('.custom-player').id;
+      if (players[id] && players[id].duration) {
+        const ratio = e.offsetX / bar.offsetWidth;
+        players[id].currentTime = ratio * players[id].duration;
+      }
+    });
+  });
+
+  // Block right-click on track cards
+  document.querySelectorAll('.track-card').forEach(card => {
+    card.addEventListener('contextmenu', e => e.preventDefault());
+  });
+
 </script>
 
 </body>

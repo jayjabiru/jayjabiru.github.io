@@ -291,6 +291,15 @@
     .mute-btn:hover { border-color: var(--gold); color: var(--gold); }
     .mute-btn.muted { color: var(--gold); border-color: var(--gold); }
 
+    #music-vol::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 12px; height: 12px;
+      background: var(--blue);
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 0 6px var(--blue-glow);
+    }
+
     .panel-close {
       font-size: 0.8rem;
       color: var(--muted);
@@ -492,6 +501,8 @@
 <canvas id="stars-canvas"></canvas>
 <audio id="track1" preload="auto" src="stellar1.mp3"></audio>
 <audio id="track2" preload="auto" src="stellar2.mp3"></audio>
+<audio id="track3" preload="auto" src="stellar3.mp3"></audio>
+<audio id="track4" preload="auto" src="stellar4.mp3"></audio>
 
 <div id="app">
 
@@ -535,6 +546,14 @@
     <div id="music-panel">
       <button class="track-btn" id="play-track1">🎵 Stellar 1</button>
       <button class="track-btn" id="play-track2">🎵 Stellar 2</button>
+      <button class="track-btn" id="play-track3">🎵 Stellar 3</button>
+      <button class="track-btn" id="play-track4">🎵 Stellar 4</button>
+      <div style="display:flex;align-items:center;gap:6px;border-left:1px solid rgba(74,127,255,0.2);padding-left:8px;">
+        <span style="font-size:0.65rem;color:var(--muted);">VOL</span>
+        <input type="range" id="music-vol" min="0" max="100" value="40"
+          style="-webkit-appearance:none;width:80px;height:3px;background:rgba(74,127,255,0.3);outline:none;border-radius:2px;cursor:pointer;"
+          oninput="setMusicVolume(this.value)">
+      </div>
       <button class="mute-btn" id="mute-btn">🔊</button>
       <span class="panel-close" id="panel-close">✕</span>
     </div>
@@ -629,38 +648,51 @@
 // ═══════════════════════════════════════════════
 const track1El = document.getElementById('track1');
 const track2El = document.getElementById('track2');
-const musicToggle  = document.getElementById('music-toggle');
-const musicPanel   = document.getElementById('music-panel');
-const muteBtn      = document.getElementById('mute-btn');
-const playTrack1Btn = document.getElementById('play-track1');
-const playTrack2Btn = document.getElementById('play-track2');
-const panelClose   = document.getElementById('panel-close');
+const track3El = document.getElementById('track3');
+const track4El = document.getElementById('track4');
+const musicToggle    = document.getElementById('music-toggle');
+const musicPanel     = document.getElementById('music-panel');
+const muteBtn        = document.getElementById('mute-btn');
+const playTrack1Btn  = document.getElementById('play-track1');
+const playTrack2Btn  = document.getElementById('play-track2');
+const playTrack3Btn  = document.getElementById('play-track3');
+const playTrack4Btn  = document.getElementById('play-track4');
+const panelClose     = document.getElementById('panel-close');
 
 let currentTrack = null;
 let muted = false;
 let panelOpen = false;
+let musicVolume = 0.4;
+
+function setMusicVolume(val) {
+  musicVolume = val / 100;
+  tracks.forEach(t => { t.el.volume = muted ? 0 : musicVolume; });
+}
 
 function stopAll() {
-  track1El.pause(); track1El.currentTime = 0;
-  track2El.pause(); track2El.currentTime = 0;
-  playTrack1Btn.classList.remove('playing');
-  playTrack2Btn.classList.remove('playing');
+  tracks.forEach(t => { t.el.pause(); t.el.currentTime = 0; t.btn.classList.remove('playing'); });
   musicToggle.classList.remove('active');
   currentTrack = null;
 }
 
 function playTrack(el, btn) {
   stopAll();
-  if (!muted) { el.volume = 0.4; el.play().catch(()=>{}); }
-  currentTrack = el;
+  if (!muted) { el.volume = musicVolume; el.play().catch(()=>{}); }
+  currentTrack = { el, btn };
   btn.classList.add('playing');
   musicToggle.classList.add('active');
 }
 
 function toggleMute() {
   muted = !muted;
-  if (muted) { if (currentTrack) currentTrack.pause(); muteBtn.textContent = '🔇'; muteBtn.classList.add('muted'); }
-  else { if (currentTrack) currentTrack.play().catch(()=>{}); muteBtn.textContent = '🔊'; muteBtn.classList.remove('muted'); }
+  if (muted) {
+    tracks.forEach(t => t.el.volume = 0);
+    muteBtn.textContent = '🔇'; muteBtn.classList.add('muted');
+  } else {
+    tracks.forEach(t => t.el.volume = musicVolume);
+    if (currentTrack) currentTrack.el.play().catch(()=>{});
+    muteBtn.textContent = '🔊'; muteBtn.classList.remove('muted');
+  }
 }
 
 function togglePanel() {
@@ -668,12 +700,14 @@ function togglePanel() {
   musicPanel.classList.toggle('open', panelOpen);
 }
 
-// Auto-advance: when a track ends, play the next one (wraps back to first)
 const tracks = [
   { el: track1El, btn: playTrack1Btn },
   { el: track2El, btn: playTrack2Btn },
+  { el: track3El, btn: playTrack3Btn },
+  { el: track4El, btn: playTrack4Btn },
 ];
 
+// Auto-advance through all 4 tracks
 tracks.forEach((t, i) => {
   t.el.addEventListener('ended', () => {
     const next = tracks[(i + 1) % tracks.length];
@@ -686,6 +720,8 @@ panelClose.addEventListener('click', ()=>{ panelOpen=false; musicPanel.classList
 muteBtn.addEventListener('click', toggleMute);
 playTrack1Btn.addEventListener('click', ()=>{ getAudioCtx(); playTrack(track1El, playTrack1Btn); });
 playTrack2Btn.addEventListener('click', ()=>{ getAudioCtx(); playTrack(track2El, playTrack2Btn); });
+playTrack3Btn.addEventListener('click', ()=>{ getAudioCtx(); playTrack(track3El, playTrack3Btn); });
+playTrack4Btn.addEventListener('click', ()=>{ getAudioCtx(); playTrack(track4El, playTrack4Btn); });
 
 document.addEventListener('click', e => {
   if (panelOpen && !document.getElementById('game-wrap').contains(e.target)) {

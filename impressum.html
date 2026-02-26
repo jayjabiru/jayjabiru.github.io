@@ -56,22 +56,34 @@
 
 <h2>Angaben gemäß § 5 TMG</h2>
 <p>
-  Jan Stefan Tolstoy<br>
-  Nadlerweg 6<br>
-  44329 Dortmund<br>
-  Deutschland
+  <span id="addr"></span>
+  <script>
+    // Address obfuscation — assembled by JS, not readable by crawlers
+    const n = ['Jan',' Stefan',' Tolstoy'].join('');
+    const a = ['Nadler','weg 6'].join('');
+    const z = ['44329',' Dortmund'].join('');
+    document.getElementById('addr').innerHTML = n+'<br>'+a+'<br>'+z+'<br>Deutschland';
+  </script>
 </p>
 
 <h2>Kontakt</h2>
 <p>
-  E-Mail: <a href="mailto:stormheart@gmx.at">stormheart@gmx.at</a>
+  E-Mail: <span id="em"></span>
+  <script>
+    // Email obfuscation — not visible to crawlers
+    const u = 'stormheart'; const d = 'gmx.at';
+    const el = document.getElementById('em');
+    el.innerHTML = '<a href="mailto:'+u+'@'+d+'">'+u+'@'+d+'</a>';
+  </script>
 </p>
 
 <h2>Verantwortlich für den Inhalt nach § 55 Abs. 2 RStV</h2>
 <p>
-  Jan Stefan Tolstoy<br>
-  Nadlerweg 6<br>
-  44329 Dortmund
+  <span id="addr2"></span>
+  <script>
+    const el2 = document.getElementById('addr2');
+    el2.innerHTML = n+'<br>'+a+'<br>'+z;
+  </script>
 </p>
 
 <h2>Haftungsausschluss</h2>

@@ -421,6 +421,7 @@
 <header>
   <h1>RHYTHM STAGE</h1>
   <p>Hit the beat. Feel the orbit.</p>
+  <p style="margin-top:4px;font-size:.65rem;letter-spacing:.18em;color:rgba(201,162,39,.4)">V 1.03</p>
 </header>
 
 <div id="app">
@@ -496,13 +497,15 @@
   <!-- Instructions -->
   <div id="instructions">
     <strong>HOW TO PLAY</strong><br>
-    Notes fall from the top. Press the matching key when they reach the receptor zone at the bottom.
+    Notes fall from the top. Press the matching key when the note <strong>overlaps the glowing target box</strong> at the bottom — not as it approaches, but at the moment of contact.
     <div class="key-row">
       <span class="key-tag" style="color:var(--left-col);border-color:var(--left-col)">← LEFT</span>
       <span class="key-tag" style="color:var(--down-col);border-color:var(--down-col)">↓ DOWN</span>
       <span class="key-tag" style="color:var(--up-col);border-color:var(--up-col)">↑ UP</span>
       <span class="key-tag" style="color:var(--right-col);border-color:var(--right-col)">→ RIGHT</span>
     </div><br>
+    <strong>Timing windows</strong> — you have leeway either side of the exact beat:<br>
+    <span style="color:#f0c84a">■ PERFECT</span> &nbsp;±80ms &nbsp;·&nbsp; <span style="color:#4da6f5">■ GOOD</span> &nbsp;±180ms &nbsp;·&nbsp; <span style="color:#ff4444">■ MISS</span> &nbsp;anything outside<br><br>
     The chart is <strong>auto-generated from your audio file</strong> — peaks, beats and transients are detected and mapped to arrows. Energy levels shape the density: quieter sections stay sparse, chorus sections hit hard.
   </div>
 

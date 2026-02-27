@@ -403,7 +403,34 @@
     letter-spacing: .05em;
   }
 
-  @media (max-width: 440px) {
+  /* ── SCROLL FREEZE BADGE ── */
+  #scroll-freeze {
+    display: none;
+    position: fixed;
+    bottom: 18px;
+    right: 18px;
+    z-index: 1000;
+    background: rgba(5,10,26,.92);
+    border: 1px solid var(--gold);
+    border-radius: 4px;
+    padding: 8px 14px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: .6rem;
+    letter-spacing: .15em;
+    color: var(--gold);
+    box-shadow: 0 0 16px rgba(201,162,39,.25);
+    cursor: pointer;
+    transition: opacity .3s;
+  }
+  #scroll-freeze span {
+    display: block;
+    font-family: 'Space Mono', monospace;
+    font-size: .55rem;
+    color: rgba(232,224,204,.5);
+    letter-spacing: .08em;
+    margin-top: 3px;
+  }
+  body.scroll-locked { overflow: hidden; }
     :root { --lane-w: 70px; --game-w: 320px; }
     .receptor { width: 54px; height: 54px; font-size: 1.5rem; }
   }
@@ -415,13 +442,13 @@
 
 <nav>
   <a href="index.html" class="nav-brand">JAY JABIRU</a>
+  <span style="font-family:'Space Mono',monospace;font-size:.65rem;letter-spacing:.15em;color:var(--gold);opacity:.9">V 1.03</span>
   <a href="index.html" class="nav-back">← EXPLORE</a>
 </nav>
 
 <header>
   <h1>RHYTHM STAGE</h1>
   <p>Hit the beat. Feel the orbit.</p>
-  <p style="margin-top:4px;font-size:.65rem;letter-spacing:.18em;color:rgba(201,162,39,.4)">V 1.03</p>
 </header>
 
 <div id="app">
@@ -511,9 +538,10 @@
 
 </div>
 
-<script>
-// ─────────────────────────────────────────
-//  STARFIELD
+  <div id="scroll-freeze" onclick="stopAndUnfreeze()" title="Click to stop game and re-enable scrolling">
+    🔒 SCROLL FREEZE
+    <span>Stop game to scroll</span>
+  </div>
 // ─────────────────────────────────────────
 (function initStars() {
   const c = document.getElementById('stars-canvas');
@@ -782,7 +810,27 @@ function updateHUD() {
 // ─────────────────────────────────────────
 //  KEY HANDLER
 // ─────────────────────────────────────────
-function onKeyDown(e) {
+function lockScroll() {
+  document.body.classList.add('scroll-locked');
+  document.getElementById('scroll-freeze').style.display = 'block';
+}
+
+function unlockScroll() {
+  document.body.classList.remove('scroll-locked');
+  document.getElementById('scroll-freeze').style.display = 'none';
+}
+
+function stopAndUnfreeze() {
+  if (gameRunning) endGame();
+  unlockScroll();
+}
+
+// Also prevent arrow keys from scrolling during gameplay
+window.addEventListener('keydown', e => {
+  if (gameRunning && ['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)) {
+    e.preventDefault();
+  }
+}, { passive: false });
   if (!gameRunning) return;
   const lane = KEYS[e.key.toLowerCase()];
   if (lane === undefined) return;
@@ -976,6 +1024,7 @@ function startGame() {
   sourceNode.onended = () => { if (gameRunning) endGame(); };
 
   gameRunning = true;
+  lockScroll();
   if (animId) cancelAnimationFrame(animId);
 
   // ── DIAGNOSTICS ──
@@ -990,12 +1039,14 @@ function startGame() {
 
 function restartGame() {
   gameRunning = false;
+  unlockScroll();
   if (animId) cancelAnimationFrame(animId);
   startGame();
 }
 
 function endGame() {
   gameRunning = false;
+  unlockScroll();
   if (animId) cancelAnimationFrame(animId);
   try { sourceNode && sourceNode.stop(); } catch(e) {}
 

@@ -638,7 +638,6 @@ function generateChart(buffer, difficulty) {
 
   // Map onsets → chart notes with lane assignment
   const arrows = ['←','↓','↑','→'];
-  const laneColors = ['var(--left-col)','var(--down-col)','var(--up-col)','var(--right-col)'];
   const notes = [];
   let lastLane = -1;
   let patternIdx = 0;
@@ -664,7 +663,6 @@ function generateChart(buffer, difficulty) {
     notes.push({
       time: onset.time,
       lane,
-      color: laneColors[lane],
       label: arrows[lane],
       hit: false,
       missed: false
@@ -686,7 +684,8 @@ let notes = [];
 let particles = [];
 let stats = { perfect: 0, good: 0, miss: 0 };
 
-const KEYS = { 'arrowleft':0, 'arrowdown':1, 'arrowup':2, 'arrowright':3 };
+const LANE_COLORS = ['#f05a5a','#4da6f5','#a855f7','#c9a227'];
+function laneColor(lane) { return LANE_COLORS[lane]; }
 
 const gameCanvas = document.getElementById('game-canvas');
 const pCanvas    = document.getElementById('particle-canvas');
@@ -700,9 +699,6 @@ function resizeCanvases() {
   const h = rect.height || wrap.offsetHeight || 600;
   gameCanvas.width  = pCanvas.width  = Math.floor(w);
   gameCanvas.height = pCanvas.height = Math.floor(h);
-  // Debug: paint a faint yellow wash so we can confirm canvas is live
-  gCtx.fillStyle = 'rgba(255,255,0,0.1)';
-  gCtx.fillRect(0, 0, gameCanvas.width, gameCanvas.height);
 }
 
 const LANE_W = 80;
@@ -811,7 +807,7 @@ function onKeyDown(e) {
     stats.perfect++;
     showJudgment('PERFECT', '#f0c84a');
     const px = laneX(lane, gameCanvas.width) + noteWidth(gameCanvas.width) / 2;
-    spawnParticles(px, ly, best.color, 18);
+    spawnParticles(px, ly, laneColor(lane), 18);
   } else if (bestDist <= GOOD_WIN) {
     best.hit = true;
     combo++;
@@ -820,7 +816,7 @@ function onKeyDown(e) {
     stats.good++;
     showJudgment('GOOD', '#4da6f5');
     const px = laneX(lane, gameCanvas.width) + noteWidth(gameCanvas.width) / 2;
-    spawnParticles(px, ly, best.color, 8);
+    spawnParticles(px, ly, laneColor(lane), 8);
   } else {
     // Early press on far-future note: ignore
   }
@@ -872,17 +868,10 @@ function gameLoop() {
     const w = noteWidth(canvasW);
     const h = NOTE_H;
     const r = 6;
+    const col = laneColor(n.lane);
 
-    // Glow
-    const grd = gCtx.createRadialGradient(x+w/2, y+h/2, 2, x+w/2, y+h/2, w);
-    grd.addColorStop(0, n.color.replace('var(', '').replace(')', ''));
-
-    // Arrow body
     gCtx.save();
-    gCtx.shadowColor = n.color.replace('var(--left-col)','#f05a5a')
-                                .replace('var(--down-col)','#4da6f5')
-                                .replace('var(--up-col)','#a855f7')
-                                .replace('var(--right-col)','#c9a227');
+    gCtx.shadowColor = col;
     gCtx.shadowBlur = 12;
 
     // Rounded rect
@@ -894,19 +883,15 @@ function gameLoop() {
     gCtx.lineTo(x,y+r); gCtx.quadraticCurveTo(x,y,x+r,y);
     gCtx.closePath();
 
-    const resolvedColor = n.color.replace('var(--left-col)','#f05a5a')
-                                   .replace('var(--down-col)','#4da6f5')
-                                   .replace('var(--up-col)','#a855f7')
-                                   .replace('var(--right-col)','#c9a227');
-    gCtx.fillStyle = resolvedColor + '33';
+    gCtx.fillStyle = col + '44';
     gCtx.fill();
-    gCtx.strokeStyle = resolvedColor;
+    gCtx.strokeStyle = col;
     gCtx.lineWidth = 2;
     gCtx.stroke();
 
     // Arrow text
     gCtx.font = `bold ${h+2}px Arial`;
-    gCtx.fillStyle = resolvedColor;
+    gCtx.fillStyle = col;
     gCtx.textAlign = 'center';
     gCtx.textBaseline = 'middle';
     gCtx.fillText(n.label, x+w/2, y+h/2+1);
@@ -919,12 +904,8 @@ function gameLoop() {
     p.x += p.vx; p.y += p.vy;
     p.vy += 0.15;
     p.life -= p.decay;
-    const col = p.color.replace('var(--left-col)','#f05a5a')
-                        .replace('var(--down-col)','#4da6f5')
-                        .replace('var(--up-col)','#a855f7')
-                        .replace('var(--right-col)','#c9a227');
     pCtx.globalAlpha = p.life;
-    pCtx.fillStyle = col;
+    pCtx.fillStyle = p.color;
     pCtx.beginPath();
     pCtx.arc(p.x, p.y, p.r * p.life, 0, Math.PI*2);
     pCtx.fill();

@@ -532,6 +532,32 @@
       z-index: 500;
       background: var(--lilac2);
     }
+
+    .beat-pad {
+      width: 64px;
+      height: 64px;
+      border: 1px solid rgba(155,114,207,0.25);
+      background: var(--panel2);
+      border-radius: 3px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      cursor: pointer;
+      user-select: none;
+      color: var(--muted);
+      font-family: var(--mono);
+      transition: all 0.08s;
+    }
+    .beat-pad:hover { border-color: var(--lilac); color: var(--lilac2); }
+    .beat-pad.active {
+      background: rgba(155,114,207,0.15);
+      border-color: var(--lilac2);
+      color: var(--lilac2);
+      box-shadow: 0 0 14px rgba(155,114,207,0.4);
+      transform: scale(0.95);
+    }
   </style>
 </head>
 <body>
@@ -570,6 +596,7 @@
 
     <div class="kb-hint">
       <kbd>A</kbd><kbd>W</kbd><kbd>S</kbd><kbd>E</kbd><kbd>D</kbd><kbd>F</kbd><kbd>T</kbd><kbd>G</kbd><kbd>Y</kbd><kbd>H</kbd><kbd>U</kbd><kbd>J</kbd><kbd>K</kbd>
+      &nbsp;|&nbsp; <kbd>Space</kbd> Kick
     </div>
 
     <div class="controls-row">
@@ -581,6 +608,17 @@
       <div class="vu-row" id="vu-keys">
         <div class="vu-b"></div><div class="vu-b"></div><div class="vu-b"></div>
         <div class="vu-b"></div><div class="vu-b"></div><div class="vu-b"></div>
+      </div>
+      <div style="border-left:1px solid rgba(155,114,207,0.15);padding-left:1.5rem;display:flex;align-items:center;gap:1rem;">
+        <span style="font-family:var(--mono);font-size:0.58rem;color:var(--muted);letter-spacing:0.15em;">BEAT</span>
+        <div class="beat-pad" id="pad-kick" onmousedown="triggerKick()" ontouchstart="triggerKick()">
+          <span style="font-size:0.65rem;">KICK</span>
+          <span style="font-size:0.45rem;opacity:0.5;">key: Space</span>
+        </div>
+        <div class="vol-control">
+          <span class="vol-label" style="min-width:40px;">KICK</span>
+          <input type="range" id="kick-vol" min="0" max="100" value="80" oninput="kickVol=this.value/100">
+        </div>
       </div>
     </div>
   </div>
@@ -778,9 +816,9 @@ function getCtx() {
 // ════════════════════════════════════════════════
 const sections = [
   { name: 'angel_Esus', file: 'cw_chd100_angel_Esus.wav', info: 'Esus chord — warm, ethereal, ambient one-shot', baseSemitone: 4 },
-  { name: '130_Bbm_pad', file: '130_Bbm_pad_02.wav',       info: 'Bbm pad loop — deep, melancholic, soul synth', baseSemitone: 10 },
-  { name: 'F#maj7_Lead', file: '90_Fmaj7_Lead_01.wav',     info: 'F# major 7 vaporwave lead — melodic, floating', baseSemitone: 6 },
-  { name: 'F#maj7_Pad',  file: '90_Fmaj7_pad_02.wav',      info: 'F# pad — dense, atmospheric, single sustained note', baseSemitone: 6 },
+  { name: '130_Bbm_pad', file: '130_bbm_pad_02.wav',       info: 'Bbm pad loop — deep, melancholic, soul synth', baseSemitone: 10 },
+  { name: 'F#maj7_Lead', file: '90_fmaj7_Lead_01.wav',    info: 'F# major 7 vaporwave lead — melodic, floating', baseSemitone: 6 },
+  { name: 'F#maj7_Pad',  file: '90_fmaj7_pad_02.wav',     info: 'F# pad — dense, atmospheric, single sustained note', baseSemitone: 6 },
 ];
 
 const sectionInfoText = [
@@ -803,9 +841,30 @@ async function loadBuffer(name, file) {
   } catch(e) { console.warn('Could not load', file); }
 }
 
+let kickVol = 0.8;
+
 async function loadAll() {
   getCtx();
   for (const s of sections) await loadBuffer(s.name, s.file);
+  await loadBuffer('kick', 'drumhit_Kick9.wav');
+}
+
+function triggerKick() {
+  const ctx = getCtx();
+  const buf = buffers['kick'];
+  if (!buf) return;
+  const source = ctx.createBufferSource();
+  source.buffer = buf;
+  const gain = ctx.createGain();
+  gain.gain.value = kickVol;
+  source.connect(gain);
+  gain.connect(distChain.input);
+  source.start();
+  const pad = document.getElementById('pad-kick');
+  pad.classList.add('active');
+  glitterBurst(pad.getBoundingClientRect().left + 32, pad.getBoundingClientRect().top + 32);
+  setTimeout(() => pad.classList.remove('active'), 120);
+  animateVU('vu-keys');
 }
 
 // ════════════════════════════════════════════════
@@ -1062,6 +1121,7 @@ document.addEventListener('keydown', e => {
       setTimeout(() => key?.classList.remove('active'), 400);
     }
   }
+  if (e.key === ' ') { e.preventDefault(); getCtx(); triggerKick(); }
 });
 
 // ════════════════════════════════════════════════

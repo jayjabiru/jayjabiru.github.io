@@ -206,7 +206,7 @@
       height: 155px;
       background: linear-gradient(170deg, #1e1530 0%, #2a1d45 60%, #1a1228 100%);
       border: 1px solid rgba(155,114,207,0.3);
-      color: var(--muted);
+      color: rgba(196,160,240,0.7);
     }
 
     .key.white::before {
@@ -220,7 +220,7 @@
 
     .key.white:hover, .key.white.active {
       background: linear-gradient(170deg, #3a2060 0%, #5a3090 60%, #3a2060 100%);
-      color: var(--lilac2);
+      color: var(--white);
       border-color: var(--lilac);
       box-shadow: 0 0 20px rgba(155,114,207,0.5), inset 0 0 15px rgba(155,114,207,0.15);
       transform: translateY(3px);
@@ -231,7 +231,7 @@
       height: 95px;
       background: linear-gradient(180deg, #0d0818 0%, #1a0f2e 100%);
       border: 1px solid rgba(107,63,160,0.4);
-      color: rgba(155,114,207,0.4);
+      color: rgba(196,160,240,0.55);
       margin-left: -19px;
       margin-right: -19px;
       z-index: 2;
@@ -239,7 +239,7 @@
 
     .key.black:hover, .key.black.active {
       background: linear-gradient(180deg, #3a1860 0%, #5a2890 100%);
-      color: var(--lilac2);
+      color: var(--white);
       border-color: var(--lilac2);
       box-shadow: 0 0 15px rgba(155,114,207,0.6);
       transform: translateY(3px);
@@ -247,14 +247,15 @@
 
     .key .note-label {
       font-family: var(--mono);
-      font-size: 0.5rem;
-      opacity: 0.6;
+      font-size: 0.62rem;
+      opacity: 1;
+      font-weight: bold;
     }
 
     .key .key-binding {
       font-family: var(--mono);
-      font-size: 0.4rem;
-      opacity: 0.35;
+      font-size: 0.52rem;
+      opacity: 0.6;
       margin-top: 2px;
     }
 
@@ -590,22 +591,12 @@
 
     <div class="section-info" id="section-info">Esus chord — warm, ethereal, ambient one-shot</div>
 
-    <div class="keyboard-outer" style="display:flex;align-items:flex-end;gap:12px;">
+    <div class="keyboard-outer">
       <div class="keyboard" id="keyboard"></div>
-      <div style="display:flex;flex-direction:column;align-items:center;gap:6px;padding-bottom:10px;">
-        <div class="beat-pad" id="pad-kick" onmousedown="triggerKick()" ontouchstart="triggerKick()">
-          <span style="font-size:0.65rem;font-family:var(--mono);">KICK</span>
-          <span style="font-size:0.4rem;opacity:0.4;font-family:var(--mono);">Space</span>
-        </div>
-        <input type="range" id="kick-vol" min="0" max="100" value="80"
-          style="width:64px;transform:rotate(-90deg) translateX(-18px) translateY(18px);"
-          oninput="kickVol=this.value/100">
-      </div>
     </div>
 
     <div class="kb-hint">
       <kbd>A</kbd><kbd>W</kbd><kbd>S</kbd><kbd>E</kbd><kbd>D</kbd><kbd>F</kbd><kbd>T</kbd><kbd>G</kbd><kbd>Y</kbd><kbd>H</kbd><kbd>U</kbd><kbd>J</kbd><kbd>K</kbd>
-      &nbsp;|&nbsp; <kbd>Space</kbd> Kick
     </div>
 
     <div class="controls-row">
@@ -845,25 +836,6 @@ let kickVol = 0.8;
 async function loadAll() {
   getCtx();
   for (const s of sections) await loadBuffer(s.name, s.file);
-  await loadBuffer('kick', 'drumhit_Kick9.wav');
-}
-
-function triggerKick() {
-  const ctx = getCtx();
-  const buf = buffers['kick'];
-  if (!buf) return;
-  const source = ctx.createBufferSource();
-  source.buffer = buf;
-  const gain = ctx.createGain();
-  gain.gain.value = kickVol;
-  source.connect(gain);
-  gain.connect(distChain.input);
-  source.start();
-  const pad = document.getElementById('pad-kick');
-  pad.classList.add('active');
-  glitterBurst(pad.getBoundingClientRect().left + 32, pad.getBoundingClientRect().top + 32);
-  setTimeout(() => pad.classList.remove('active'), 120);
-  animateVU('vu-keys');
 }
 
 // ════════════════════════════════════════════════
@@ -1135,7 +1107,7 @@ document.addEventListener('keydown', e => {
       setTimeout(() => key?.classList.remove('active'), 400);
     }
   }
-  if (e.key === ' ') { e.preventDefault(); getCtx(); triggerKick(); }
+  if (e.key === ' ') return; // spacebar reserved — no action on ambient page
 });
 
 // ════════════════════════════════════════════════

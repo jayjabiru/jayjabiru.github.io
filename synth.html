@@ -493,13 +493,40 @@
       <button class="synth-btn" id="btn-hold" onclick="toggleHold()" title="Coming soon — requires sustained sample" disabled style="opacity:0.3;cursor:not-allowed;">⏸ HOLD</button>
     </div>
 
-    <div class="keyboard-wrap">
+    <div class="keyboard-wrap" style="display:flex;align-items:flex-end;gap:14px;overflow-x:auto;">
       <div class="keyboard" id="keyboard"></div>
+      <!-- DRUM PADS beside keyboard -->
+      <div style="display:flex;flex-direction:column;gap:6px;padding-bottom:8px;flex-shrink:0;">
+        <div class="beat-pad" id="pad-kick" onmousedown="triggerBeat('kick')" ontouchstart="triggerBeat('kick')">
+          <span class="pad-name">KICK</span>
+          <span class="pad-key">Space</span>
+        </div>
+        <div class="beat-pad" id="pad-bass" onmousedown="triggerBeat('bass')" ontouchstart="triggerBeat('bass')">
+          <span class="pad-name">BASS</span>
+          <span class="pad-key">key: 8</span>
+        </div>
+        <div class="beat-pad" id="pad-tom" onmousedown="triggerBeat('tom')" ontouchstart="triggerBeat('tom')">
+          <span class="pad-name">TOM</span>
+          <span class="pad-key">key: 9</span>
+        </div>
+        <div class="beat-pad" id="pad-shaker" onmousedown="triggerBeat('shaker')" ontouchstart="triggerBeat('shaker')">
+          <span class="pad-name">SHAKER</span>
+          <span class="pad-key">key: 0</span>
+        </div>
+      </div>
+      <!-- BEAT VOLUME -->
+      <div style="display:flex;flex-direction:column;align-items:center;gap:6px;padding-bottom:8px;flex-shrink:0;">
+        <span style="font-family:var(--mono);font-size:0.55rem;color:var(--muted);letter-spacing:0.1em;">BEAT<br>VOL</span>
+        <input type="range" id="beat-vol" min="0" max="100" value="80"
+          style="writing-mode:vertical-lr;direction:rtl;width:28px;height:120px;"
+          oninput="updateVol('beat', this.value)">
+        <span class="vol-value" id="beat-vol-val" style="font-size:0.55rem;">80</span>
+      </div>
     </div>
 
     <div class="kb-hint">
-      Computer keys: <kbd>A</kbd><kbd>W</kbd><kbd>S</kbd><kbd>E</kbd><kbd>D</kbd><kbd>F</kbd><kbd>T</kbd><kbd>G</kbd><kbd>Y</kbd><kbd>H</kbd><kbd>U</kbd><kbd>J</kbd><kbd>K</kbd>
-      &nbsp;|&nbsp; Beat: <kbd>8</kbd> Bass &nbsp;<kbd>9</kbd> Tom &nbsp;<kbd>0</kbd> Shaker
+      Synth: <kbd>A</kbd><kbd>W</kbd><kbd>S</kbd><kbd>E</kbd><kbd>D</kbd><kbd>F</kbd><kbd>T</kbd><kbd>G</kbd><kbd>Y</kbd><kbd>H</kbd><kbd>U</kbd><kbd>J</kbd><kbd>K</kbd>
+      &nbsp;|&nbsp; Drums: <kbd>Space</kbd> Kick &nbsp;<kbd>8</kbd> Bass &nbsp;<kbd>9</kbd> Tom &nbsp;<kbd>0</kbd> Shaker
     </div>
 
     <div class="controls-row">
@@ -516,35 +543,6 @@
         <div class="vu-bar" style="height:5px;background:var(--accent)"></div>
         <div class="vu-bar" style="height:10px;background:var(--accent)"></div>
       </div>
-    </div>
-  </div>
-
-  <!-- BEAT MACHINE -->
-  <div class="panel">
-    <div class="panel-label">Beat Machine</div>
-    <div class="beat-grid">
-
-      <div class="beat-pad" id="pad-bass" onmousedown="triggerBeat('bass')" ontouchstart="triggerBeat('bass')">
-        <span class="pad-name">BASS</span>
-        <span class="pad-key">key: 8</span>
-      </div>
-
-      <div class="beat-pad" id="pad-tom" onmousedown="triggerBeat('tom')" ontouchstart="triggerBeat('tom')">
-        <span class="pad-name">TOM</span>
-        <span class="pad-key">key: 9</span>
-      </div>
-
-      <div class="beat-pad" id="pad-shaker" onmousedown="triggerBeat('shaker')" ontouchstart="triggerBeat('shaker')">
-        <span class="pad-name">SHAKER</span>
-        <span class="pad-key">key: 0</span>
-      </div>
-
-      <div class="vol-control" style="margin-left:1rem;">
-        <span class="vol-label">BEAT VOL</span>
-        <input type="range" id="beat-vol" min="0" max="100" value="80" oninput="updateVol('beat', this.value)">
-        <span class="vol-value" id="beat-vol-val">80</span>
-      </div>
-
     </div>
   </div>
 
@@ -578,7 +576,8 @@
       <strong>Wobbly Note3 Single A PSS560 & Boss Chorus</strong> — by Crabflag · freesound.org/people/Crabflag · CC0<br>
       <strong>FATTER Bass Stab Single C Mono PSS560</strong> — by Crabflag · freesound.org/people/Crabflag · CC0<br>
       <strong>PSS560 TOM 3</strong> — by Crabflag · freesound.org/people/Crabflag · CC0<br>
-      <strong>PSS560 Shaker</strong> — by Crabflag · freesound.org/people/Crabflag · CC0<br><br>
+      <strong>PSS560 Shaker</strong> — by Crabflag · freesound.org/people/Crabflag · CC0<br>
+      <strong>drumhit Kick9</strong> — by DigitalUnderglow · freesound.org/people/DigitalUnderglow · CC0<br><br>
       Instrument: <strong>Yamaha PSS-560 Digital Synthesizer</strong>
     </p>
   </div>
@@ -616,7 +615,8 @@ const soundFiles = {
   synth2: 'WobblyNote3_SingleA.wav',
   bass:   'FATTER_bass_stab_C.wav',
   tom:    'PSS560_TOM_3.wav',
-  shaker: 'PSS560_Shaker.wav'
+  shaker: 'PSS560_Shaker.wav',
+  kick:   'drumhit_Kick9.wav'
 };
 
 async function loadSound(name, file) {
@@ -804,7 +804,7 @@ function buildKeyboard() {
 const keyMap = {};
 notes.forEach(n => { keyMap[n.key] = n.semitone; });
 
-const beatKeys = { '8': 'bass', '9': 'tom', '0': 'shaker' };
+const beatKeys = { '8': 'bass', '9': 'tom', '0': 'shaker', ' ': 'kick' };
 const activeKeys = new Set();
 
 document.addEventListener('keydown', (e) => {
@@ -823,6 +823,7 @@ document.addEventListener('keydown', (e) => {
   }
 
   if (beatKeys[e.key]) {
+    e.preventDefault();
     triggerBeat(beatKeys[e.key]);
   }
 });

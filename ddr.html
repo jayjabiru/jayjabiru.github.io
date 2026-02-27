@@ -174,9 +174,11 @@
     position: absolute;
     bottom: 80px;
     left: 0; right: 0;
-    height: 2px;
-    background: rgba(201,162,39,.3);
+    height: 4px;
+    background: linear-gradient(90deg, #f05a5a 25%, #4da6f5 25% 50%, #a855f7 50% 75%, #c9a227 75%);
     z-index: 2;
+    box-shadow: 0 0 12px rgba(255,255,255,0.4), 0 0 24px rgba(255,255,255,0.15);
+    opacity: 0.7;
   }
 
   /* Receptors */
@@ -704,9 +706,9 @@ function resizeCanvases() {
 const LANE_W = 80;
 const NOTE_H = 24;
 const HIT_Y_FRAC = (h) => h - 96; // pixels from top where receptor centre sits
-const TRAVEL_TIME = 1.8; // seconds for note to traverse visible area
-const PERFECT_WIN = 0.06;
-const GOOD_WIN = 0.13;
+const TRAVEL_TIME = 2.2; // seconds for note to traverse visible area
+const PERFECT_WIN = 0.08;  // ±80ms
+const GOOD_WIN    = 0.18;  // ±180ms
 
 function laneX(lane, canvasW) {
   const lw = canvasW / 4;
@@ -849,6 +851,18 @@ function gameLoop() {
   // Clear
   gCtx.clearRect(0, 0, canvasW, canvasH);
   pCtx.clearRect(0, 0, canvasW, canvasH);
+
+  // Target zone glow behind receptors
+  for (let i = 0; i < 4; i++) {
+    const tx = laneX(i, canvasW);
+    const tw = noteWidth(canvasW);
+    const ty = hitY - NOTE_H / 2;
+    gCtx.fillStyle = LANE_COLORS[i] + '18';
+    gCtx.fillRect(tx, ty - 4, tw, NOTE_H + 8);
+    gCtx.strokeStyle = LANE_COLORS[i] + '55';
+    gCtx.lineWidth = 1;
+    gCtx.strokeRect(tx, ty - 4, tw, NOTE_H + 8);
+  }
 
   // Lane highlight lines
   for (let i = 0; i < 4; i++) {

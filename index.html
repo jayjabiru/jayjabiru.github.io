@@ -854,6 +854,15 @@ the day's last rays' glow of fire.</div>
       <div class="explore-desc">A puzzle game set to Jay Jabiru music.</div>
     </a>
 
+    <a class="explore-card" href="ddr.html">
+      <div class="explore-icon" style="color:#c8a84b;">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3a9 9 0 1 0 0 18A9 9 0 0 0 12 3zm-1 5h2v4h3l-4 5-4-5h3V8z"/></svg>
+      </div>
+      <div class="explore-label" style="color:#c8a84b;">Rhythm Stage</div>
+      <div class="explore-desc">A rhythm game set to Jay Jabiru music. Hit the beat.</div>
+      <div class="explore-wip">WIP</div>
+    </a>
+
   </div>
 </section>
 
@@ -863,7 +872,7 @@ the day's last rays' glow of fire.</div>
   <h2>Connect</h2>
 
   <div style="text-align:center; margin-bottom: 2.5rem;">
-    <a class="btn" href="mailto:&#106;&#97;&#121;&#106;&#97;&#98;&#105;&#114;&#117;&#64;&#112;&#114;&#111;&#116;&#111;&#110;&#109;&#97;&#105;&#108;&#46;&#99;&#111;&#109;" style="font-size:0.75rem;letter-spacing:0.25em;">
+    <a class="btn" href="/cdn-cgi/l/email-protection#83a5a0b2b3b5b8a5a0bab4b8a5a0b2b1b2b8a5a0b2b3b5b8a5a0bab4b8a5a0babbb8a5a0b2b3b6b8a5a0b2b2b7b8a5a0b2b2b4b8a5a0b5b7b8a5a0b2b2b1b8a5a0b2b2b7b8a5a0b2b2b2b8a5a0b2b2b5b8a5a0b2b2b2b8a5a0b2b2b3b8a5a0b2b3bab8a5a0bab4b8a5a0b2b3b6b8a5a0b2b3bbb8a5a0b7b5b8a5a0babab8a5a0b2b2b2b8a5a0b2b3bab8" style="font-size:0.75rem;letter-spacing:0.25em;">
       ✉ Stay Connected
     </a>
     <p style="margin-top:1rem;font-size:0.82rem;color:var(--text);letter-spacing:0.08em;font-style:italic;">Write to say hello, for collaborations, or press enquiries.</p>
@@ -910,7 +919,7 @@ the day's last rays' glow of fire.</div>
   <img id="lightbox-img" src="" alt="">
 </div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
   function openLightbox(src) {
     document.getElementById('lightbox-img').src = src;
     document.getElementById('lightbox').classList.add('active');
@@ -1009,17 +1018,4 @@ the day's last rays' glow of fire.</div>
       const id = bar.closest('.custom-player').id;
       if (players[id] && players[id].duration) {
         const ratio = e.offsetX / bar.offsetWidth;
-        players[id].currentTime = ratio * players[id].duration;
-      }
-    });
-  });
-
-  // Block right-click on track cards
-  document.querySelectorAll('.track-card').forEach(card => {
-    card.addEventListener('contextmenu', e => e.preventDefault());
-  });
-
-</script>
-
-</body>
-</html>
+        players[id]

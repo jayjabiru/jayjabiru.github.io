@@ -442,7 +442,7 @@
 
 <nav>
   <a href="index.html" class="nav-brand">JAY JABIRU</a>
-  <span style="font-family:'Space Mono',monospace;font-size:.65rem;letter-spacing:.15em;color:var(--gold);opacity:.9">V 1.12</span>
+  <span style="font-family:'Space Mono',monospace;font-size:.65rem;letter-spacing:.15em;color:var(--gold);opacity:.9">V 1.13</span>
   <a href="index.html" class="nav-back">← EXPLORE</a>
 </nav>
 
@@ -496,8 +496,27 @@
     font-size:.8rem;letter-spacing:.08em;color:#ff6666;text-align:center;
   ">⚠ Playfield not fully visible — scroll up or zoom out, then try again.</div>
 
-  <!-- Game -->
-  <div id="game-wrap">
+  <!-- Game row: diagnostic left, playfield right -->
+  <div style="display:flex;gap:12px;align-items:flex-start;width:100%;max-width:700px;justify-content:center">
+
+    <!-- DIAGNOSTIC PANEL -->
+    <div id="diag" style="
+      width:200px;flex-shrink:0;
+      background:rgba(0,0,0,.85);border:1px solid #333;
+      border-radius:4px;padding:10px 12px;font-family:'Space Mono',monospace;
+      font-size:.62rem;line-height:2;color:#888;
+    ">
+      <div style="color:#f0c84a;letter-spacing:.1em;margin-bottom:4px;font-size:.65rem">⚙ DIAG</div>
+      <div>clock: <span id="d-clock" style="color:#fff">—</span></div>
+      <div>lane Δ: <span id="d-nearest" style="color:#fff">—</span></div>
+      <div>note Y: <span id="d-noty" style="color:#fff">—</span></div>
+      <div>hit Y: <span id="d-hity" style="color:#fff">—</span></div>
+      <div>key: <span id="d-key" style="color:#fff">—</span></div>
+      <div>result: <span id="d-result" style="color:#fff">—</span></div>
+    </div>
+
+    <!-- PLAYFIELD -->
+    <div id="game-wrap">
     <div class="lane-div" style="left:25%"></div>
     <div class="lane-div" style="left:50%"></div>
     <div class="lane-div" style="left:75%"></div>
@@ -538,24 +557,11 @@
         color:var(--gold-light);text-shadow:0 0 40px rgba(201,162,39,.8);
         transition:transform .15s,opacity .15s;
       ">3</div>
-    </div>
-  </div>
+    </div><!-- /countdown -->
+  </div><!-- /game-wrap -->
 
-  <!-- DIAGNOSTIC PANEL -->
-  <div id="diag" style="
-    width:var(--game-w);background:rgba(0,0,0,.85);border:1px solid #444;
-    border-radius:4px;padding:12px 14px;font-family:'Space Mono',monospace;
-    font-size:.7rem;line-height:1.9;color:#aaa;
-  ">
-    <div style="color:#f0c84a;letter-spacing:.12em;margin-bottom:6px">⚙ LIVE DIAGNOSTICS</div>
-    <div>Game clock: <span id="d-clock" style="color:#fff">—</span></div>
-    <div>Nearest note: <span id="d-nearest" style="color:#fff">—</span></div>
-    <div>Note Y pos: <span id="d-noty" style="color:#fff">—</span></div>
-    <div>Hit zone Y: <span id="d-hity" style="color:#fff">—</span></div>
-    <div>Last keypress: <span id="d-key" style="color:#fff">—</span></div>
-    <div>Last result: <span id="d-result" style="color:#fff">—</span></div>
-    <div>PERFECT win: <span style="color:#f0c84a">±80ms</span> &nbsp; GOOD win: <span style="color:#4da6f5">±180ms</span></div>
-  </div>
+  </div><!-- /game row flex -->
+
   <div id="instructions">
     <strong>HOW TO PLAY</strong><br>
     Notes fall from the top. Press the matching key when the note <strong>overlaps the glowing target box</strong> at the bottom — not as it approaches, but at the moment of contact.
@@ -754,6 +760,13 @@ let particles = [];
 let stats = { perfect: 0, good: 0, miss: 0 };
 
 const LANE_COLORS = ['#f05a5a','#4da6f5','#a855f7','#c9a227'];
+const KEYS = { 'arrowleft':0, 'arrowdown':1, 'arrowup':2, 'arrowright':3 };
+const LANE_W = 80;
+const NOTE_H = 24;
+const HIT_Y_FRAC = (h) => h - 96;
+const TRAVEL_TIME = 2.2;
+const PERFECT_WIN = 0.08;
+const GOOD_WIN    = 0.18;
 function laneColor(lane) { return LANE_COLORS[lane]; }
 
 const gameCanvas = document.getElementById('game-canvas');
@@ -769,13 +782,6 @@ function resizeCanvases() {
   gameCanvas.width  = pCanvas.width  = Math.floor(w);
   gameCanvas.height = pCanvas.height = Math.floor(h);
 }
-
-const LANE_W = 80;
-const NOTE_H = 24;
-const HIT_Y_FRAC = (h) => h - 96; // pixels from top where receptor centre sits
-const TRAVEL_TIME = 2.2; // seconds for note to traverse visible area
-const PERFECT_WIN = 0.08;  // ±80ms
-const GOOD_WIN    = 0.18;  // ±180ms
 
 function laneX(lane, canvasW) {
   const lw = canvasW / 4;

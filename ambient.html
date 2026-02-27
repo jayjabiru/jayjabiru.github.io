@@ -1,0 +1,1155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ambient Keys — Jay Jabiru</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --void:    #080610;
+      --deep:    #0e0a1a;
+      --panel:   #120d20;
+      --panel2:  #1a1230;
+      --lilac:   #9b72cf;
+      --lilac2:  #c4a0f0;
+      --violet:  #6b3fa0;
+      --glow:    rgba(155,114,207,0.4);
+      --glitter: rgba(196,160,240,0.8);
+      --gold:    #d4a85a;
+      --white:   #ede8ff;
+      --muted:   #6a5a8a;
+      --red:     #ff6b8a;
+      --green:   #6bffb8;
+      --mono:    'Share Tech Mono', monospace;
+      --serif:   'Cormorant Garamond', Georgia, serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--void);
+      color: var(--white);
+      font-family: var(--serif);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* GLITTER CANVAS */
+    #glitter-canvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* SCANLINES */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg, transparent, transparent 3px,
+        rgba(0,0,0,0.04) 3px, rgba(0,0,0,0.04) 4px
+      );
+      pointer-events: none;
+      z-index: 999;
+    }
+
+    /* NAV */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      background: rgba(8,6,16,0.92);
+      border-bottom: 1px solid rgba(155,114,207,0.15);
+      backdrop-filter: blur(12px);
+    }
+
+    nav a {
+      color: var(--muted);
+      text-decoration: none;
+      font-family: var(--mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      transition: color 0.3s;
+    }
+    nav a:hover { color: var(--lilac2); }
+    nav img { height: 34px; filter: drop-shadow(0 0 8px var(--glow)); }
+
+    /* MAIN */
+    .studio {
+      position: relative;
+      z-index: 1;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 2.5rem 1.5rem 5rem;
+    }
+
+    /* TITLE */
+    .page-title {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+    .page-title h1 {
+      font-family: var(--serif);
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 300;
+      font-style: italic;
+      letter-spacing: 0.1em;
+      background: linear-gradient(135deg, var(--white) 0%, var(--lilac2) 50%, var(--lilac) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .page-title p {
+      font-family: var(--mono);
+      font-size: 0.6rem;
+      color: var(--muted);
+      letter-spacing: 0.3em;
+      margin-top: 0.5rem;
+    }
+
+    /* PANEL */
+    .panel {
+      background: var(--panel);
+      border: 1px solid rgba(155,114,207,0.2);
+      border-radius: 3px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      position: relative;
+    }
+
+    .panel-label {
+      font-family: var(--mono);
+      font-size: 0.58rem;
+      letter-spacing: 0.35em;
+      color: var(--lilac);
+      text-transform: uppercase;
+      margin-bottom: 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .panel-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: rgba(155,114,207,0.15);
+    }
+
+    /* ── SECTION TABS ── */
+    .section-tabs {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .tab-btn {
+      padding: 0.5rem 1.1rem;
+      border: 1px solid rgba(155,114,207,0.25);
+      background: transparent;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.12em;
+      cursor: pointer;
+      transition: all 0.2s;
+      border-radius: 2px;
+    }
+    .tab-btn:hover { border-color: var(--lilac); color: var(--lilac2); }
+    .tab-btn.active {
+      border-color: var(--lilac);
+      color: var(--lilac2);
+      background: rgba(155,114,207,0.12);
+      box-shadow: 0 0 12px rgba(155,114,207,0.2);
+    }
+
+    /* ── KEYBOARD ── */
+    .keyboard-outer {
+      overflow-x: auto;
+      padding-bottom: 0.5rem;
+    }
+
+    .keyboard {
+      display: flex;
+      position: relative;
+      height: 155px;
+      width: fit-content;
+      margin: 0 auto;
+      gap: 3px;
+    }
+
+    .key {
+      position: relative;
+      cursor: pointer;
+      border-radius: 0 0 6px 6px;
+      transition: all 0.06s;
+      user-select: none;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: center;
+      padding-bottom: 10px;
+    }
+
+    .key.white {
+      width: 52px;
+      height: 155px;
+      background: linear-gradient(170deg, #1e1530 0%, #2a1d45 60%, #1a1228 100%);
+      border: 1px solid rgba(155,114,207,0.3);
+      color: var(--muted);
+    }
+
+    .key.white::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 0 0 6px 6px;
+      background: radial-gradient(ellipse at 30% 20%, rgba(155,114,207,0.08), transparent 70%);
+      pointer-events: none;
+    }
+
+    .key.white:hover, .key.white.active {
+      background: linear-gradient(170deg, #3a2060 0%, #5a3090 60%, #3a2060 100%);
+      color: var(--lilac2);
+      border-color: var(--lilac);
+      box-shadow: 0 0 20px rgba(155,114,207,0.5), inset 0 0 15px rgba(155,114,207,0.15);
+      transform: translateY(3px);
+    }
+
+    .key.black {
+      width: 34px;
+      height: 95px;
+      background: linear-gradient(180deg, #0d0818 0%, #1a0f2e 100%);
+      border: 1px solid rgba(107,63,160,0.4);
+      color: rgba(155,114,207,0.4);
+      margin-left: -19px;
+      margin-right: -19px;
+      z-index: 2;
+    }
+
+    .key.black:hover, .key.black.active {
+      background: linear-gradient(180deg, #3a1860 0%, #5a2890 100%);
+      color: var(--lilac2);
+      border-color: var(--lilac2);
+      box-shadow: 0 0 15px rgba(155,114,207,0.6);
+      transform: translateY(3px);
+    }
+
+    .key .note-label {
+      font-family: var(--mono);
+      font-size: 0.5rem;
+      opacity: 0.6;
+    }
+
+    .key .key-binding {
+      font-family: var(--mono);
+      font-size: 0.4rem;
+      opacity: 0.35;
+      margin-top: 2px;
+    }
+
+    /* active glitter flash on key */
+    .key.active::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: radial-gradient(ellipse at center, rgba(196,160,240,0.4) 0%, transparent 70%);
+      animation: keyflash 0.4s ease forwards;
+      pointer-events: none;
+    }
+
+    @keyframes keyflash {
+      0% { opacity: 1; }
+      100% { opacity: 0; }
+    }
+
+    /* ── CONTROLS ROW ── */
+    .controls-row {
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-top: 1.2rem;
+    }
+
+    .vol-control {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+
+    .vol-label {
+      font-family: var(--mono);
+      font-size: 0.6rem;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      min-width: 55px;
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      width: 110px;
+      height: 2px;
+      background: rgba(155,114,207,0.2);
+      outline: none;
+      border-radius: 1px;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 12px; height: 12px;
+      background: var(--lilac);
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 0 8px var(--glow);
+    }
+
+    .vol-value {
+      font-family: var(--mono);
+      font-size: 0.6rem;
+      color: var(--lilac);
+      min-width: 30px;
+    }
+
+    /* ── KB HINT ── */
+    .kb-hint {
+      font-family: var(--mono);
+      font-size: 0.55rem;
+      color: var(--muted);
+      text-align: center;
+      margin-top: 0.8rem;
+      letter-spacing: 0.08em;
+    }
+    kbd {
+      display: inline-block;
+      padding: 1px 4px;
+      border: 1px solid rgba(155,114,207,0.3);
+      border-radius: 2px;
+      font-family: var(--mono);
+      font-size: 0.5rem;
+      color: var(--lilac);
+      background: rgba(155,114,207,0.05);
+    }
+
+    /* ── SECTION INFO ── */
+    .section-info {
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: 0.9rem;
+      color: rgba(196,160,240,0.6);
+      margin-bottom: 1rem;
+      letter-spacing: 0.04em;
+    }
+
+    /* ── DISTORTION MACHINE ── */
+    .dist-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.2rem;
+    }
+
+    .dist-knob-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .knob-label {
+      font-family: var(--mono);
+      font-size: 0.58rem;
+      color: var(--muted);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+
+    .knob-value {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      color: var(--lilac2);
+    }
+
+    .dist-type-row {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+    }
+
+    .type-btn {
+      padding: 0.4rem 0.9rem;
+      border: 1px solid rgba(155,114,207,0.25);
+      background: transparent;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 0.58rem;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      transition: all 0.2s;
+      border-radius: 2px;
+    }
+    .type-btn:hover { border-color: var(--lilac); color: var(--lilac2); }
+    .type-btn.active {
+      border-color: var(--gold);
+      color: var(--gold);
+      background: rgba(212,168,90,0.08);
+    }
+
+    /* MIC INPUT */
+    .mic-row {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-top: 1rem;
+    }
+
+    .mic-btn {
+      padding: 0.55rem 1.2rem;
+      border: 1px solid rgba(155,114,207,0.3);
+      background: transparent;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.12em;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .mic-btn:hover { border-color: var(--lilac); color: var(--white); }
+    .mic-btn.active {
+      border-color: var(--red);
+      color: var(--red);
+      background: rgba(255,107,138,0.08);
+      animation: micpulse 1.5s ease-in-out infinite;
+    }
+    @keyframes micpulse {
+      0%,100% { box-shadow: 0 0 5px rgba(255,107,138,0.3); }
+      50% { box-shadow: 0 0 14px rgba(255,107,138,0.6); }
+    }
+
+    .dist-status {
+      font-family: var(--mono);
+      font-size: 0.58rem;
+      color: var(--muted);
+    }
+    .dist-status.on { color: var(--green); }
+
+    /* VU BAR */
+    .vu-row { display: flex; gap: 2px; align-items: flex-end; height: 28px; }
+    .vu-b { width: 4px; background: var(--muted); border-radius: 1px; height: 4px; transition: height 0.1s; }
+
+    /* ── RECORDING ── */
+    .rec-controls { display: flex; gap: 0.8rem; align-items: center; flex-wrap: wrap; }
+
+    .rec-btn {
+      padding: 0.5rem 1.2rem;
+      border: 1px solid rgba(155,114,207,0.25);
+      background: transparent;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.12em;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .rec-btn:hover { border-color: var(--lilac); color: var(--white); }
+    .rec-btn.recording { border-color: var(--red); color: var(--red); background: rgba(255,107,138,0.08); animation: micpulse 1s ease-in-out infinite; }
+    .rec-btn.ready { border-color: var(--green); color: var(--green); }
+
+    .rec-dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+    .rec-status { font-family: var(--mono); font-size: 0.6rem; color: var(--muted); }
+    .rec-status.recording { color: var(--red); }
+    .rec-status.ready { color: var(--green); }
+
+    /* ── CREDITS ── */
+    .credits-toggle {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .credits-toggle-btn {
+      padding: 0.4rem 1rem;
+      border: 1px solid rgba(155,114,207,0.25);
+      background: transparent;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.15em;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .credits-toggle-btn:hover { border-color: var(--lilac); color: var(--lilac2); }
+    .credits-toggle-btn.open { border-color: var(--gold); color: var(--gold); }
+
+    .credits-body {
+      display: none;
+      margin-top: 1rem;
+    }
+    .credits-body.open { display: block; }
+
+    .credits-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 0.3rem;
+    }
+
+    .credit-row {
+      font-family: var(--mono);
+      font-size: 0.55rem;
+      color: var(--muted);
+      line-height: 1.9;
+      letter-spacing: 0.04em;
+    }
+    .credit-row strong { color: rgba(196,160,240,0.8); }
+    .credit-row .cc { color: var(--gold); }
+
+    /* GLITTER SPAWN ON KEY PRESS */
+    .glitter-particle {
+      position: fixed;
+      width: 3px; height: 3px;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 500;
+      background: var(--lilac2);
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="glitter-canvas"></canvas>
+
+<nav>
+  <a href="index.html">← Back</a>
+  <a href="index.html"><img src="logo.png" alt="Jay Jabiru"></a>
+  <a href="index.html">jayjabiru.com</a>
+</nav>
+
+<div class="studio">
+
+  <div class="page-title">
+    <h1>Ambient Keys</h1>
+    <p>Jay Jabiru · Void Laboratory · Spatial Harmonics</p>
+  </div>
+
+  <!-- KEYBOARD PANEL -->
+  <div class="panel">
+    <div class="panel-label">Sound Section</div>
+
+    <div class="section-tabs">
+      <button class="tab-btn active" onclick="selectSection(0)">I · Angel Chord</button>
+      <button class="tab-btn" onclick="selectSection(1)">II · Bbm Pad</button>
+      <button class="tab-btn" onclick="selectSection(2)">III · F# Lead</button>
+      <button class="tab-btn" onclick="selectSection(3)">IV · F# Pad</button>
+    </div>
+
+    <div class="section-info" id="section-info">Esus chord — warm, ethereal, ambient one-shot</div>
+
+    <div class="keyboard-outer">
+      <div class="keyboard" id="keyboard"></div>
+    </div>
+
+    <div class="kb-hint">
+      <kbd>A</kbd><kbd>W</kbd><kbd>S</kbd><kbd>E</kbd><kbd>D</kbd><kbd>F</kbd><kbd>T</kbd><kbd>G</kbd><kbd>Y</kbd><kbd>H</kbd><kbd>U</kbd><kbd>J</kbd><kbd>K</kbd>
+    </div>
+
+    <div class="controls-row">
+      <div class="vol-control">
+        <span class="vol-label">VOLUME</span>
+        <input type="range" id="keys-vol" min="0" max="100" value="80" oninput="keysVol=this.value/100; document.getElementById('keys-vol-val').textContent=this.value">
+        <span class="vol-value" id="keys-vol-val">80</span>
+      </div>
+      <div class="vu-row" id="vu-keys">
+        <div class="vu-b"></div><div class="vu-b"></div><div class="vu-b"></div>
+        <div class="vu-b"></div><div class="vu-b"></div><div class="vu-b"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DISTORTION MACHINE -->
+  <div class="panel">
+    <div class="panel-label">Distortion Machine</div>
+
+    <div class="dist-type-row">
+      <button class="type-btn active" onclick="setDistType('soft')">Soft Clip</button>
+      <button class="type-btn" onclick="setDistType('hard')">Hard Clip</button>
+      <button class="type-btn" onclick="setDistType('fuzz')">Fuzz</button>
+      <button class="type-btn" onclick="setDistType('bitcrush')">Bit Crush</button>
+      <button class="type-btn" onclick="setDistType('ring')">Ring Mod</button>
+      <button class="type-btn" onclick="setDistType('tape')">Tape Sat</button>
+    </div>
+
+    <div class="dist-grid">
+      <div class="dist-knob-wrap">
+        <span class="knob-label">Drive</span>
+        <input type="range" id="dist-drive" min="1" max="100" value="20" oninput="updateDist()">
+        <span class="knob-value" id="dist-drive-val">20</span>
+      </div>
+      <div class="dist-knob-wrap">
+        <span class="knob-label">Tone</span>
+        <input type="range" id="dist-tone" min="200" max="8000" value="3000" oninput="updateDist()">
+        <span class="knob-value" id="dist-tone-val">3000 Hz</span>
+      </div>
+      <div class="dist-knob-wrap">
+        <span class="knob-label">Mix</span>
+        <input type="range" id="dist-mix" min="0" max="100" value="50" oninput="updateDist()">
+        <span class="knob-value" id="dist-mix-val">50%</span>
+      </div>
+      <div class="dist-knob-wrap">
+        <span class="knob-label">Output</span>
+        <input type="range" id="dist-out" min="0" max="100" value="70" oninput="updateDist()">
+        <span class="knob-value" id="dist-out-val">70</span>
+      </div>
+      <div class="dist-knob-wrap">
+        <span class="knob-label">Resonance</span>
+        <input type="range" id="dist-res" min="0.1" max="20" step="0.1" value="1" oninput="updateDist()">
+        <span class="knob-value" id="dist-res-val">1.0</span>
+      </div>
+      <div class="dist-knob-wrap">
+        <span class="knob-label">Depth</span>
+        <input type="range" id="dist-depth" min="1" max="16" step="1" value="8" oninput="updateDist()">
+        <span class="knob-value" id="dist-depth-val">8 bits</span>
+      </div>
+    </div>
+
+    <div class="mic-row">
+      <button class="mic-btn" id="mic-btn" onclick="toggleMic()">
+        <span>🎤</span> MIC INPUT
+      </button>
+      <span class="dist-status" id="dist-status">Distortion applies to keyboard notes</span>
+      <div class="vu-row" id="vu-dist">
+        <div class="vu-b"></div><div class="vu-b"></div><div class="vu-b"></div>
+        <div class="vu-b"></div><div class="vu-b"></div><div class="vu-b"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RECORDING -->
+  <div class="panel">
+    <div class="panel-label">Recording</div>
+    <div class="rec-controls">
+      <button class="rec-btn" id="rec-btn" onclick="toggleRecord()">
+        <div class="rec-dot"></div>
+        <span id="rec-btn-text">RECORD</span>
+      </button>
+      <button class="rec-btn" id="play-btn" onclick="playRec()" style="display:none">▶ PLAY</button>
+      <button class="rec-btn" id="dl-btn" onclick="dlRec()" style="display:none">↓ SAVE</button>
+      <button class="rec-btn" id="clear-btn" onclick="clearRec()" style="display:none">✕ CLEAR</button>
+      <span class="rec-status" id="rec-status">Ready</span>
+    </div>
+  </div>
+
+  <!-- CREDITS -->
+  <div class="panel">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;">
+      <span style="font-family:var(--mono);font-size:0.6rem;color:var(--muted);letter-spacing:0.2em;">SOUND SOURCES</span>
+      <button class="credits-toggle-btn" id="credits-btn" onclick="toggleCredits()">▾ SHOW CREDITS</button>
+    </div>
+    <div class="credits-body" id="credits-body">
+      <div style="margin-top:1rem;margin-bottom:0.5rem;">
+        <span style="font-family:var(--mono);font-size:0.55rem;color:var(--gold);letter-spacing:0.2em;">ALL SOUNDS — CREATIVE COMMONS 0 (CC0) — PUBLIC DOMAIN — NO RIGHTS RESERVED</span>
+      </div>
+      <div class="credits-grid">
+        <div class="credit-row"><strong>cw_chd100_angel_Esus</strong> · by <span class="cc">DigitalUnderglow</span> · freesound.org #783988 · CC0</div>
+        <div class="credit-row"><strong>130_Bbm_pad_02</strong> · by <span class="cc">DigitalUnderglow</span> · freesound.org #757713 · CC0</div>
+        <div class="credit-row"><strong>90_F#maj7_Lead_01</strong> · by <span class="cc">DigitalUnderglow</span> · freesound.org #745076 · CC0</div>
+        <div class="credit-row"><strong>90_F#maj7_pad_02</strong> · by <span class="cc">DigitalUnderglow</span> · freesound.org #757747 · CC0</div>
+        <div class="credit-row"><strong>drumhit_Kick9</strong> · by <span class="cc">DigitalUnderglow</span> · freesound.org #691692 · CC0</div>
+        <div class="credit-row" style="border-top:1px solid rgba(155,114,207,0.1);padding-top:0.5rem;margin-top:0.3rem;grid-column:1/-1;">
+          <strong>PSS-560 Series (Synth REC page)</strong> — Wobbly Note Single A · Wobbly Note3 · FATTER Bass Stab · TOM 3 · Shaker · by <span class="cc">Crabflag</span> · freesound.org · CC0
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ════════════════════════════════════════════════
+// GLITTER CANVAS
+// ════════════════════════════════════════════════
+(function() {
+  const canvas = document.getElementById('glitter-canvas');
+  const ctx = canvas.getContext('2d');
+  let particles = [];
+
+  function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+  window.addEventListener('resize', resize);
+  resize();
+
+  // Ambient drifting glitter
+  function spawnAmbient() {
+    const count = 2;
+    for (let i = 0; i < count; i++) {
+      particles.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        size: Math.random() * 1.5 + 0.3,
+        alpha: Math.random() * 0.4,
+        da: (Math.random() - 0.5) * 0.008,
+        vx: (Math.random() - 0.5) * 0.3,
+        vy: -Math.random() * 0.4 - 0.1,
+        life: 1,
+        decay: Math.random() * 0.003 + 0.001,
+        hue: Math.random() * 60 + 250 // 250-310: purple range
+      });
+    }
+  }
+
+  // Burst on key press
+  window.glitterBurst = function(x, y) {
+    for (let i = 0; i < 22; i++) {
+      const angle = (Math.PI * 2 * i) / 22 + Math.random() * 0.5;
+      const speed = Math.random() * 4 + 1;
+      particles.push({
+        x, y,
+        size: Math.random() * 2.5 + 0.5,
+        alpha: Math.random() * 0.8 + 0.2,
+        da: 0,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        life: 1,
+        decay: Math.random() * 0.025 + 0.015,
+        hue: Math.random() * 60 + 250
+      });
+    }
+  };
+
+  function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    spawnAmbient();
+    particles = particles.filter(p => p.life > 0);
+    particles.forEach(p => {
+      p.x += p.vx; p.y += p.vy;
+      p.alpha += p.da;
+      if (p.alpha < 0) p.alpha = 0;
+      if (p.alpha > 1) p.alpha = 1;
+      p.life -= p.decay;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+      ctx.fillStyle = `hsla(${p.hue}, 80%, 75%, ${p.alpha * p.life})`;
+      ctx.fill();
+    });
+    requestAnimationFrame(animate);
+  }
+  animate();
+})();
+
+// ════════════════════════════════════════════════
+// AUDIO CONTEXT
+// ════════════════════════════════════════════════
+let audioCtx = null;
+let destination = null;
+let distChain = null;   // { input, output }
+let micSource = null;
+let micStream = null;
+let micActive = false;
+
+function getCtx() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    destination = audioCtx.createMediaStreamDestination();
+    buildDistChain();
+  }
+  return audioCtx;
+}
+
+// ════════════════════════════════════════════════
+// SOUND BUFFERS
+// ════════════════════════════════════════════════
+const sections = [
+  { name: 'angel_Esus', file: 'cw_chd100_angel_Esus.wav', info: 'Esus chord — warm, ethereal, ambient one-shot', baseSemitone: 4 },
+  { name: '130_Bbm_pad', file: '130_Bbm_pad_02.wav',       info: 'Bbm pad loop — deep, melancholic, soul synth', baseSemitone: 10 },
+  { name: 'F#maj7_Lead', file: '90_Fmaj7_Lead_01.wav',     info: 'F# major 7 vaporwave lead — melodic, floating', baseSemitone: 6 },
+  { name: 'F#maj7_Pad',  file: '90_Fmaj7_pad_02.wav',      info: 'F# pad — dense, atmospheric, single sustained note', baseSemitone: 6 },
+];
+
+const sectionInfoText = [
+  'Esus chord — warm, ethereal, ambient one-shot',
+  'Bbm pad loop — deep, melancholic, soul synth',
+  'F# major 7 vaporwave lead — melodic, floating',
+  'F# pad — dense, atmospheric, single sustained note',
+];
+
+const buffers = {};
+let currentSection = 0;
+let keysVol = 0.8;
+
+async function loadBuffer(name, file) {
+  try {
+    const ctx = getCtx();
+    const r = await fetch(file);
+    const ab = await r.arrayBuffer();
+    buffers[name] = await ctx.decodeAudioData(ab);
+  } catch(e) { console.warn('Could not load', file); }
+}
+
+async function loadAll() {
+  getCtx();
+  for (const s of sections) await loadBuffer(s.name, s.file);
+}
+
+// ════════════════════════════════════════════════
+// DISTORTION CHAIN
+// ════════════════════════════════════════════════
+let distType = 'soft';
+let distNodes = {};
+
+function buildDistChain() {
+  const ctx = audioCtx;
+
+  // Input gain
+  const inputGain = ctx.createGain();
+  inputGain.gain.value = 1;
+
+  // Waveshaper for clipping
+  const shaper = ctx.createWaveShaper();
+  shaper.oversample = '4x';
+
+  // Tone filter
+  const toneFilter = ctx.createBiquadFilter();
+  toneFilter.type = 'lowpass';
+  toneFilter.frequency.value = 3000;
+
+  // Resonance filter
+  const resFilter = ctx.createBiquadFilter();
+  resFilter.type = 'peaking';
+  resFilter.frequency.value = 1000;
+  resFilter.gain.value = 0;
+
+  // Output gain
+  const outputGain = ctx.createGain();
+  outputGain.gain.value = 0.7;
+
+  // Dry path
+  const dryGain = ctx.createGain();
+  dryGain.gain.value = 0.5;
+
+  // Wet path
+  const wetGain = ctx.createGain();
+  wetGain.gain.value = 0.5;
+
+  // Master
+  const master = ctx.createGain();
+  master.gain.value = 1;
+
+  // Connect: input → shaper → toneFilter → resFilter → wetGain → master
+  //                                                   ↗
+  //                            inputGain → dryGain ─→ master → destination
+  inputGain.connect(shaper);
+  shaper.connect(toneFilter);
+  toneFilter.connect(resFilter);
+  resFilter.connect(wetGain);
+  wetGain.connect(master);
+
+  inputGain.connect(dryGain);
+  dryGain.connect(master);
+
+  master.connect(ctx.destination);
+  master.connect(destination);
+
+  distNodes = { inputGain, shaper, toneFilter, resFilter, outputGain, dryGain, wetGain, master };
+  distChain = { input: inputGain, output: master };
+
+  updateDist();
+}
+
+function makeWaveshape(amount, type) {
+  const n = 256;
+  const curve = new Float32Array(n);
+  const deg = Math.PI / 180;
+
+  for (let i = 0; i < n; i++) {
+    const x = (i * 2) / n - 1;
+    switch(type) {
+      case 'soft':
+        curve[i] = ((Math.PI + amount) * x) / (Math.PI + amount * Math.abs(x));
+        break;
+      case 'hard':
+        curve[i] = Math.max(-1, Math.min(1, x * amount / 5));
+        break;
+      case 'fuzz':
+        curve[i] = Math.sign(x) * (1 - Math.exp(-Math.abs(x) * amount / 10));
+        break;
+      case 'tape':
+        curve[i] = Math.tanh(x * amount / 15);
+        break;
+      case 'bitcrush':
+        const bits = parseInt(document.getElementById('dist-depth')?.value || 8);
+        const step = 2 / Math.pow(2, bits);
+        curve[i] = Math.floor(x / step) * step;
+        break;
+      case 'ring':
+        const freq = amount / 5;
+        curve[i] = x * Math.sin(i * freq * deg);
+        break;
+    }
+  }
+  return curve;
+}
+
+function updateDist() {
+  if (!distNodes.shaper) return;
+  const drive = parseFloat(document.getElementById('dist-drive').value);
+  const tone  = parseFloat(document.getElementById('dist-tone').value);
+  const mix   = parseFloat(document.getElementById('dist-mix').value) / 100;
+  const out   = parseFloat(document.getElementById('dist-out').value) / 100;
+  const res   = parseFloat(document.getElementById('dist-res').value);
+  const depth = parseInt(document.getElementById('dist-depth').value);
+
+  document.getElementById('dist-drive-val').textContent = drive;
+  document.getElementById('dist-tone-val').textContent = tone + ' Hz';
+  document.getElementById('dist-mix-val').textContent = Math.round(mix*100) + '%';
+  document.getElementById('dist-out-val').textContent = Math.round(out*100);
+  document.getElementById('dist-res-val').textContent = res.toFixed(1);
+  document.getElementById('dist-depth-val').textContent = depth + ' bits';
+
+  distNodes.shaper.curve = makeWaveshape(drive, distType);
+  distNodes.toneFilter.frequency.value = tone;
+  distNodes.resFilter.Q.value = res;
+  distNodes.wetGain.gain.value = mix;
+  distNodes.dryGain.gain.value = 1 - mix;
+  distNodes.master.gain.value = out;
+}
+
+function setDistType(type) {
+  distType = type;
+  document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  updateDist();
+}
+
+// ════════════════════════════════════════════════
+// MIC INPUT
+// ════════════════════════════════════════════════
+async function toggleMic() {
+  getCtx();
+  if (micActive) {
+    stopMic();
+  } else {
+    try {
+      micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      micSource = audioCtx.createMediaStreamSource(micStream);
+      micSource.connect(distChain.input);
+      micActive = true;
+      document.getElementById('mic-btn').classList.add('active');
+      document.getElementById('mic-btn').innerHTML = '<span>🔴</span> MIC ON';
+      document.getElementById('dist-status').textContent = 'Mic live — speak or sing through distortion';
+      document.getElementById('dist-status').className = 'dist-status on';
+    } catch(e) {
+      document.getElementById('dist-status').textContent = 'Mic access denied';
+    }
+  }
+}
+
+function stopMic() {
+  if (micSource) { micSource.disconnect(); micSource = null; }
+  if (micStream) { micStream.getTracks().forEach(t => t.stop()); micStream = null; }
+  micActive = false;
+  document.getElementById('mic-btn').classList.remove('active');
+  document.getElementById('mic-btn').innerHTML = '<span>🎤</span> MIC INPUT';
+  document.getElementById('dist-status').textContent = 'Distortion applies to keyboard notes';
+  document.getElementById('dist-status').className = 'dist-status';
+}
+
+// ════════════════════════════════════════════════
+// NOTE PLAYBACK
+// ════════════════════════════════════════════════
+const notes = [
+  { note:'C',  semitone:0,  black:false, key:'a' },
+  { note:'C#', semitone:1,  black:true,  key:'w' },
+  { note:'D',  semitone:2,  black:false, key:'s' },
+  { note:'D#', semitone:3,  black:true,  key:'e' },
+  { note:'E',  semitone:4,  black:false, key:'d' },
+  { note:'F',  semitone:5,  black:false, key:'f' },
+  { note:'F#', semitone:6,  black:true,  key:'t' },
+  { note:'G',  semitone:7,  black:false, key:'g' },
+  { note:'G#', semitone:8,  black:true,  key:'y' },
+  { note:'A',  semitone:9,  black:false, key:'h' },
+  { note:'A#', semitone:10, black:true,  key:'u' },
+  { note:'B',  semitone:11, black:false, key:'j' },
+  { note:'C2', semitone:12, black:false, key:'k' },
+];
+
+function playNote(semitone) {
+  const ctx = getCtx();
+  const sec = sections[currentSection];
+  const buf = buffers[sec.name];
+  if (!buf) return;
+
+  const diff = semitone - sec.baseSemitone;
+  const rate = Math.pow(2, diff / 12);
+
+  const source = ctx.createBufferSource();
+  source.buffer = buf;
+  source.playbackRate.value = rate;
+
+  const gain = ctx.createGain();
+  gain.gain.value = keysVol;
+
+  source.connect(gain);
+  gain.connect(distChain.input);
+
+  source.start();
+  animateVU('vu-keys');
+}
+
+// ════════════════════════════════════════════════
+// KEYBOARD BUILD
+// ════════════════════════════════════════════════
+function buildKeyboard() {
+  const kb = document.getElementById('keyboard');
+  kb.innerHTML = '';
+  notes.forEach((n, i) => {
+    const key = document.createElement('div');
+    key.className = 'key ' + (n.black ? 'black' : 'white');
+    key.innerHTML = `<span class="note-label">${n.note}</span><span class="key-binding">${n.key.toUpperCase()}</span>`;
+
+    const triggerKey = (e) => {
+      if (e) e.preventDefault();
+      playNote(n.semitone);
+      key.classList.add('active');
+      // Glitter burst from key position
+      const rect = key.getBoundingClientRect();
+      glitterBurst(rect.left + rect.width / 2, rect.top + rect.height / 3);
+      setTimeout(() => key.classList.remove('active'), 400);
+    };
+
+    key.addEventListener('mousedown', triggerKey);
+    key.addEventListener('touchstart', triggerKey);
+    kb.appendChild(key);
+  });
+}
+
+// ════════════════════════════════════════════════
+// KEYBOARD INPUT
+// ════════════════════════════════════════════════
+const keyMap = {};
+notes.forEach(n => keyMap[n.key] = n.semitone);
+
+document.addEventListener('keydown', e => {
+  if (e.repeat) return;
+  const k = e.key.toLowerCase();
+  if (keyMap[k] !== undefined) {
+    getCtx();
+    playNote(keyMap[k]);
+    const idx = notes.findIndex(n => n.key === k);
+    if (idx >= 0) {
+      const keys = document.querySelectorAll('.key');
+      const key = keys[idx];
+      key?.classList.add('active');
+      const rect = key?.getBoundingClientRect();
+      if (rect) glitterBurst(rect.left + rect.width/2, rect.top + rect.height/3);
+      setTimeout(() => key?.classList.remove('active'), 400);
+    }
+  }
+});
+
+// ════════════════════════════════════════════════
+// SECTION SELECT
+// ════════════════════════════════════════════════
+function selectSection(idx) {
+  currentSection = idx;
+  document.querySelectorAll('.tab-btn').forEach((b, i) => b.classList.toggle('active', i === idx));
+  document.getElementById('section-info').textContent = sectionInfoText[idx];
+}
+
+// ════════════════════════════════════════════════
+// VU METER
+// ════════════════════════════════════════════════
+function animateVU(id) {
+  const bars = document.querySelectorAll('#' + id + ' .vu-b');
+  bars.forEach(b => {
+    const h = Math.floor(Math.random() * 22) + 4;
+    b.style.height = h + 'px';
+    b.style.background = h > 18 ? 'var(--lilac2)' : 'var(--lilac)';
+  });
+  setTimeout(() => bars.forEach(b => { b.style.height = '3px'; b.style.background = 'var(--muted)'; }), 250);
+}
+
+// ════════════════════════════════════════════════
+// RECORDING
+// ════════════════════════════════════════════════
+let isRecording = false;
+let mediaRecorder = null;
+let recChunks = [];
+let recBlob = null;
+
+function toggleRecord() {
+  if (!isRecording) startRecord(); else stopRecord();
+}
+
+function startRecord() {
+  getCtx();
+  if (!destination) return;
+  recChunks = [];
+  mediaRecorder = new MediaRecorder(destination.stream);
+  mediaRecorder.ondataavailable = e => { if (e.data.size > 0) recChunks.push(e.data); };
+  mediaRecorder.onstop = () => {
+    recBlob = new Blob(recChunks, { type: 'audio/webm' });
+    ['play-btn','dl-btn','clear-btn'].forEach(id => document.getElementById(id).style.display = '');
+    document.getElementById('rec-status').textContent = 'Recording ready';
+    document.getElementById('rec-status').className = 'rec-status ready';
+  };
+  mediaRecorder.start();
+  isRecording = true;
+  document.getElementById('rec-btn').classList.add('recording');
+  document.getElementById('rec-btn-text').textContent = 'STOP';
+  document.getElementById('rec-status').textContent = '● Recording...';
+  document.getElementById('rec-status').className = 'rec-status recording';
+}
+
+function stopRecord() {
+  mediaRecorder?.stop();
+  isRecording = false;
+  document.getElementById('rec-btn').classList.remove('recording');
+  document.getElementById('rec-btn-text').textContent = 'RECORD';
+}
+
+function playRec() { if (recBlob) { const a = new Audio(URL.createObjectURL(recBlob)); a.play(); } }
+function dlRec() { if (!recBlob) return; const a = document.createElement('a'); a.href = URL.createObjectURL(recBlob); a.download = 'jayjabiru-ambient.webm'; a.click(); }
+function clearRec() {
+  recBlob = null; recChunks = [];
+  ['play-btn','dl-btn','clear-btn'].forEach(id => document.getElementById(id).style.display = 'none');
+  document.getElementById('rec-status').textContent = 'Ready';
+  document.getElementById('rec-status').className = 'rec-status';
+}
+
+// ════════════════════════════════════════════════
+// CREDITS TOGGLE
+// ════════════════════════════════════════════════
+function toggleCredits() {
+  const body = document.getElementById('credits-body');
+  const btn = document.getElementById('credits-btn');
+  const open = body.classList.toggle('open');
+  btn.classList.toggle('open', open);
+  btn.textContent = open ? '▴ HIDE CREDITS' : '▾ SHOW CREDITS';
+}
+
+// ════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════
+buildKeyboard();
+loadAll();
+</script>
+</body>
+</html>

@@ -21,7 +21,7 @@ Artist website for **Jay Jabiru** (Jan Stefan Tolstoy), Electronic Space Pop mus
 ```
 index.html          — Main website (single page)
 impressum.html      — German legal page (noindex)
-synth.html          — Synth REC instrument page
+ambient.html        — Ambient Keys instrument page (dark lilac, glitter, distortion)
 sokoban.html        — Sokoban puzzle game
 logo.png            — JJ wings logo
 photo.jpg           — Artist photo (currently NOT used on site, kept in repo)
@@ -118,7 +118,7 @@ NOTES.md            — This file
 ---
 
 ## SOUND CREDITS (all CC0)
-All from freesound.org/people/Crabflag — Yamaha PSS-560 Free Sample Pack
+**Yamaha PSS-560 pack** — all from freesound.org/people/Crabflag
 
 | File | Original name |
 |------|--------------|
@@ -127,6 +127,16 @@ All from freesound.org/people/Crabflag — Yamaha PSS-560 Free Sample Pack
 | FATTER_bass_stab_C.wav | FATTER bass stab_Single_C_MONO_PSS560.aif |
 | PSS560_TOM_3.wav | PSS560_TOM_3.aif |
 | PSS560_Shaker.wav | PSS560_Shaker.aif |
+
+**DigitalUnderglow ambient pack** — all from freesound.org/people/DigitalUnderglow
+
+| File | Freesound ID | Notes |
+|------|-------------|-------|
+| cw_chd100_angel_Esus.wav | #783988 | Esus ambient chord, 9.6s |
+| 130_Bbm_pad_02.wav | #757713 | Bbm pad loop, 7.4s |
+| 90_Fmaj7_Lead_01.wav | #745076 | F# vaporwave lead, 10.7s |
+| 90_Fmaj7_pad_02.wav | #757747 | F# pad (trimmed to single note), 10.7s |
+| drumhit_Kick9.wav | #691692 | Electronic kick drum, 0.36s |
 
 ---
 

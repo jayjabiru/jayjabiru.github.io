@@ -442,7 +442,7 @@
 
 <nav>
   <a href="index.html" class="nav-brand">JAY JABIRU</a>
-  <span style="font-family:'Space Mono',monospace;font-size:.65rem;letter-spacing:.15em;color:var(--gold);opacity:.9">V 1.09</span>
+  <span style="font-family:'Space Mono',monospace;font-size:.65rem;letter-spacing:.15em;color:var(--gold);opacity:.9">V 1.10</span>
   <a href="index.html" class="nav-back">← EXPLORE</a>
 </nav>
 
@@ -833,6 +833,8 @@ window.addEventListener('keydown', e => {
     e.preventDefault();
   }
 }, { passive: false });
+
+function onKeyDown(e) {
   if (!gameRunning) return;
   const lane = KEYS[e.key.toLowerCase()];
   if (lane === undefined) return;

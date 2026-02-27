@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Press — Jay Jabiru</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Raleway:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --deep:   #0a0a14;
+      --navy:   #0d0d1f;
+      --panel:  #111126;
+      --accent: #4a7fff;
+      --glow:   #6fa3ff;
+      --gold:   #c8a84b;
+      --white:  #f0f0ff;
+      --text:   #c8ccee;
+      --muted:  #8888aa;
+      --border: rgba(74,127,255,0.18);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--deep);
+      color: var(--text);
+      font-family: 'Raleway', sans-serif;
+      font-weight: 300;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        radial-gradient(1px 1px at 15% 20%, rgba(255,255,255,0.5) 0%, transparent 100%),
+        radial-gradient(1px 1px at 45% 55%, rgba(255,255,255,0.3) 0%, transparent 100%),
+        radial-gradient(1px 1px at 75% 15%, rgba(255,255,255,0.4) 0%, transparent 100%),
+        radial-gradient(1px 1px at 85% 70%, rgba(111,163,255,0.3) 0%, transparent 100%),
+        radial-gradient(2px 2px at 30% 80%, rgba(111,163,255,0.2) 0%, transparent 100%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.2rem 3rem;
+      background: linear-gradient(to bottom, rgba(10,10,20,0.97), transparent);
+      backdrop-filter: blur(6px);
+    }
+
+    nav a {
+      color: var(--muted);
+      text-decoration: none;
+      font-family: 'Cinzel', serif;
+      font-size: 0.68rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      transition: color 0.3s;
+    }
+    nav a:hover { color: var(--glow); }
+    nav img { height: 40px; filter: drop-shadow(0 0 8px rgba(74,127,255,0.4)); }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 4rem 2rem 6rem;
+    }
+
+    /* PAGE HEADER */
+    .page-header {
+      text-align: center;
+      margin-bottom: 4rem;
+      padding-bottom: 3rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .page-header .label {
+      font-family: 'Cinzel', serif;
+      font-size: 0.65rem;
+      letter-spacing: 0.4em;
+      color: var(--accent);
+      text-transform: uppercase;
+      display: block;
+      margin-bottom: 1rem;
+    }
+
+    .page-header h1 {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(2.2rem, 5vw, 3.5rem);
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      background: linear-gradient(135deg, #fff 0%, var(--glow) 50%, var(--gold) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.5rem;
+    }
+
+    .page-header .sub {
+      font-family: 'Raleway', sans-serif;
+      font-size: 0.85rem;
+      color: var(--muted);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-top: 0.8rem;
+    }
+
+    /* BLOCKS */
+    .press-block {
+      margin-bottom: 3.5rem;
+    }
+
+    .block-label {
+      font-family: 'Cinzel', serif;
+      font-size: 0.62rem;
+      letter-spacing: 0.35em;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 1.2rem;
+      padding-bottom: 0.6rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .block-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ONE-LINER */
+    .one-liner {
+      font-family: 'Raleway', sans-serif;
+      font-size: 1.25rem;
+      font-style: italic;
+      font-weight: 300;
+      color: var(--white);
+      line-height: 1.65;
+      padding: 1.5rem 2rem;
+      border-left: 2px solid var(--gold);
+      background: rgba(200,168,75,0.04);
+    }
+
+    /* BIO */
+    .bio-short, .bio-long {
+      font-size: 0.98rem;
+      line-height: 1.9;
+      color: var(--text);
+    }
+
+    .bio-long p { margin-bottom: 1.2rem; }
+    .bio-long p:last-child { margin-bottom: 0; }
+
+    /* TAGS */
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+    }
+
+    .tag {
+      font-family: 'Cinzel', serif;
+      font-size: 0.62rem;
+      letter-spacing: 0.2em;
+      padding: 0.4rem 1rem;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    .tag.accent {
+      border-color: rgba(74,127,255,0.4);
+      color: var(--glow);
+      background: rgba(74,127,255,0.05);
+    }
+
+    .tag.gold {
+      border-color: rgba(200,168,75,0.4);
+      color: var(--gold);
+      background: rgba(200,168,75,0.04);
+    }
+
+    /* DISCOGRAPHY */
+    .track-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 1rem;
+      align-items: start;
+      padding: 1.2rem 0;
+      border-bottom: 1px solid rgba(74,127,255,0.08);
+    }
+
+    .track-row:last-child { border-bottom: none; }
+
+    .track-name {
+      font-family: 'Cinzel', serif;
+      font-size: 0.95rem;
+      color: var(--white);
+      margin-bottom: 0.4rem;
+    }
+
+    .track-detail {
+      font-size: 0.82rem;
+      color: var(--muted);
+      line-height: 1.6;
+      font-style: italic;
+    }
+
+    .track-year {
+      font-family: 'Cinzel', serif;
+      font-size: 0.65rem;
+      color: var(--accent);
+      letter-spacing: 0.15em;
+      white-space: nowrap;
+    }
+
+    /* FACTS TABLE */
+    .facts-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .facts-table tr {
+      border-bottom: 1px solid rgba(74,127,255,0.08);
+    }
+
+    .facts-table tr:last-child { border-bottom: none; }
+
+    .facts-table td {
+      padding: 0.9rem 0;
+      font-size: 0.88rem;
+      vertical-align: top;
+    }
+
+    .facts-table td:first-child {
+      font-family: 'Cinzel', serif;
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      color: var(--muted);
+      text-transform: uppercase;
+      width: 160px;
+      padding-right: 2rem;
+    }
+
+    .facts-table td:last-child {
+      color: var(--text);
+      line-height: 1.7;
+    }
+
+    /* CONTACT */
+    .contact-box {
+      padding: 2rem;
+      border: 1px solid rgba(74,127,255,0.2);
+      background: rgba(74,127,255,0.03);
+      text-align: center;
+    }
+
+    .contact-box p {
+      font-size: 0.9rem;
+      color: var(--muted);
+      margin-bottom: 1.5rem;
+      line-height: 1.7;
+    }
+
+    .contact-email {
+      display: inline-block;
+      font-family: 'Cinzel', serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.25em;
+      color: var(--white);
+      text-decoration: none;
+      padding: 0.9rem 2.5rem;
+      border: 1px solid var(--accent);
+      transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .contact-email::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--accent);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.3s;
+      z-index: -1;
+    }
+
+    .contact-email:hover::before { transform: scaleX(1); }
+    .contact-email:hover { color: var(--deep); }
+
+    /* SOCIAL ROW */
+    .social-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .social-pill {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1.2rem;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      text-decoration: none;
+      font-family: 'Cinzel', serif;
+      font-size: 0.62rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      transition: all 0.25s;
+    }
+
+    .social-pill:hover { border-color: var(--accent); color: var(--white); }
+    .social-pill svg { width: 14px; height: 14px; fill: currentColor; }
+
+    /* FOOTER */
+    footer {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      padding: 2.5rem;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 0.78rem;
+      letter-spacing: 0.1em;
+    }
+
+    footer a { color: var(--muted); text-decoration: none; transition: color 0.3s; }
+    footer a:hover { color: var(--accent); }
+
+    @media (max-width: 600px) {
+      .container { padding: 2.5rem 1.2rem 4rem; }
+      nav { padding: 1rem 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html">← Back to Site</a>
+  <a href="index.html"><img src="logo.png" alt="Jay Jabiru"></a>
+  <a href="index.html">jayjabiru.com</a>
+</nav>
+
+<div class="container">
+
+  <div class="page-header">
+    <span class="label">Media &amp; Press</span>
+    <h1>Jay Jabiru</h1>
+    <p class="sub">Electronic Space Pop · Jabiru K-Pop · Ancient meets Orbital</p>
+  </div>
+
+  <!-- ONE-LINER -->
+  <div class="press-block">
+    <div class="block-label">One-Liner</div>
+    <div class="one-liner">
+      Jay Jabiru makes K-pop charged with ancient instruments, glitch textures and cyberpunk space — you haven't heard anything like it.
+    </div>
+  </div>
+
+  <!-- SHORT BIO -->
+  <div class="press-block">
+    <div class="block-label">Short Bio</div>
+    <p class="bio-short">
+      Jay Jabiru is a European artist, poet and maker creating a sound built from energetic K-Pop, traditional Asian instruments, and the dark shimmer of cyberpunk space. Shamisen meets synthesizer. Ancient meets orbital. Glitch textures fracture the signal just enough to let something real through. The music explores what connects us and what breaks down between us — relationships, communication, technology's gifts and its costs.
+    </p>
+  </div>
+
+  <!-- LONG BIO -->
+  <div class="press-block">
+    <div class="block-label">Full Bio</div>
+    <div class="bio-long">
+      <p>Jay Jabiru creates a sound built from energetic K-Pop, traditional Asian instruments, and the dark shimmer of cyberpunk space. Shamisen meets synthesizer. Ancient meets orbital. Glitch textures fracture the signal just enough to let something real through.</p>
+      <p>The music explores what connects us and what breaks down between us — relationships, communication, technology's gifts and its costs. It doesn't preach. It pulls you in.</p>
+      <p>Influenced by world-builders like Jarre, Björk and Kate Bush, Jay Jabiru approaches music the way he approaches everything — with his hands first. He plays tin whistle, ocarina and several flutes, owns a pipa he is stubbornly learning, and builds things from wood, fire and papier-mâché.</p>
+      <p>He speaks English, German and Spanish, and knows enough words in enough other languages to greet strangers on the tram in their own tongue. He is a carpenter, an educator, a chess and Go player, a free climber, and a self-described vegan fisher — certified, never successful. He keeps two pacific parrotlets. All of it ended up in the music.</p>
+    </div>
+  </div>
+
+  <!-- GENRE / TAGS -->
+  <div class="press-block">
+    <div class="block-label">Genre &amp; Tags</div>
+    <div class="tag-row">
+      <span class="tag accent">Electronic Space Pop</span>
+      <span class="tag accent">Jabiru K-Pop</span>
+      <span class="tag">K-Pop</span>
+      <span class="tag">Electronic</span>
+      <span class="tag gold">Ancient · Orbital</span>
+      <span class="tag">Cyberpunk</span>
+      <span class="tag">World Fusion</span>
+      <span class="tag">Shamisen</span>
+      <span class="tag">Glitch</span>
+    </div>
+  </div>
+
+  <!-- DISCOGRAPHY -->
+  <div class="press-block">
+    <div class="block-label">Releases</div>
+
+    <div class="track-row">
+      <div>
+        <div class="track-name">Are You for Real?</div>
+        <div class="track-detail">K-pop in the Jay Jabiru style. Love in the age of AI — shamisen strings, glitch effects, and one unresolved question.</div>
+      </div>
+      <div class="track-year">2025</div>
+    </div>
+
+    <div class="track-row">
+      <div>
+        <div class="track-name">Warp Closer [Remix]</div>
+        <div class="track-detail">Electronic space pop. A long-distance relationship, the remembrance of good times, and the feeling of missing your other half — set adrift in orbit.</div>
+      </div>
+      <div class="track-year">2025</div>
+    </div>
+
+  </div>
+
+  <!-- FACTS -->
+  <div class="press-block">
+    <div class="block-label">Facts</div>
+    <table class="facts-table">
+      <tr>
+        <td>Artist Name</td>
+        <td>Jay Jabiru</td>
+      </tr>
+      <tr>
+        <td>Origin</td>
+        <td>Europe</td>
+      </tr>
+      <tr>
+        <td>Genre</td>
+        <td>Electronic Space Pop · Jabiru K-Pop</td>
+      </tr>
+      <tr>
+        <td>Influences</td>
+        <td>Jean-Michel Jarre · Björk · Kate Bush</td>
+      </tr>
+      <tr>
+        <td>Instruments</td>
+        <td>Tin whistle · Ocarina · Flute · Pipa · Synthesizer</td>
+      </tr>
+      <tr>
+        <td>Language</td>
+        <td>English, German, Spanish</td>
+      </tr>
+      <tr>
+        <td>Website</td>
+        <td><a href="https://jayjabiru.com" style="color:var(--glow);text-decoration:none;">jayjabiru.com</a></td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- LINKS -->
+  <div class="press-block">
+    <div class="block-label">Find Online</div>
+    <div class="social-row">
+      <a class="social-pill" href="https://youtube.com/@jayjabiru" target="_blank">
+        <svg viewBox="0 0 24 24"><path d="M23.5 6.2s-.3-2-1.2-2.8c-1.1-1.2-2.4-1.2-3-1.3C16.8 2 12 2 12 2s-4.8 0-7.3.2c-.6 0-1.9.1-3 1.3C.8 4.2.5 6.2.5 6.2S.2 8.5.2 10.8v2.1c0 2.3.3 4.6.3 4.6s.3 2 1.2 2.8c1.1 1.2 2.6 1.1 3.3 1.2C7.2 21.7 12 21.8 12 21.8s4.8 0 7.3-.3c.6-.1 1.9-.2 3-1.3.9-.8 1.2-2.8 1.2-2.8s.3-2.3.3-4.6v-2.1c0-2.3-.3-4.6-.3-4.6zM9.7 15.5V8.4l8 3.6-8 3.5z"/></svg>
+        YouTube
+      </a>
+      <a class="social-pill" href="https://soundcloud.com/jayjabiru" target="_blank">
+        <svg viewBox="0 0 24 24"><path d="M1.175 12.225c-.017 0-.034.001-.05.004a.44.44 0 0 0-.313.17.44.44 0 0 0-.087.35l.372 2.418-.372 2.16a.44.44 0 0 0 .45.504c.017 0 .034-.001.05-.004.196-.034.35-.204.35-.404V12.63a.44.44 0 0 0-.4-.405zm2.137-1.3c-.03 0-.06.003-.088.008a.574.574 0 0 0-.486.568v5.835a.574.574 0 0 0 .574.574.574.574 0 0 0 .574-.574V11.5a.574.574 0 0 0-.574-.575zm13.69-5.217a5.98 5.98 0 0 0-4.207 1.73 8.17 8.17 0 0 0-1.912-.228c-4.51 0-8.17 3.66-8.17 8.17 0 .107.003.213.008.319h14.28a3.43 3.43 0 0 0 3.43-3.43 3.43 3.43 0 0 0-3.43-3.43z"/></svg>
+        SoundCloud
+      </a>
+      <a class="social-pill" href="https://instagram.com/jayjabiru" target="_blank">
+        <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
+        Instagram
+      </a>
+      <a class="social-pill" href="https://tiktok.com/@jayjabiru" target="_blank">
+        <svg viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.29 6.29 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.75a4.85 4.85 0 0 1-1.01-.06z"/></svg>
+        TikTok
+      </a>
+    </div>
+  </div>
+
+  <!-- CONTACT -->
+  <div class="press-block">
+    <div class="block-label">Contact</div>
+    <div class="contact-box">
+      <p>For interview requests, playlist submissions, collaborations,<br>and all press enquiries — write directly.</p>
+      <a class="contact-email" href="mailto:&#106;&#97;&#121;&#106;&#97;&#98;&#105;&#114;&#117;&#64;&#112;&#114;&#111;&#116;&#111;&#110;&#109;&#97;&#105;&#108;&#46;&#99;&#111;&#109;">
+        ✉ &nbsp; Get in Touch
+      </a>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <p>© 2026 Jay Jabiru &nbsp;·&nbsp; All rights reserved &nbsp;·&nbsp;
+    <a href="index.html">jayjabiru.com</a> &nbsp;·&nbsp;
+    <a href="impressum.html">Impressum</a>
+  </p>
+</footer>
+
+</body>
+</html>

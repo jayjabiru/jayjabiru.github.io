@@ -5,8 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Jay Jabiru — Electronic Space Pop</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Raleway:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Raleway:ital,wght@0,300;0,400;0,600;1,300&display=swap&display=swap" rel="stylesheet">
+  <link rel="preload" as="image" href="art-astronaut.jpg">
   <style>
+    body { opacity: 0; animation: bodyFadeIn 0.6s ease 0.1s forwards; }
+    @keyframes bodyFadeIn { to { opacity: 1; } }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
@@ -546,6 +550,67 @@
       fill: currentColor;
     }
 
+    /* EXPLORE */
+    .explore-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    .explore-card {
+      display: block;
+      text-decoration: none;
+      padding: 2rem 1.8rem;
+      border: 1px solid rgba(74,127,255,0.2);
+      background: rgba(255,255,255,0.02);
+      position: relative;
+      transition: all 0.3s;
+      color: var(--white);
+    }
+
+    .explore-card:hover {
+      border-color: var(--accent);
+      background: rgba(74,127,255,0.07);
+      transform: translateY(-4px);
+    }
+
+    .explore-icon {
+      width: 36px;
+      height: 36px;
+      color: var(--gold);
+      margin-bottom: 1rem;
+    }
+
+    .explore-icon svg { width: 100%; height: 100%; }
+
+    .explore-label {
+      font-family: 'Cinzel', serif;
+      font-size: 1rem;
+      letter-spacing: 0.15em;
+      color: var(--gold);
+      margin-bottom: 0.6rem;
+    }
+
+    .explore-desc {
+      font-size: 0.85rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .explore-wip {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      font-family: 'Cinzel', serif;
+      font-size: 0.55rem;
+      letter-spacing: 0.2em;
+      color: var(--gold);
+      border: 1px solid rgba(200,168,75,0.3);
+      padding: 2px 7px;
+      opacity: 0.7;
+    }
+
     /* FOOTER */
     footer {
       position: relative;
@@ -608,9 +673,8 @@
     <li><a href="#gallery">Art</a></li>
     <li><a href="#poem">Poem</a></li>
     <li><a href="#about">About</a></li>
-    <li><a href="synth.html">Synth Keys</a></li>
-    <li><a href="ambient.html">Ambient Keys</a></li>
-    <li><a href="sokoban.html">Sokoban</a></li>
+    <li><a href="#explore">Explore</a></li>
+    <li><a href="press.html">Press</a></li>
     <li><a href="#links">Connect</a></li>
   </ul>
 </nav>
@@ -643,6 +707,7 @@
         <div class="progress-bar"><div class="progress-fill" id="fill-1"></div></div>
         <span class="time-display" id="time-1">0:00</span>
       </div>
+      <p class="track-note">A K-pop song in the Jay Jabiru style. Love in the age of AI makes us question whether the intentions are genuine — or even whether the person behind the screen is real at all, when the connection began online. Shamisen strings meet glitch effects and K-pop energy: the traditional and the modern in one unresolved question.</p>
     </div>
 
     <div class="track-card">
@@ -652,6 +717,7 @@
         <div class="progress-bar"><div class="progress-fill" id="fill-2"></div></div>
         <span class="time-display" id="time-2">0:00</span>
       </div>
+      <p class="track-note">An electronic song set in space, in the Jay Jabiru style. A long-distance relationship. The remembrance of good times. A song that sends you on a journey through space — mesmerising sound effects, lyrics with a slight whimsical touch — and underneath it all, the feeling of missing your other half.</p>
     </div>
 
   </div>
@@ -669,23 +735,23 @@
       <div class="overlay"></div>
     </div>
     <div class="gallery-item" onclick="openLightbox('art-mermaid.jpg')">
-      <img src="art-mermaid.jpg" alt="Mermaid">
+      <img loading="lazy" src="art-mermaid.jpg" alt="Mermaid">
       <div class="overlay"></div>
     </div>
     <div class="gallery-item" onclick="openLightbox('art-cats.jpg')">
-      <img src="art-cats.jpg" alt="Romantic Cats">
+      <img loading="lazy" src="art-cats.jpg" alt="Romantic Cats">
       <div class="overlay"></div>
     </div>
     <div class="gallery-item" onclick="openLightbox('art-spacecat.jpg')">
-      <img src="art-spacecat.jpg" alt="Space Cat">
+      <img loading="lazy" src="art-spacecat.jpg" alt="Space Cat">
       <div class="overlay"></div>
     </div>
     <div class="gallery-item" onclick="openLightbox('art-peacock.jpg')">
-      <img src="art-peacock.jpg" alt="Peacock">
+      <img loading="lazy" src="art-peacock.jpg" alt="Peacock">
       <div class="overlay"></div>
     </div>
     <div class="gallery-item" onclick="openLightbox('art-fossa.jpg')">
-      <img src="art-fossa.jpg" alt="Fossa with Key">
+      <img loading="lazy" src="art-fossa.jpg" alt="Fossa with Key">
       <div class="overlay"></div>
     </div>
   </div>
@@ -753,32 +819,59 @@ the day's last rays' glow of fire.</div>
 
 <div class="divider"></div>
 
-<!-- LINKS -->
+<!-- EXPLORE -->
+<section id="explore">
+  <span class="section-label">Discover</span>
+  <h2>Explore</h2>
+  <div class="explore-grid">
+
+    <a class="explore-card" href="synth.html">
+      <div class="explore-icon">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3a9 9 0 1 0 0 18A9 9 0 0 0 12 3zm-1 13V8l7 4-7 4z"/></svg>
+      </div>
+      <div class="explore-label">Synth Keys</div>
+      <div class="explore-desc">Play the PSS-560 synthesizer. Drum pads included.</div>
+      <div class="explore-wip">WIP</div>
+    </a>
+
+    <a class="explore-card" href="ambient.html">
+      <div class="explore-icon" style="color:#c4a0f0;">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 14.5a4.5 4.5 0 1 1 0-9 4.5 4.5 0 0 1 0 9zm0-5.5a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/></svg>
+      </div>
+      <div class="explore-label" style="color:#c4a0f0;">Ambient Keys</div>
+      <div class="explore-desc">Spatial pads, distortion machine, mic input.</div>
+      <div class="explore-wip">WIP</div>
+    </a>
+
+    <a class="explore-card" href="sokoban.html">
+      <div class="explore-icon">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zm2 4v10h10V7H7zm2 2h6v6H9V9z"/></svg>
+      </div>
+      <div class="explore-label">Sokoban</div>
+      <div class="explore-desc">A puzzle game set to Jay Jabiru music.</div>
+    </a>
+
+  </div>
+</section>
+
+<div class="divider"></div>
 <section id="links">
   <span class="section-label">Find Me</span>
   <h2>Connect</h2>
+
+  <div style="text-align:center; margin-bottom: 2.5rem;">
+    <a class="btn" href="mailto:&#106;&#97;&#121;&#106;&#97;&#98;&#105;&#114;&#117;&#64;&#112;&#114;&#111;&#116;&#111;&#110;&#109;&#97;&#105;&#108;&#46;&#99;&#111;&#109;" style="font-size:0.75rem;letter-spacing:0.25em;">
+      ✉ Stay Connected
+    </a>
+    <p style="margin-top:1rem;font-size:0.75rem;color:var(--muted);letter-spacing:0.1em;font-style:italic;">Write to say hello, for collaborations, or press enquiries.</p>
+  </div>
+
   <div class="social-grid">
-
-    <a class="social-link" href="synth.html" style="border-color:rgba(200,168,75,0.4);color:var(--gold);">
-      <svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 0 18A9 9 0 0 0 12 3zm0 16a7 7 0 1 1 0-14 7 7 0 0 1 0 14zm-1-11v6l5-3-5-3z"/></svg>
-      Synth Keys
-    </a>
-
-    <a class="social-link" href="ambient.html" style="border-color:rgba(155,114,207,0.4);color:#c4a0f0;">
-      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 14.5c-2.49 0-4.5-2.01-4.5-4.5S9.51 7.5 12 7.5s4.5 2.01 4.5 4.5-2.01 4.5-4.5 4.5zm0-5.5c-.55 0-1 .45-1 1s.45 1 1 1 1-.45 1-1-.45-1-1-1z"/></svg>
-      Ambient Keys
-    </a>
-
-    <a class="social-link" href="sokoban.html" style="border-color:rgba(200,168,75,0.4);color:var(--gold);">
-      <svg viewBox="0 0 24 24"><path d="M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zm7 14l7-7-1.4-1.4L12 14.2l-3.6-3.6L7 12l5 5z"/></svg>
-      Sokoban
-    </a>
 
     <a class="social-link" href="https://youtube.com/@jayjabiru" target="_blank">
       <svg viewBox="0 0 24 24"><path d="M23.5 6.2s-.3-2-1.2-2.8c-1.1-1.2-2.4-1.2-3-1.3C16.8 2 12 2 12 2s-4.8 0-7.3.2c-.6 0-1.9.1-3 1.3C.8 4.2.5 6.2.5 6.2S.2 8.5.2 10.8v2.1c0 2.3.3 4.6.3 4.6s.3 2 1.2 2.8c1.1 1.2 2.6 1.1 3.3 1.2C7.2 21.7 12 21.8 12 21.8s4.8 0 7.3-.3c.6-.1 1.9-.2 3-1.3.9-.8 1.2-2.8 1.2-2.8s.3-2.3.3-4.6v-2.1c0-2.3-.3-4.6-.3-4.6zM9.7 15.5V8.4l8 3.6-8 3.5z"/></svg>
       YouTube
     </a>
-
 
     <a class="social-link" href="https://soundcloud.com/jayjabiru" target="_blank">
       <svg viewBox="0 0 24 24"><path d="M1.175 12.225c-.017 0-.034.001-.05.004a.44.44 0 0 0-.313.17.44.44 0 0 0-.087.35l.372 2.418-.372 2.16a.44.44 0 0 0 .45.504c.017 0 .034-.001.05-.004.196-.034.35-.204.35-.404V12.63a.44.44 0 0 0-.4-.405zm2.137-1.3c-.03 0-.06.003-.088.008a.574.574 0 0 0-.486.568v5.835a.574.574 0 0 0 .574.574.574.574 0 0 0 .574-.574V11.5a.574.574 0 0 0-.574-.575zm13.69-5.217a5.98 5.98 0 0 0-4.207 1.73 8.17 8.17 0 0 0-1.912-.228c-4.51 0-8.17 3.66-8.17 8.17 0 .107.003.213.008.319h14.28a3.43 3.43 0 0 0 3.43-3.43 3.43 3.43 0 0 0-3.43-3.43z"/></svg>
@@ -793,6 +886,11 @@ the day's last rays' glow of fire.</div>
     <a class="social-link" href="https://instagram.com/jayjabiru" target="_blank">
       <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
       Instagram
+    </a>
+
+    <a class="social-link" href="press.html" style="border-color:rgba(200,168,75,0.4);color:var(--gold);">
+      <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm-1 1.5L18.5 9H13V3.5zM6 20V4h5v7h7v9H6z"/></svg>
+      Press Kit
     </a>
 
   </div>

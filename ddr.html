@@ -442,7 +442,7 @@
 
 <nav>
   <a href="index.html" class="nav-brand">JAY JABIRU</a>
-  <span style="font-family:'Space Mono',monospace;font-size:.65rem;letter-spacing:.15em;color:var(--gold);opacity:.9">V 1.11</span>
+  <span style="font-family:'Space Mono',monospace;font-size:.65rem;letter-spacing:.15em;color:var(--gold);opacity:.9">V 1.12</span>
   <a href="index.html" class="nav-back">← EXPLORE</a>
 </nav>
 
@@ -541,7 +541,21 @@
     </div>
   </div>
 
-  <!-- Instructions -->
+  <!-- DIAGNOSTIC PANEL -->
+  <div id="diag" style="
+    width:var(--game-w);background:rgba(0,0,0,.85);border:1px solid #444;
+    border-radius:4px;padding:12px 14px;font-family:'Space Mono',monospace;
+    font-size:.7rem;line-height:1.9;color:#aaa;
+  ">
+    <div style="color:#f0c84a;letter-spacing:.12em;margin-bottom:6px">⚙ LIVE DIAGNOSTICS</div>
+    <div>Game clock: <span id="d-clock" style="color:#fff">—</span></div>
+    <div>Nearest note: <span id="d-nearest" style="color:#fff">—</span></div>
+    <div>Note Y pos: <span id="d-noty" style="color:#fff">—</span></div>
+    <div>Hit zone Y: <span id="d-hity" style="color:#fff">—</span></div>
+    <div>Last keypress: <span id="d-key" style="color:#fff">—</span></div>
+    <div>Last result: <span id="d-result" style="color:#fff">—</span></div>
+    <div>PERFECT win: <span style="color:#f0c84a">±80ms</span> &nbsp; GOOD win: <span style="color:#4da6f5">±180ms</span></div>
+  </div>
   <div id="instructions">
     <strong>HOW TO PLAY</strong><br>
     Notes fall from the top. Press the matching key when the note <strong>overlaps the glowing target box</strong> at the bottom — not as it approaches, but at the moment of contact.
@@ -874,7 +888,14 @@ function onKeyDown(e) {
     if (dist < bestDist) { bestDist = dist; best = n; }
   });
 
-  if (!best) return;
+  const keyLabel = ['←','↓','↑','→'][lane];
+  document.getElementById('d-key').textContent =
+    `${keyLabel} at ${now.toFixed(3)}s` + (best ? ` | nearest Δ=${(bestDist*1000).toFixed(0)}ms` : ' | no note in lane');
+
+  if (!best) {
+    document.getElementById('d-result').textContent = 'no note in lane';
+    return;
+  }
 
   if (bestDist <= PERFECT_WIN) {
     best.hit = true;
@@ -884,6 +905,8 @@ function onKeyDown(e) {
     health = Math.min(100, health + 2);
     stats.perfect++;
     showJudgment('PERFECT', '#f0c84a');
+    document.getElementById('d-result').style.color = '#f0c84a';
+    document.getElementById('d-result').textContent = `PERFECT Δ=${(bestDist*1000).toFixed(0)}ms`;
     const px = laneX(lane, gameCanvas.width) + noteWidth(gameCanvas.width) / 2;
     spawnParticles(px, ly, laneColor(lane), 18);
   } else if (bestDist <= GOOD_WIN) {
@@ -893,10 +916,13 @@ function onKeyDown(e) {
     health = Math.min(100, health + 1);
     stats.good++;
     showJudgment('GOOD', '#4da6f5');
+    document.getElementById('d-result').style.color = '#4da6f5';
+    document.getElementById('d-result').textContent = `GOOD Δ=${(bestDist*1000).toFixed(0)}ms`;
     const px = laneX(lane, gameCanvas.width) + noteWidth(gameCanvas.width) / 2;
     spawnParticles(px, ly, laneColor(lane), 8);
   } else {
-    // Early press on far-future note: ignore
+    document.getElementById('d-result').style.color = '#ff6666';
+    document.getElementById('d-result').textContent = `TOO ${best.time > now ? 'EARLY' : 'LATE'} Δ=${(bestDist*1000).toFixed(0)}ms (need <180ms)`;
   }
   updateHUD();
 }
@@ -1009,6 +1035,21 @@ function gameLoop() {
     endGame();
     return;
   }
+
+  // ── DIAGNOSTICS ──
+  const nearestUnhit = notes
+    .filter(n => !n.hit && !n.missed)
+    .sort((a,b) => Math.abs(a.time - now) - Math.abs(b.time - now))[0];
+  if (nearestUnhit) {
+    const diff = (nearestUnhit.time - now) * 1000;
+    const ny = noteY(nearestUnhit, now, canvasH);
+    document.getElementById('d-clock').textContent = now.toFixed(3) + 's';
+    document.getElementById('d-nearest').textContent =
+      `lane=${nearestUnhit.lane} Δ=${diff.toFixed(0)}ms (${diff > 0 ? 'future' : 'PAST'})`;
+    document.getElementById('d-noty').textContent = ny.toFixed(1) + 'px';
+    document.getElementById('d-hity').textContent = hitY.toFixed(1) + 'px';
+  }
+  // ─────────────────
 
   animId = requestAnimationFrame(gameLoop);
 }

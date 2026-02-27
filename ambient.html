@@ -9,35 +9,38 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --void:    #080610;
-      --deep:    #0e0a1a;
-      --panel:   #120d20;
-      --panel2:  #1a1230;
-      --lilac:   #9b72cf;
-      --lilac2:  #c4a0f0;
-      --violet:  #6b3fa0;
-      --glow:    rgba(155,114,207,0.4);
-      --glitter: rgba(196,160,240,0.8);
-      --gold:    #d4a85a;
-      --white:   #ede8ff;
-      --muted:   #6a5a8a;
-      --red:     #ff6b8a;
-      --green:   #6bffb8;
-      --mono:    'Share Tech Mono', monospace;
-      --serif:   'Cormorant Garamond', Georgia, serif;
+      --void:      #080610;
+      --deep:      #0e0a1a;
+      --panel:     #120d20;
+      --panel2:    #1a1230;
+      --panel-dist: #100a1e;
+      --panel-rec:  #110812;
+      --lilac:     #9b72cf;
+      --lilac2:    #c4a0f0;
+      --violet:    #6b3fa0;
+      --glow:      rgba(155,114,207,0.4);
+      --gold:      #d4a85a;
+      --white:     #ede8ff;
+      --text:      #cdc4e8;
+      --muted:     #8a7aaa;
+      --red:       #ff3a5a;
+      --red-glow:  rgba(255,58,90,0.35);
+      --green:     #6bffb8;
+      --mono:      'Share Tech Mono', monospace;
+      --serif:     'Cormorant Garamond', Georgia, serif;
     }
 
     html { scroll-behavior: smooth; }
 
     body {
       background: var(--void);
-      color: var(--white);
+      color: var(--text);
       font-family: var(--serif);
+      font-size: 1rem;
       min-height: 100vh;
       overflow-x: hidden;
     }
 
-    /* GLITTER CANVAS */
     #glitter-canvas {
       position: fixed;
       inset: 0;
@@ -45,20 +48,15 @@
       z-index: 0;
     }
 
-    /* SCANLINES */
     body::after {
       content: '';
       position: fixed;
       inset: 0;
-      background: repeating-linear-gradient(
-        0deg, transparent, transparent 3px,
-        rgba(0,0,0,0.04) 3px, rgba(0,0,0,0.04) 4px
-      );
+      background: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.04) 3px, rgba(0,0,0,0.04) 4px);
       pointer-events: none;
       z-index: 999;
     }
 
-    /* NAV */
     nav {
       position: sticky;
       top: 0;
@@ -68,7 +66,7 @@
       align-items: center;
       padding: 1rem 2rem;
       background: rgba(8,6,16,0.92);
-      border-bottom: 1px solid rgba(155,114,207,0.15);
+      border-bottom: 1px solid rgba(155,114,207,0.18);
       backdrop-filter: blur(12px);
     }
 
@@ -76,7 +74,7 @@
       color: var(--muted);
       text-decoration: none;
       font-family: var(--mono);
-      font-size: 0.6rem;
+      font-size: 0.7rem;
       letter-spacing: 0.3em;
       text-transform: uppercase;
       transition: color 0.3s;
@@ -84,7 +82,6 @@
     nav a:hover { color: var(--lilac2); }
     nav img { height: 34px; filter: drop-shadow(0 0 8px var(--glow)); }
 
-    /* MAIN */
     .studio {
       position: relative;
       z-index: 1;
@@ -93,11 +90,11 @@
       padding: 2.5rem 1.5rem 5rem;
     }
 
-    /* TITLE */
     .page-title {
       text-align: center;
-      margin-bottom: 3rem;
+      margin-bottom: 1rem;
     }
+
     .page-title h1 {
       font-family: var(--serif);
       font-size: clamp(2rem, 5vw, 3.5rem);
@@ -109,43 +106,75 @@
       -webkit-text-fill-color: transparent;
       background-clip: text;
     }
+
     .page-title p {
       font-family: var(--mono);
-      font-size: 0.6rem;
+      font-size: 0.75rem;
       color: var(--muted);
       letter-spacing: 0.3em;
       margin-top: 0.5rem;
     }
 
-    /* PANEL */
+    .wip-badge {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      color: var(--gold);
+      border: 1px solid rgba(212,168,90,0.4);
+      padding: 2px 8px;
+      border-radius: 2px;
+      letter-spacing: 0.15em;
+      margin-left: 0.6rem;
+      vertical-align: middle;
+      opacity: 0.85;
+      font-style: normal;
+    }
+
+    .page-desc {
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: 1rem;
+      color: var(--muted);
+      text-align: center;
+      margin-bottom: 2.5rem;
+      letter-spacing: 0.04em;
+    }
+
+    /* PANELS — each section distinctly tinted */
     .panel {
-      background: var(--panel);
-      border: 1px solid rgba(155,114,207,0.2);
       border-radius: 3px;
-      padding: 1.5rem;
+      padding: 1.6rem;
       margin-bottom: 1.5rem;
       position: relative;
     }
 
+    .panel-keys  { background: var(--panel);      border: 1px solid rgba(155,114,207,0.22); }
+    .panel-dist  { background: var(--panel-dist); border: 1px solid rgba(212,168,90,0.2); }
+    .panel-rec   { background: var(--panel-rec);  border: 1px solid rgba(255,58,90,0.2); }
+    .panel-cred  { background: rgba(155,114,207,0.03); border: 1px solid rgba(155,114,207,0.15); }
+
     .panel-label {
       font-family: var(--mono);
-      font-size: 0.58rem;
+      font-size: 0.7rem;
       letter-spacing: 0.35em;
-      color: var(--lilac);
       text-transform: uppercase;
       margin-bottom: 1.2rem;
       display: flex;
       align-items: center;
       gap: 0.6rem;
     }
-    .panel-label::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: rgba(155,114,207,0.15);
-    }
+    .panel-label::after { content: ''; flex: 1; height: 1px; }
 
-    /* ── SECTION TABS ── */
+    .panel-keys .panel-label  { color: var(--lilac2); }
+    .panel-keys .panel-label::after  { background: rgba(155,114,207,0.2); }
+    .panel-dist .panel-label  { color: var(--gold); }
+    .panel-dist .panel-label::after  { background: rgba(212,168,90,0.2); }
+    .panel-rec  .panel-label  { color: var(--red); }
+    .panel-rec  .panel-label::after  { background: rgba(255,58,90,0.2); }
+    .panel-cred .panel-label  { color: var(--muted); }
+    .panel-cred .panel-label::after  { background: rgba(155,114,207,0.1); }
+
+    /* SECTION TABS */
     .section-tabs {
       display: flex;
       gap: 0.5rem;
@@ -154,12 +183,12 @@
     }
 
     .tab-btn {
-      padding: 0.5rem 1.1rem;
-      border: 1px solid rgba(155,114,207,0.25);
+      padding: 0.55rem 1.2rem;
+      border: 1px solid rgba(155,114,207,0.28);
       background: transparent;
       color: var(--muted);
       font-family: var(--mono);
-      font-size: 0.62rem;
+      font-size: 0.7rem;
       letter-spacing: 0.12em;
       cursor: pointer;
       transition: all 0.2s;
@@ -168,16 +197,13 @@
     .tab-btn:hover { border-color: var(--lilac); color: var(--lilac2); }
     .tab-btn.active {
       border-color: var(--lilac);
-      color: var(--lilac2);
-      background: rgba(155,114,207,0.12);
+      color: var(--white);
+      background: rgba(155,114,207,0.15);
       box-shadow: 0 0 12px rgba(155,114,207,0.2);
     }
 
-    /* ── KEYBOARD ── */
-    .keyboard-outer {
-      overflow-x: auto;
-      padding-bottom: 0.5rem;
-    }
+    /* KEYBOARD */
+    .keyboard-outer { overflow-x: auto; padding-bottom: 0.5rem; }
 
     .keyboard {
       display: flex;
@@ -206,7 +232,7 @@
       height: 155px;
       background: linear-gradient(170deg, #1e1530 0%, #2a1d45 60%, #1a1228 100%);
       border: 1px solid rgba(155,114,207,0.3);
-      color: rgba(196,160,240,0.7);
+      color: rgba(196,160,240,0.75);
     }
 
     .key.white::before {
@@ -230,8 +256,8 @@
       width: 34px;
       height: 95px;
       background: linear-gradient(180deg, #0d0818 0%, #1a0f2e 100%);
-      border: 1px solid rgba(107,63,160,0.4);
-      color: rgba(196,160,240,0.55);
+      border: 1px solid rgba(107,63,160,0.45);
+      color: rgba(196,160,240,0.65);
       margin-left: -19px;
       margin-right: -19px;
       z-index: 2;
@@ -245,21 +271,9 @@
       transform: translateY(3px);
     }
 
-    .key .note-label {
-      font-family: var(--mono);
-      font-size: 0.62rem;
-      opacity: 1;
-      font-weight: bold;
-    }
+    .key .note-label  { font-family: var(--mono); font-size: 0.65rem; opacity: 1; font-weight: bold; }
+    .key .key-binding { font-family: var(--mono); font-size: 0.54rem; opacity: 0.65; margin-top: 2px; }
 
-    .key .key-binding {
-      font-family: var(--mono);
-      font-size: 0.52rem;
-      opacity: 0.6;
-      margin-top: 2px;
-    }
-
-    /* active glitter flash on key */
     .key.active::after {
       content: '';
       position: absolute;
@@ -270,12 +284,9 @@
       pointer-events: none;
     }
 
-    @keyframes keyflash {
-      0% { opacity: 1; }
-      100% { opacity: 0; }
-    }
+    @keyframes keyflash { 0% { opacity:1; } 100% { opacity:0; } }
 
-    /* ── CONTROLS ROW ── */
+    /* CONTROLS */
     .controls-row {
       display: flex;
       gap: 2rem;
@@ -284,15 +295,11 @@
       margin-top: 1.2rem;
     }
 
-    .vol-control {
-      display: flex;
-      align-items: center;
-      gap: 0.8rem;
-    }
+    .vol-control { display: flex; align-items: center; gap: 0.8rem; }
 
     .vol-label {
       font-family: var(--mono);
-      font-size: 0.6rem;
+      font-size: 0.68rem;
       color: var(--muted);
       letter-spacing: 0.1em;
       min-width: 55px;
@@ -308,51 +315,47 @@
     }
     input[type="range"]::-webkit-slider-thumb {
       -webkit-appearance: none;
-      width: 12px; height: 12px;
+      width: 13px; height: 13px;
       background: var(--lilac);
       border-radius: 50%;
       cursor: pointer;
       box-shadow: 0 0 8px var(--glow);
     }
 
-    .vol-value {
-      font-family: var(--mono);
-      font-size: 0.6rem;
-      color: var(--lilac);
-      min-width: 30px;
-    }
+    .vol-value { font-family: var(--mono); font-size: 0.68rem; color: var(--lilac); min-width: 30px; }
 
-    /* ── KB HINT ── */
+    /* KB HINT */
     .kb-hint {
       font-family: var(--mono);
-      font-size: 0.55rem;
+      font-size: 0.65rem;
       color: var(--muted);
       text-align: center;
       margin-top: 0.8rem;
       letter-spacing: 0.08em;
+      line-height: 1.8;
     }
     kbd {
       display: inline-block;
-      padding: 1px 4px;
-      border: 1px solid rgba(155,114,207,0.3);
+      padding: 2px 5px;
+      border: 1px solid rgba(155,114,207,0.32);
       border-radius: 2px;
       font-family: var(--mono);
-      font-size: 0.5rem;
-      color: var(--lilac);
-      background: rgba(155,114,207,0.05);
+      font-size: 0.58rem;
+      color: var(--lilac2);
+      background: rgba(155,114,207,0.06);
     }
 
-    /* ── SECTION INFO ── */
+    /* SECTION INFO */
     .section-info {
       font-family: var(--serif);
       font-style: italic;
-      font-size: 0.9rem;
-      color: rgba(196,160,240,0.6);
+      font-size: 1rem;
+      color: rgba(196,160,240,0.75);
       margin-bottom: 1rem;
       letter-spacing: 0.04em;
     }
 
-    /* ── DISTORTION MACHINE ── */
+    /* DISTORTION MACHINE */
     .dist-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -369,16 +372,16 @@
 
     .knob-label {
       font-family: var(--mono);
-      font-size: 0.58rem;
-      color: var(--muted);
+      font-size: 0.65rem;
+      color: rgba(212,168,90,0.8);
       letter-spacing: 0.15em;
       text-transform: uppercase;
     }
 
     .knob-value {
       font-family: var(--mono);
-      font-size: 0.65rem;
-      color: var(--lilac2);
+      font-size: 0.7rem;
+      color: var(--gold);
     }
 
     .dist-type-row {
@@ -389,25 +392,26 @@
     }
 
     .type-btn {
-      padding: 0.4rem 0.9rem;
-      border: 1px solid rgba(155,114,207,0.25);
+      padding: 0.45rem 1rem;
+      border: 1px solid rgba(212,168,90,0.25);
       background: transparent;
-      color: var(--muted);
+      color: rgba(212,168,90,0.6);
       font-family: var(--mono);
-      font-size: 0.58rem;
+      font-size: 0.65rem;
       letter-spacing: 0.1em;
       cursor: pointer;
       transition: all 0.2s;
       border-radius: 2px;
     }
-    .type-btn:hover { border-color: var(--lilac); color: var(--lilac2); }
+    .type-btn:hover { border-color: var(--gold); color: var(--gold); }
     .type-btn.active {
       border-color: var(--gold);
-      color: var(--gold);
-      background: rgba(212,168,90,0.08);
+      color: var(--white);
+      background: rgba(212,168,90,0.12);
+      box-shadow: 0 0 10px rgba(212,168,90,0.2);
     }
 
-    /* MIC INPUT */
+    /* MIC */
     .mic-row {
       display: flex;
       gap: 1rem;
@@ -418,11 +422,11 @@
 
     .mic-btn {
       padding: 0.55rem 1.2rem;
-      border: 1px solid rgba(155,114,207,0.3);
+      border: 1px solid rgba(212,168,90,0.3);
       background: transparent;
-      color: var(--muted);
+      color: rgba(212,168,90,0.7);
       font-family: var(--mono);
-      font-size: 0.62rem;
+      font-size: 0.68rem;
       letter-spacing: 0.12em;
       cursor: pointer;
       transition: all 0.2s;
@@ -430,82 +434,78 @@
       align-items: center;
       gap: 0.4rem;
     }
-    .mic-btn:hover { border-color: var(--lilac); color: var(--white); }
+    .mic-btn:hover { border-color: var(--gold); color: var(--white); }
     .mic-btn.active {
       border-color: var(--red);
       color: var(--red);
-      background: rgba(255,107,138,0.08);
+      background: rgba(255,58,90,0.08);
       animation: micpulse 1.5s ease-in-out infinite;
     }
     @keyframes micpulse {
-      0%,100% { box-shadow: 0 0 5px rgba(255,107,138,0.3); }
-      50% { box-shadow: 0 0 14px rgba(255,107,138,0.6); }
+      0%,100% { box-shadow: 0 0 5px var(--red-glow); }
+      50%      { box-shadow: 0 0 14px var(--red-glow); }
     }
 
-    .dist-status {
-      font-family: var(--mono);
-      font-size: 0.58rem;
-      color: var(--muted);
-    }
+    .dist-status { font-family: var(--mono); font-size: 0.65rem; color: var(--muted); }
     .dist-status.on { color: var(--green); }
 
-    /* VU BAR */
+    /* VU */
     .vu-row { display: flex; gap: 2px; align-items: flex-end; height: 28px; }
     .vu-b { width: 4px; background: var(--muted); border-radius: 1px; height: 4px; transition: height 0.1s; }
 
-    /* ── RECORDING ── */
+    /* RECORDING */
     .rec-controls { display: flex; gap: 0.8rem; align-items: center; flex-wrap: wrap; }
 
     .rec-btn {
-      padding: 0.5rem 1.2rem;
-      border: 1px solid rgba(155,114,207,0.25);
-      background: transparent;
-      color: var(--muted);
+      padding: 0.65rem 1.5rem;
+      border: 1px solid rgba(255,58,90,0.55);
+      background: rgba(255,58,90,0.08);
+      color: #ff8090;
       font-family: var(--mono);
-      font-size: 0.62rem;
-      letter-spacing: 0.12em;
+      font-size: 0.72rem;
+      letter-spacing: 0.15em;
       cursor: pointer;
       transition: all 0.2s;
       display: flex;
       align-items: center;
       gap: 0.4rem;
     }
-    .rec-btn:hover { border-color: var(--lilac); color: var(--white); }
-    .rec-btn.recording { border-color: var(--red); color: var(--red); background: rgba(255,107,138,0.08); animation: micpulse 1s ease-in-out infinite; }
-    .rec-btn.ready { border-color: var(--green); color: var(--green); }
-
-    .rec-dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
-    .rec-status { font-family: var(--mono); font-size: 0.6rem; color: var(--muted); }
-    .rec-status.recording { color: var(--red); }
-    .rec-status.ready { color: var(--green); }
-
-    /* ── CREDITS ── */
-    .credits-toggle {
-      display: flex;
-      align-items: center;
-      gap: 0.8rem;
-      cursor: pointer;
-      user-select: none;
+    .rec-btn:hover { border-color: var(--red); color: var(--white); background: rgba(255,58,90,0.14); }
+    .rec-btn.recording {
+      border-color: var(--red);
+      color: var(--red);
+      background: rgba(255,58,90,0.12);
+      animation: micpulse 1s ease-in-out infinite;
     }
+    .rec-btn.secondary {
+      border-color: rgba(155,114,207,0.25);
+      background: transparent;
+      color: var(--muted);
+    }
+    .rec-btn.secondary:hover { border-color: var(--lilac); color: var(--white); }
+    .rec-btn.ready { border-color: var(--green); color: var(--green); background: transparent; }
 
+    .rec-dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+    .rec-status { font-family: var(--mono); font-size: 0.68rem; color: var(--muted); }
+    .rec-status.recording { color: var(--red); }
+    .rec-status.ready     { color: var(--green); }
+
+    /* CREDITS */
     .credits-toggle-btn {
-      padding: 0.4rem 1rem;
-      border: 1px solid rgba(155,114,207,0.25);
+      padding: 0.45rem 1.1rem;
+      border: 1px solid rgba(155,114,207,0.28);
       background: transparent;
       color: var(--muted);
       font-family: var(--mono);
-      font-size: 0.6rem;
+      font-size: 0.68rem;
       letter-spacing: 0.15em;
       cursor: pointer;
       transition: all 0.2s;
     }
     .credits-toggle-btn:hover { border-color: var(--lilac); color: var(--lilac2); }
-    .credits-toggle-btn.open { border-color: var(--gold); color: var(--gold); }
+    .credits-toggle-btn.open  { border-color: var(--gold); color: var(--gold); }
 
-    .credits-body {
-      display: none;
-      margin-top: 1rem;
-    }
+    .credits-body { display: none; margin-top: 1rem; }
     .credits-body.open { display: block; }
 
     .credits-grid {
@@ -516,15 +516,15 @@
 
     .credit-row {
       font-family: var(--mono);
-      font-size: 0.55rem;
+      font-size: 0.62rem;
       color: var(--muted);
-      line-height: 1.9;
+      line-height: 2;
       letter-spacing: 0.04em;
     }
-    .credit-row strong { color: rgba(196,160,240,0.8); }
-    .credit-row .cc { color: var(--gold); }
+    .credit-row strong { color: rgba(196,160,240,0.9); }
+    .credit-row .cc   { color: var(--gold); }
 
-    /* GLITTER SPAWN ON KEY PRESS */
+    /* GLITTER */
     .glitter-particle {
       position: fixed;
       width: 3px; height: 3px;
@@ -532,32 +532,6 @@
       pointer-events: none;
       z-index: 500;
       background: var(--lilac2);
-    }
-
-    .beat-pad {
-      width: 64px;
-      height: 64px;
-      border: 1px solid rgba(155,114,207,0.25);
-      background: var(--panel2);
-      border-radius: 3px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 3px;
-      cursor: pointer;
-      user-select: none;
-      color: var(--muted);
-      font-family: var(--mono);
-      transition: all 0.08s;
-    }
-    .beat-pad:hover { border-color: var(--lilac); color: var(--lilac2); }
-    .beat-pad.active {
-      background: rgba(155,114,207,0.15);
-      border-color: var(--lilac2);
-      color: var(--lilac2);
-      box-shadow: 0 0 14px rgba(155,114,207,0.4);
-      transform: scale(0.95);
     }
   </style>
 </head>
@@ -574,12 +548,14 @@
 <div class="studio">
 
   <div class="page-title">
-    <h1>Ambient Keys</h1>
+    <h1>Ambient Keys <span class="wip-badge">WIP</span></h1>
     <p>Jay Jabiru · Void Laboratory · Spatial Harmonics</p>
   </div>
 
+  <p class="page-desc">Record audios or simply experiment with sounds.</p>
+
   <!-- KEYBOARD PANEL -->
-  <div class="panel">
+  <div class="panel panel-keys">
     <div class="panel-label">Sound Section</div>
 
     <div class="section-tabs">
@@ -613,7 +589,7 @@
   </div>
 
   <!-- DISTORTION MACHINE -->
-  <div class="panel">
+  <div class="panel panel-dist">
     <div class="panel-label">Distortion Machine</div>
 
     <div class="dist-type-row">
@@ -672,22 +648,22 @@
   </div>
 
   <!-- RECORDING -->
-  <div class="panel">
+  <div class="panel panel-rec">
     <div class="panel-label">Recording</div>
     <div class="rec-controls">
       <button class="rec-btn" id="rec-btn" onclick="toggleRecord()">
         <div class="rec-dot"></div>
         <span id="rec-btn-text">RECORD</span>
       </button>
-      <button class="rec-btn" id="play-btn" onclick="playRec()" style="display:none">▶ PLAY</button>
-      <button class="rec-btn" id="dl-btn" onclick="dlRec()" style="display:none">↓ SAVE</button>
-      <button class="rec-btn" id="clear-btn" onclick="clearRec()" style="display:none">✕ CLEAR</button>
+      <button class="rec-btn secondary" id="play-btn" onclick="playRec()" style="display:none">▶ PLAY</button>
+      <button class="rec-btn secondary" id="dl-btn" onclick="dlRec()" style="display:none">↓ SAVE</button>
+      <button class="rec-btn secondary" id="clear-btn" onclick="clearRec()" style="display:none">✕ CLEAR</button>
       <span class="rec-status" id="rec-status">Ready</span>
     </div>
   </div>
 
   <!-- CREDITS -->
-  <div class="panel">
+  <div class="panel panel-cred">
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;">
       <span style="font-family:var(--mono);font-size:0.6rem;color:var(--muted);letter-spacing:0.2em;">SOUND SOURCES</span>
       <button class="credits-toggle-btn" id="credits-btn" onclick="toggleCredits()">▾ SHOW CREDITS</button>

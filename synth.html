@@ -3,51 +3,48 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Synth REC — Jay Jabiru</title>
+  <title>Synth Keys — Jay Jabiru</title>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Share+Tech+Mono&family=Raleway:wght@300;400;600&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --deep: #07080f;
-      --panel: #0d0f1c;
-      --panel2: #111428;
-      --border: rgba(74,127,255,0.2);
-      --accent: #4a7fff;
-      --glow: #6fa3ff;
-      --gold: #c8a84b;
-      --red: #ff4a4a;
-      --green: #4aff8a;
-      --white: #e8ecff;
-      --muted: #5a6080;
-      --mono: 'Share Tech Mono', monospace;
+      --deep:     #07080f;
+      --panel:    #0d0f1c;
+      --panel2:   #111428;
+      --panel-drum:  #0e1520;
+      --panel-rec:   #110d0d;
+      --border:   rgba(74,127,255,0.22);
+      --accent:   #4a7fff;
+      --glow:     #6fa3ff;
+      --gold:     #c8a84b;
+      --red:      #ff3a3a;
+      --red-glow: rgba(255,58,58,0.35);
+      --green:    #4aff8a;
+      --white:    #e8ecff;
+      --text:     #c8d0e8;
+      --muted:    #7a849c;
+      --mono:     'Share Tech Mono', monospace;
     }
 
     body {
       background: var(--deep);
-      color: var(--white);
+      color: var(--text);
       font-family: 'Raleway', sans-serif;
+      font-size: 1rem;
       min-height: 100vh;
       overflow-x: hidden;
     }
 
-    /* SCANLINE EFFECT */
     body::after {
       content: '';
       position: fixed;
       inset: 0;
-      background: repeating-linear-gradient(
-        0deg,
-        transparent,
-        transparent 2px,
-        rgba(0,0,0,0.03) 2px,
-        rgba(0,0,0,0.03) 4px
-      );
+      background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px);
       pointer-events: none;
       z-index: 1000;
     }
 
-    /* NAV */
     nav {
       display: flex;
       justify-content: space-between;
@@ -64,17 +61,14 @@
       color: var(--muted);
       text-decoration: none;
       font-family: 'Cinzel', serif;
-      font-size: 0.65rem;
+      font-size: 0.72rem;
       letter-spacing: 0.3em;
       text-transform: uppercase;
       transition: color 0.3s;
     }
-
     nav a:hover { color: var(--accent); }
-
     nav img { height: 36px; filter: drop-shadow(0 0 6px rgba(74,127,255,0.4)); }
 
-    /* MAIN CONTAINER */
     .studio {
       max-width: 1100px;
       margin: 0 auto;
@@ -88,7 +82,7 @@
 
     .studio-title h1 {
       font-family: 'Cinzel', serif;
-      font-size: clamp(1.5rem, 4vw, 2.5rem);
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
       letter-spacing: 0.3em;
       background: linear-gradient(135deg, var(--white), var(--glow), var(--gold));
       -webkit-background-clip: text;
@@ -98,29 +92,55 @@
 
     .studio-title p {
       font-family: var(--mono);
-      font-size: 0.7rem;
+      font-size: 0.78rem;
       color: var(--muted);
       letter-spacing: 0.2em;
-      margin-top: 0.4rem;
+      margin-top: 0.5rem;
     }
 
-    /* PANEL */
-    .panel {
-      background: var(--panel);
-      border: 1px solid var(--border);
+    .wip-badge {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      color: var(--gold);
+      border: 1px solid rgba(200,168,75,0.4);
+      padding: 2px 8px;
       border-radius: 2px;
-      padding: 1.5rem;
-      margin-bottom: 1.2rem;
+      letter-spacing: 0.15em;
+      margin-left: 0.8rem;
+      vertical-align: middle;
+      opacity: 0.8;
+    }
+
+    .page-desc {
+      font-family: 'Raleway', sans-serif;
+      font-size: 0.92rem;
+      color: var(--muted);
+      text-align: center;
+      letter-spacing: 0.05em;
+      margin-bottom: 2rem;
+      font-style: italic;
+    }
+
+    /* PANELS — each section has its own tint */
+    .panel {
+      border-radius: 2px;
+      padding: 1.6rem;
+      margin-bottom: 1.4rem;
       position: relative;
     }
 
+    .panel-synth  { background: var(--panel);      border: 1px solid rgba(74,127,255,0.22); }
+    .panel-drum   { background: var(--panel-drum); border: 1px solid rgba(200,168,75,0.22); }
+    .panel-rec    { background: var(--panel-rec);  border: 1px solid rgba(255,58,58,0.2); }
+    .panel-credits { background: rgba(200,168,75,0.03); border: 1px solid rgba(200,168,75,0.15); padding: 1.2rem 1.6rem; border-radius: 2px; }
+
     .panel-label {
       font-family: var(--mono);
-      font-size: 0.6rem;
+      font-size: 0.7rem;
       letter-spacing: 0.3em;
-      color: var(--accent);
       text-transform: uppercase;
-      margin-bottom: 1rem;
+      margin-bottom: 1.2rem;
       display: flex;
       align-items: center;
       gap: 0.5rem;
@@ -130,8 +150,14 @@
       content: '';
       flex: 1;
       height: 1px;
-      background: var(--border);
     }
+
+    .panel-synth  .panel-label { color: var(--accent); }
+    .panel-synth  .panel-label::after { background: rgba(74,127,255,0.2); }
+    .panel-drum   .panel-label { color: var(--gold); }
+    .panel-drum   .panel-label::after { background: rgba(200,168,75,0.2); }
+    .panel-rec    .panel-label { color: var(--red); }
+    .panel-rec    .panel-label::after { background: rgba(255,58,58,0.2); }
 
     /* SYNTH SELECTOR */
     .synth-selector {
@@ -142,13 +168,20 @@
       flex-wrap: wrap;
     }
 
+    .synth-selector-label {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+    }
+
     .synth-btn {
       padding: 0.5rem 1.2rem;
       border: 1px solid var(--border);
       background: transparent;
       color: var(--muted);
       font-family: var(--mono);
-      font-size: 0.7rem;
+      font-size: 0.72rem;
       letter-spacing: 0.1em;
       cursor: pointer;
       transition: all 0.2s;
@@ -156,8 +189,8 @@
 
     .synth-btn.active {
       border-color: var(--accent);
-      color: var(--accent);
-      background: rgba(74,127,255,0.1);
+      color: var(--white);
+      background: rgba(74,127,255,0.12);
       box-shadow: 0 0 10px rgba(74,127,255,0.2);
     }
 
@@ -199,9 +232,9 @@
       height: 140px;
       background: linear-gradient(to bottom, #d0d8f0, #e8ecff);
       border: 1px solid #8899cc;
-      color: #334;
+      color: #223;
       font-family: var(--mono);
-      font-size: 0.55rem;
+      font-size: 0.6rem;
     }
 
     .key.white:hover, .key.white.active {
@@ -216,9 +249,9 @@
       height: 88px;
       background: linear-gradient(to bottom, #1a1e35, #0d0f1c);
       border: 1px solid #334;
-      color: var(--muted);
+      color: #8899bb;
       font-family: var(--mono);
-      font-size: 0.45rem;
+      font-size: 0.5rem;
       margin-left: -18px;
       margin-right: -18px;
       z-index: 2;
@@ -231,18 +264,10 @@
       transform: translateY(2px);
     }
 
-    .key .note-label {
-      font-size: 0.5rem;
-      opacity: 0.7;
-    }
+    .key .note-label  { font-size: 0.58rem; opacity: 0.85; font-weight: bold; }
+    .key .key-binding { font-size: 0.5rem;  opacity: 0.6;  margin-top: 2px; }
 
-    .key .key-binding {
-      font-size: 0.45rem;
-      opacity: 0.5;
-      margin-top: 2px;
-    }
-
-    /* VOLUME */
+    /* CONTROLS */
     .controls-row {
       display: flex;
       gap: 2rem;
@@ -259,7 +284,7 @@
 
     .vol-label {
       font-family: var(--mono);
-      font-size: 0.65rem;
+      font-size: 0.7rem;
       color: var(--muted);
       letter-spacing: 0.1em;
       min-width: 60px;
@@ -276,8 +301,7 @@
 
     input[type="range"]::-webkit-slider-thumb {
       -webkit-appearance: none;
-      width: 14px;
-      height: 14px;
+      width: 14px; height: 14px;
       background: var(--accent);
       border-radius: 50%;
       cursor: pointer;
@@ -286,41 +310,23 @@
 
     .vol-value {
       font-family: var(--mono);
-      font-size: 0.65rem;
+      font-size: 0.7rem;
       color: var(--accent);
       min-width: 35px;
     }
 
-    /* BEAT MACHINE */
-    .beat-grid {
-      display: flex;
-      gap: 1rem;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-
-    .beat-btn {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.4rem;
-      cursor: pointer;
-      background: none;
-      border: none;
-    }
-
+    /* BEAT PADS */
     .beat-pad {
       width: 70px;
       height: 70px;
-      border: 1px solid var(--border);
-      background: var(--panel2);
+      border: 1px solid rgba(200,168,75,0.3);
+      background: rgba(200,168,75,0.04);
       border-radius: 2px;
       display: flex;
       align-items: center;
       justify-content: center;
       font-family: var(--mono);
-      font-size: 0.7rem;
-      color: var(--muted);
+      color: var(--gold);
       transition: all 0.08s;
       cursor: pointer;
       user-select: none;
@@ -330,83 +336,41 @@
 
     .beat-pad:hover {
       border-color: var(--gold);
-      color: var(--gold);
+      background: rgba(200,168,75,0.1);
+      box-shadow: 0 0 10px rgba(200,168,75,0.2);
     }
 
     .beat-pad.active {
-      background: rgba(200,168,75,0.15);
+      background: rgba(200,168,75,0.2);
       border-color: var(--gold);
-      color: var(--gold);
-      box-shadow: 0 0 15px rgba(200,168,75,0.3);
-      transform: scale(0.96);
+      box-shadow: 0 0 18px rgba(200,168,75,0.4);
+      transform: scale(0.95);
     }
 
-    .beat-pad .pad-key {
-      font-size: 0.5rem;
-      opacity: 0.5;
+    .beat-pad .pad-key  { font-size: 0.55rem; opacity: 0.6; }
+    .beat-pad .pad-name { font-size: 0.72rem; font-weight: bold; letter-spacing: 0.1em; }
+
+    /* KB HINT */
+    .kb-hint {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      color: var(--muted);
+      text-align: center;
+      margin-top: 0.8rem;
+      letter-spacing: 0.08em;
+      line-height: 1.8;
     }
 
-    .beat-pad .pad-name {
-      font-size: 0.65rem;
-    }
-
-    /* RECORDING */
-    .rec-controls {
-      display: flex;
-      gap: 1rem;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-
-    .rec-btn {
-      padding: 0.6rem 1.4rem;
+    kbd {
+      display: inline-block;
+      padding: 2px 6px;
       border: 1px solid var(--border);
-      background: transparent;
-      color: var(--muted);
+      border-radius: 2px;
       font-family: var(--mono);
-      font-size: 0.7rem;
-      letter-spacing: 0.15em;
-      cursor: pointer;
-      transition: all 0.2s;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
+      font-size: 0.58rem;
+      color: var(--accent);
+      background: rgba(74,127,255,0.06);
     }
-
-    .rec-btn:hover { border-color: var(--accent); color: var(--white); }
-
-    .rec-btn.recording {
-      border-color: var(--red);
-      color: var(--red);
-      background: rgba(255,74,74,0.1);
-      animation: recpulse 1s ease-in-out infinite;
-    }
-
-    @keyframes recpulse {
-      0%, 100% { box-shadow: 0 0 5px rgba(255,74,74,0.3); }
-      50% { box-shadow: 0 0 15px rgba(255,74,74,0.6); }
-    }
-
-    .rec-btn.has-recording {
-      border-color: var(--green);
-      color: var(--green);
-    }
-
-    .rec-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: currentColor;
-    }
-
-    .rec-status {
-      font-family: var(--mono);
-      font-size: 0.65rem;
-      color: var(--muted);
-    }
-
-    .rec-status.recording { color: var(--red); }
-    .rec-status.ready { color: var(--green); }
 
     /* VU METER */
     .vu-meter {
@@ -423,46 +387,79 @@
       transition: height 0.1s;
     }
 
-    /* CREDITS */
-    .credits {
-      margin-top: 2rem;
-      padding: 1rem 1.5rem;
-      border: 1px solid rgba(200,168,75,0.15);
-      background: rgba(200,168,75,0.03);
+    /* RECORDING */
+    .rec-controls {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      flex-wrap: wrap;
     }
 
+    .rec-btn {
+      padding: 0.65rem 1.5rem;
+      border: 1px solid rgba(255,58,58,0.5);
+      background: rgba(255,58,58,0.08);
+      color: #ff8080;
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      letter-spacing: 0.15em;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .rec-btn:hover {
+      border-color: var(--red);
+      color: var(--white);
+      background: rgba(255,58,58,0.15);
+    }
+
+    .rec-btn.recording {
+      border-color: var(--red);
+      color: var(--red);
+      background: rgba(255,58,58,0.12);
+      animation: recpulse 1s ease-in-out infinite;
+    }
+
+    @keyframes recpulse {
+      0%, 100% { box-shadow: 0 0 6px var(--red-glow); }
+      50%       { box-shadow: 0 0 18px var(--red-glow); }
+    }
+
+    .rec-btn.secondary {
+      border-color: var(--border);
+      background: transparent;
+      color: var(--muted);
+    }
+    .rec-btn.secondary:hover { border-color: var(--accent); color: var(--white); }
+
+    .rec-btn.has-recording { border-color: var(--green); color: var(--green); }
+
+    .rec-dot {
+      width: 9px; height: 9px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    .rec-status {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      color: var(--muted);
+    }
+    .rec-status.recording { color: var(--red); }
+    .rec-status.ready     { color: var(--green); }
+
+    /* CREDITS */
     .credits p {
       font-family: var(--mono);
-      font-size: 0.6rem;
+      font-size: 0.65rem;
       color: var(--muted);
-      line-height: 1.8;
-      letter-spacing: 0.05em;
+      line-height: 2;
+      letter-spacing: 0.04em;
     }
-
-    .credits p strong {
-      color: var(--gold);
-    }
-
-    /* KEYBOARD HINT */
-    .kb-hint {
-      font-family: var(--mono);
-      font-size: 0.6rem;
-      color: var(--muted);
-      text-align: center;
-      margin-top: 0.8rem;
-      letter-spacing: 0.1em;
-    }
-
-    kbd {
-      display: inline-block;
-      padding: 1px 5px;
-      border: 1px solid var(--border);
-      border-radius: 2px;
-      font-family: var(--mono);
-      font-size: 0.55rem;
-      color: var(--accent);
-      background: rgba(74,127,255,0.05);
-    }
+    .credits p strong { color: var(--gold); }
   </style>
 </head>
 <body>
@@ -476,19 +473,21 @@
 <div class="studio">
 
   <div class="studio-title">
-    <h1>Synth REC</h1>
+    <h1>Synth Keys <span class="wip-badge">WIP</span></h1>
     <p>Jay Jabiru · Sound Laboratory · PSS-560 Series</p>
   </div>
 
+  <p class="page-desc">Record audios or simply experiment with sounds.</p>
+
   <!-- SYNTH PANEL -->
-  <div class="panel">
+  <div class="panel panel-synth">
     <div class="panel-label">Synthesizer</div>
 
     <div class="synth-selector">
-      <span style="font-family:var(--mono);font-size:0.65rem;color:var(--muted);letter-spacing:0.1em;">SOUND:</span>
+      <span class="synth-selector-label">SOUND:</span>
       <button class="synth-btn active" id="btn-synth1" onclick="selectSynth(1)">WOBBLY A — SYNTH 1</button>
       <button class="synth-btn" id="btn-synth2" onclick="selectSynth(2)">WOBBLY A3 — SYNTH 2</button>
-      <span style="font-family:var(--mono);font-size:0.65rem;color:var(--muted);letter-spacing:0.1em;margin-left:1rem;">MODE:</span>
+      <span class="synth-selector-label" style="margin-left:1rem;">MODE:</span>
       <button class="synth-btn" id="btn-loop" onclick="toggleLoop()" title="Coming soon — requires sustained sample" disabled style="opacity:0.3;cursor:not-allowed;">⟳ LOOP</button>
       <button class="synth-btn" id="btn-hold" onclick="toggleHold()" title="Coming soon — requires sustained sample" disabled style="opacity:0.3;cursor:not-allowed;">⏸ HOLD</button>
     </div>
@@ -516,11 +515,11 @@
       </div>
       <!-- BEAT VOLUME -->
       <div style="display:flex;flex-direction:column;align-items:center;gap:6px;padding-bottom:8px;flex-shrink:0;">
-        <span style="font-family:var(--mono);font-size:0.55rem;color:var(--muted);letter-spacing:0.1em;">BEAT<br>VOL</span>
+        <span style="font-family:var(--mono);font-size:0.65rem;color:var(--muted);letter-spacing:0.1em;text-align:center;">BEAT<br>VOL</span>
         <input type="range" id="beat-vol" min="0" max="100" value="80"
           style="writing-mode:vertical-lr;direction:rtl;width:28px;height:120px;"
           oninput="updateVol('beat', this.value)">
-        <span class="vol-value" id="beat-vol-val" style="font-size:0.55rem;">80</span>
+        <span class="vol-value" id="beat-vol-val" style="font-size:0.65rem;">80</span>
       </div>
     </div>
 
@@ -547,28 +546,22 @@
   </div>
 
   <!-- RECORDING -->
-  <div class="panel">
+  <div class="panel panel-rec">
     <div class="panel-label">Recording</div>
     <div class="rec-controls">
       <button class="rec-btn" id="rec-btn" onclick="toggleRecord()">
         <div class="rec-dot"></div>
         <span id="rec-btn-text">RECORD</span>
       </button>
-      <button class="rec-btn" id="play-btn" onclick="playRecording()" style="display:none;">
-        ▶ PLAY
-      </button>
-      <button class="rec-btn" id="dl-btn" onclick="downloadRecording()" style="display:none;">
-        ↓ DOWNLOAD
-      </button>
-      <button class="rec-btn" id="clear-btn" onclick="clearRecording()" style="display:none;">
-        ✕ CLEAR
-      </button>
+      <button class="rec-btn secondary" id="play-btn" onclick="playRecording()" style="display:none;">▶ PLAY</button>
+      <button class="rec-btn secondary" id="dl-btn" onclick="downloadRecording()" style="display:none;">↓ SAVE</button>
+      <button class="rec-btn secondary" id="clear-btn" onclick="clearRecording()" style="display:none;">✕ CLEAR</button>
       <span class="rec-status" id="rec-status">Ready</span>
     </div>
   </div>
 
   <!-- CREDITS -->
-  <div class="credits">
+  <div class="panel-credits credits">
     <p>
       <strong>Sound Sources — Creative Commons 0 (CC0) — No rights reserved</strong><br>
       All sounds may be freely used, modified and distributed for any purpose including commercial use.<br><br>

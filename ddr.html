@@ -442,7 +442,7 @@
 
 <nav>
   <a href="index.html" class="nav-brand">JAY JABIRU</a>
-  <span style="font-family:'Space Mono',monospace;font-size:.65rem;letter-spacing:.15em;color:var(--gold);opacity:.9">V 1.13</span>
+  <span style="font-family:'Space Mono',monospace;font-size:.65rem;letter-spacing:.15em;color:var(--gold);opacity:.9">V 1.14</span>
   <a href="index.html" class="nav-back">← EXPLORE</a>
 </nav>
 
@@ -940,21 +940,26 @@ document.addEventListener('keydown', onKeyDown);
 function gameLoop() {
   if (!gameRunning) return;
 
-  const now = audioContext.currentTime - startTime;
-  const canvasW = gameCanvas.width;
-  const canvasH = gameCanvas.height;
+  try {
+    const now = audioContext.currentTime - startTime;
+    const canvasW = gameCanvas.width;
+    const canvasH = gameCanvas.height;
 
-  // Miss detection
-  notes.forEach(n => {
-    if (!n.hit && !n.missed && n.time < now - GOOD_WIN) {
-      n.missed = true;
-      combo = 0;
-      health = Math.max(0, health - 8);
-      stats.miss++;
-      showJudgment('MISS', '#ff4444');
-      updateHUD();
-    }
-  });
+    // Miss detection — only show judgment for first miss per frame
+    let missedThisFrame = false;
+    notes.forEach(n => {
+      if (!n.hit && !n.missed && n.time < now - GOOD_WIN) {
+        n.missed = true;
+        combo = 0;
+        health = Math.max(0, health - 8);
+        stats.miss++;
+        if (!missedThisFrame) {
+          showJudgment('MISS', '#ff4444');
+          missedThisFrame = true;
+        }
+        updateHUD();
+      }
+    });
 
   // Clear
   gCtx.clearRect(0, 0, canvasW, canvasH);
@@ -1042,22 +1047,29 @@ function gameLoop() {
     return;
   }
 
-  // ── DIAGNOSTICS ──
-  const nearestUnhit = notes
-    .filter(n => !n.hit && !n.missed)
-    .sort((a,b) => Math.abs(a.time - now) - Math.abs(b.time - now))[0];
-  if (nearestUnhit) {
-    const diff = (nearestUnhit.time - now) * 1000;
-    const ny = noteY(nearestUnhit, now, canvasH);
-    document.getElementById('d-clock').textContent = now.toFixed(3) + 's';
-    document.getElementById('d-nearest').textContent =
-      `lane=${nearestUnhit.lane} Δ=${diff.toFixed(0)}ms (${diff > 0 ? 'future' : 'PAST'})`;
-    document.getElementById('d-noty').textContent = ny.toFixed(1) + 'px';
-    document.getElementById('d-hity').textContent = hitY.toFixed(1) + 'px';
-  }
-  // ─────────────────
+    // ── DIAGNOSTICS ──
+    const nearestUnhit = notes
+      .filter(n => !n.hit && !n.missed)
+      .sort((a,b) => Math.abs(a.time - now) - Math.abs(b.time - now))[0];
+    if (nearestUnhit) {
+      const diff = (nearestUnhit.time - now) * 1000;
+      const ny = noteY(nearestUnhit, now, canvasH);
+      document.getElementById('d-clock').textContent = now.toFixed(3) + 's';
+      document.getElementById('d-nearest').textContent =
+        `lane=${nearestUnhit.lane} Δ=${diff.toFixed(0)}ms (${diff > 0 ? 'future' : 'PAST'})`;
+      document.getElementById('d-noty').textContent = ny.toFixed(1) + 'px';
+      document.getElementById('d-hity').textContent = hitY.toFixed(1) + 'px';
+    }
+    // ─────────────────
 
-  animId = requestAnimationFrame(gameLoop);
+    animId = requestAnimationFrame(gameLoop);
+
+  } catch(err) {
+    console.error('gameLoop crash:', err);
+    document.getElementById('d-result').style.color = '#ff4444';
+    document.getElementById('d-result').textContent = 'LOOP ERR: ' + err.message;
+    animId = requestAnimationFrame(gameLoop); // keep running despite error
+  }
 }
 
 // ─────────────────────────────────────────

@@ -379,16 +379,16 @@
   /* ── INSTRUCTIONS ── */
   #instructions {
     width: var(--game-w);
-    background: rgba(255,255,255,.02);
-    border: 1px solid rgba(201,162,39,.1);
+    background: rgba(255,255,255,.04);
+    border: 1px solid rgba(201,162,39,.2);
     border-radius: 4px;
-    padding: 16px;
-    font-size: .7rem;
-    letter-spacing: .08em;
-    color: rgba(232,224,204,.4);
-    line-height: 1.8;
+    padding: 18px;
+    font-size: .85rem;
+    letter-spacing: .06em;
+    color: rgba(232,224,204,.85);
+    line-height: 2;
   }
-  #instructions strong { color: rgba(201,162,39,.7); }
+  #instructions strong { color: var(--gold-light); }
   .key-row {
     display: flex;
     gap: 12px;
@@ -396,10 +396,10 @@
     margin-top: 8px;
   }
   .key-tag {
-    padding: 2px 8px;
+    padding: 3px 10px;
     border: 1px solid;
     border-radius: 3px;
-    font-size: .65rem;
+    font-size: .8rem;
     letter-spacing: .05em;
   }
 
@@ -852,6 +852,9 @@ function gameLoop() {
   gCtx.clearRect(0, 0, canvasW, canvasH);
   pCtx.clearRect(0, 0, canvasW, canvasH);
 
+  // hitY used throughout the loop
+  const hitY = HIT_Y_FRAC(canvasH);
+
   // Target zone glow behind receptors
   for (let i = 0; i < 4; i++) {
     const tx = laneX(i, canvasW);
@@ -868,11 +871,10 @@ function gameLoop() {
   for (let i = 0; i < 4; i++) {
     const lc = ['rgba(240,90,90,.03)','rgba(77,166,245,.03)','rgba(168,85,247,.03)','rgba(201,162,39,.03)'][i];
     gCtx.fillStyle = lc;
-    gCtx.fillRect(i*LANE_W + 8, 0, LANE_W - 8, canvasH);
+    gCtx.fillRect(i * (canvasW/4), 0, canvasW/4, canvasH);
   }
 
   // Notes
-  const hitY = HIT_Y_FRAC(canvasH);
   notes.forEach(n => {
     if (n.hit || n.missed) return;
     const y = noteY(n, now, canvasH);

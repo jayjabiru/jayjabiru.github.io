@@ -590,8 +590,17 @@
 
     <div class="section-info" id="section-info">Esus chord — warm, ethereal, ambient one-shot</div>
 
-    <div class="keyboard-outer">
+    <div class="keyboard-outer" style="display:flex;align-items:flex-end;gap:12px;">
       <div class="keyboard" id="keyboard"></div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:6px;padding-bottom:10px;">
+        <div class="beat-pad" id="pad-kick" onmousedown="triggerKick()" ontouchstart="triggerKick()">
+          <span style="font-size:0.65rem;font-family:var(--mono);">KICK</span>
+          <span style="font-size:0.4rem;opacity:0.4;font-family:var(--mono);">Space</span>
+        </div>
+        <input type="range" id="kick-vol" min="0" max="100" value="80"
+          style="width:64px;transform:rotate(-90deg) translateX(-18px) translateY(18px);"
+          oninput="kickVol=this.value/100">
+      </div>
     </div>
 
     <div class="kb-hint">
@@ -609,17 +618,6 @@
         <div class="vu-b"></div><div class="vu-b"></div><div class="vu-b"></div>
         <div class="vu-b"></div><div class="vu-b"></div><div class="vu-b"></div>
       </div>
-      <div style="border-left:1px solid rgba(155,114,207,0.15);padding-left:1.5rem;display:flex;align-items:center;gap:1rem;">
-        <span style="font-family:var(--mono);font-size:0.58rem;color:var(--muted);letter-spacing:0.15em;">BEAT</span>
-        <div class="beat-pad" id="pad-kick" onmousedown="triggerKick()" ontouchstart="triggerKick()">
-          <span style="font-size:0.65rem;">KICK</span>
-          <span style="font-size:0.45rem;opacity:0.5;">key: Space</span>
-        </div>
-        <div class="vol-control">
-          <span class="vol-label" style="min-width:40px;">KICK</span>
-          <input type="range" id="kick-vol" min="0" max="100" value="80" oninput="kickVol=this.value/100">
-        </div>
-      </div>
     </div>
   </div>
 
@@ -634,6 +632,7 @@
       <button class="type-btn" onclick="setDistType('bitcrush')">Bit Crush</button>
       <button class="type-btn" onclick="setDistType('ring')">Ring Mod</button>
       <button class="type-btn" onclick="setDistType('tape')">Tape Sat</button>
+      <button class="type-btn" onclick="resetDist()" style="margin-left:auto;border-color:rgba(212,168,90,0.3);color:var(--gold);">↺ Reset</button>
     </div>
 
     <div class="dist-grid">
@@ -994,6 +993,21 @@ function setDistType(type) {
   distType = type;
   document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
   event.target.classList.add('active');
+  updateDist();
+}
+
+function resetDist() {
+  // Reset all sliders to defaults
+  document.getElementById('dist-drive').value = 20;
+  document.getElementById('dist-tone').value = 3000;
+  document.getElementById('dist-mix').value = 50;
+  document.getElementById('dist-out').value = 70;
+  document.getElementById('dist-res').value = 1;
+  document.getElementById('dist-depth').value = 8;
+  // Reset type to soft
+  distType = 'soft';
+  document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector('.type-btn:first-child').classList.add('active');
   updateDist();
 }
 

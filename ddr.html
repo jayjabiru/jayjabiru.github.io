@@ -695,13 +695,14 @@ const pCtx = pCanvas.getContext('2d');
 
 function resizeCanvases() {
   const wrap = document.getElementById('game-wrap');
-  // Force a layout flush before reading dimensions
-  const w = wrap.getBoundingClientRect().width;
-  const h = wrap.getBoundingClientRect().height;
-  if (w > 0 && h > 0) {
-    gameCanvas.width = pCanvas.width = Math.floor(w);
-    gameCanvas.height = pCanvas.height = Math.floor(h);
-  }
+  const rect = wrap.getBoundingClientRect();
+  const w = rect.width || wrap.offsetWidth || 380;
+  const h = rect.height || wrap.offsetHeight || 600;
+  gameCanvas.width  = pCanvas.width  = Math.floor(w);
+  gameCanvas.height = pCanvas.height = Math.floor(h);
+  // Debug: paint a faint yellow wash so we can confirm canvas is live
+  gCtx.fillStyle = 'rgba(255,255,0,0.1)';
+  gCtx.fillRect(0, 0, gameCanvas.width, gameCanvas.height);
 }
 
 const LANE_W = 80;
@@ -976,6 +977,14 @@ function startGame() {
 
   gameRunning = true;
   if (animId) cancelAnimationFrame(animId);
+
+  // ── DIAGNOSTICS ──
+  console.log('Canvas size:', gameCanvas.width, 'x', gameCanvas.height);
+  console.log('Notes generated:', notes.length);
+  if (notes.length > 0) console.log('First 3 notes:', notes.slice(0,3));
+  console.log('startTime:', startTime, 'audioContext.currentTime:', audioContext.currentTime);
+  // ─────────────────
+
   gameLoop();
 }
 

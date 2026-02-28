@@ -442,7 +442,7 @@
 
 <nav>
   <a href="index.html" class="nav-brand">JAY JABIRU</a>
-  <span style="font-family:'Space Mono',monospace;font-size:.65rem;letter-spacing:.15em;color:var(--gold);opacity:.9">V 1.15</span>
+  <span style="font-family:'Space Mono',monospace;font-size:.65rem;letter-spacing:.15em;color:var(--gold);opacity:.9">V 1.17</span>
   <a href="index.html" class="nav-back">← EXPLORE</a>
 </nav>
 
@@ -452,6 +452,16 @@
 </header>
 
 <div id="app">
+
+  <!-- Built-in tracks -->
+  <div style="width:var(--game-w)">
+    <div style="font-size:.65rem;letter-spacing:.15em;color:rgba(201,162,39,.5);font-family:'Space Mono',monospace;margin-bottom:8px">OR CHOOSE A TRACK</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn" onclick="loadBuiltIn('disco-2098.mp3','Disco 2098')" id="btn-t1">DISCO 2098</button>
+      <button class="btn" onclick="loadBuiltIn('dungeon-disco-short.mp3','Dungeon Disco')" id="btn-t2">DUNGEON DISCO</button>
+      <button class="btn" onclick="loadBuiltIn('space-disco-short.mp3','Space Disco')" id="btn-t3">SPACE DISCO</button>
+    </div>
+  </div>
 
   <!-- Upload -->
   <div id="upload-area" onclick="document.getElementById('file-input').click()">
@@ -585,6 +595,21 @@
     The chart is <strong>auto-generated from your audio file</strong> — peaks, beats and transients are detected and mapped to arrows. Energy levels shape the density: quieter sections stay sparse, chorus sections hit hard.
   </div>
 
+  <!-- Volume -->
+  <div style="display:flex;align-items:center;gap:12px;width:var(--game-w)">
+    <span style="font-size:.7rem;letter-spacing:.12em;color:rgba(201,162,39,.6);font-family:'Space Mono',monospace">VOL</span>
+    <input type="range" id="volume" min="0" max="1" step="0.01" value="0.8"
+      oninput="setVolume(this.value)"
+      style="flex:1;accent-color:var(--gold);cursor:pointer">
+    <span id="vol-pct" style="font-size:.7rem;color:rgba(201,162,39,.6);font-family:'Space Mono',monospace;width:2.5em;text-align:right">80%</span>
+  </div>
+
+  <!-- Legal -->
+  <p style="font-size:.6rem;letter-spacing:.07em;color:rgba(232,224,204,.25);text-align:center;width:var(--game-w);line-height:1.7">
+    Rhythm Stage is an original work by Jay Jabiru.<br>
+    Audio is user-supplied and is not stored, transmitted or distributed.
+  </p>
+
 </div>
 
   <div id="scroll-freeze" onclick="stopAndUnfreeze()" title="Click to stop game and re-enable scrolling">
@@ -650,17 +675,50 @@ document.getElementById('file-input').addEventListener('change', e => {
 let audioBuffer = null;
 let chart = [];
 let audioContext = null;
+let gainNode = null;
 let sourceNode = null;
 let startTime = 0;
 let trackDuration = 0;
 let trackName = '';
+
+function setVolume(v) {
+  if (gainNode) gainNode.gain.value = parseFloat(v);
+  document.getElementById('vol-pct').textContent = Math.round(v * 100) + '%';
+}
+
+async function loadBuiltIn(filename, label) {
+  if (!audioContext) {
+    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    gainNode = audioContext.createGain();
+    gainNode.gain.value = parseFloat(document.getElementById('volume').value);
+    gainNode.connect(audioContext.destination);
+  }
+  document.getElementById('track-name').textContent = '⏳ Loading ' + label + '…';
+  try {
+    const resp = await fetch(filename);
+    const arrayBuf = await resp.arrayBuffer();
+    audioBuffer = await audioContext.decodeAudioData(arrayBuf);
+    trackDuration = audioBuffer.duration;
+    trackName = label;
+    document.getElementById('track-name').textContent = '▶ ' + label.toUpperCase();
+    document.getElementById('overlay-sub').textContent =
+      `${label.toUpperCase()} · ${Math.floor(trackDuration/60)}:${String(Math.floor(trackDuration%60)).padStart(2,'0')} · Choose difficulty and hit BEGIN`;
+  } catch(e) {
+    document.getElementById('track-name').textContent = '⚠ Could not load ' + label;
+  }
+}
 
 function handleFile(file) {
   trackName = file.name.replace(/\.[^.]+$/, '');
   document.getElementById('track-name').textContent = '▶ ' + trackName.toUpperCase();
   const reader = new FileReader();
   reader.onload = async (e) => {
-    if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    if (!audioContext) {
+    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    gainNode = audioContext.createGain();
+    gainNode.gain.value = parseFloat(document.getElementById('volume').value);
+    gainNode.connect(audioContext.destination);
+  }
     try {
       audioBuffer = await audioContext.decodeAudioData(e.target.result);
       trackDuration = audioBuffer.duration;
@@ -1194,7 +1252,7 @@ function launchGame() {
   if (audioContext.state === 'suspended') audioContext.resume();
   sourceNode = audioContext.createBufferSource();
   sourceNode.buffer = audioBuffer;
-  sourceNode.connect(audioContext.destination);
+  sourceNode.connect(gainNode);
   startTime = audioContext.currentTime;
   sourceNode.start(0);
   sourceNode.onended = () => { if (gameRunning) endGame(); };

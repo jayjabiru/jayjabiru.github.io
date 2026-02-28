@@ -442,7 +442,7 @@
 
 <nav>
   <a href="index.html" class="nav-brand">JAY JABIRU</a>
-  <span style="font-family:'Space Mono',monospace;font-size:.65rem;letter-spacing:.15em;color:var(--gold);opacity:.9">V 1.14</span>
+  <span style="font-family:'Space Mono',monospace;font-size:.65rem;letter-spacing:.15em;color:var(--gold);opacity:.9">V 1.15</span>
   <a href="index.html" class="nav-back">← EXPLORE</a>
 </nav>
 
@@ -499,20 +499,29 @@
   <!-- Game row: diagnostic left, playfield right -->
   <div style="display:flex;gap:12px;align-items:flex-start;width:100%;max-width:700px;justify-content:center">
 
-    <!-- DIAGNOSTIC PANEL -->
-    <div id="diag" style="
-      width:200px;flex-shrink:0;
-      background:rgba(0,0,0,.85);border:1px solid #333;
-      border-radius:4px;padding:10px 12px;font-family:'Space Mono',monospace;
-      font-size:.62rem;line-height:2;color:#888;
-    ">
-      <div style="color:#f0c84a;letter-spacing:.1em;margin-bottom:4px;font-size:.65rem">⚙ DIAG</div>
-      <div>clock: <span id="d-clock" style="color:#fff">—</span></div>
-      <div>lane Δ: <span id="d-nearest" style="color:#fff">—</span></div>
-      <div>note Y: <span id="d-noty" style="color:#fff">—</span></div>
-      <div>hit Y: <span id="d-hity" style="color:#fff">—</span></div>
-      <div>key: <span id="d-key" style="color:#fff">—</span></div>
-      <div>result: <span id="d-result" style="color:#fff">—</span></div>
+    <!-- DIAGNOSTIC TOGGLE -->
+    <div style="display:flex;flex-direction:column;align-items:center;gap:6px">
+      <button id="diag-toggle" onclick="toggleDiag()" style="
+        background:transparent;border:1px solid rgba(255,255,255,.1);
+        color:rgba(255,255,255,.2);font-family:'Space Mono',monospace;
+        font-size:.55rem;letter-spacing:.12em;padding:5px 8px;
+        border-radius:3px;cursor:pointer;transition:all .2s;
+      " title="Toggle diagnostics">⚙</button>
+
+      <div id="diag" style="
+        display:none;width:200px;
+        background:rgba(0,0,0,.85);border:1px solid #333;
+        border-radius:4px;padding:10px 12px;font-family:'Space Mono',monospace;
+        font-size:.62rem;line-height:2;color:#888;
+      ">
+        <div style="color:#f0c84a;letter-spacing:.1em;margin-bottom:4px;font-size:.65rem">⚙ DIAG</div>
+        <div>clock: <span id="d-clock" style="color:#fff">—</span></div>
+        <div>lane Δ: <span id="d-nearest" style="color:#fff">—</span></div>
+        <div>note Y: <span id="d-noty" style="color:#fff">—</span></div>
+        <div>hit Y: <span id="d-hity" style="color:#fff">—</span></div>
+        <div>key: <span id="d-key" style="color:#fff">—</span></div>
+        <div>result: <span id="d-result" style="color:#fff">—</span></div>
+      </div>
     </div>
 
     <!-- PLAYFIELD -->
@@ -853,6 +862,15 @@ function updateHUD() {
 // ─────────────────────────────────────────
 //  KEY HANDLER
 // ─────────────────────────────────────────
+function toggleDiag() {
+  const panel = document.getElementById('diag');
+  const btn   = document.getElementById('diag-toggle');
+  const open  = panel.style.display === 'none';
+  panel.style.display = open ? 'block' : 'none';
+  btn.style.color     = open ? 'rgba(255,255,255,.5)' : 'rgba(255,255,255,.2)';
+  btn.style.borderColor = open ? 'rgba(255,255,255,.3)' : 'rgba(255,255,255,.1)';
+}
+
 function lockScroll() {
   document.body.classList.add('scroll-locked');
   document.getElementById('scroll-freeze').style.display = 'block';

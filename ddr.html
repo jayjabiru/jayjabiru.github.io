@@ -111,40 +111,43 @@
     max-width: 700px;
   }
 
-  /* ── HUD ── */
+  /* ── HUD (left column) ── */
   #hud {
-    width: var(--game-w);
     display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    padding: 0 4px;
+    flex-direction: column;
+    gap: 10px;
+    width: 110px;
+    flex-shrink: 0;
+    padding-top: 8px;
   }
-  .hud-block { text-align: center; }
+  .hud-block { text-align: left; }
   .hud-label {
-    font-size: .6rem;
-    letter-spacing: .15em;
-    color: rgba(201,162,39,.5);
+    font-size: .58rem;
+    letter-spacing: .18em;
+    color: rgba(201,162,39,.45);
     margin-bottom: 2px;
   }
   .hud-value {
     font-family: 'Orbitron', sans-serif;
-    font-size: 1.4rem;
+    font-size: 1.3rem;
     font-weight: 700;
     color: var(--gold-light);
+    line-height: 1;
   }
   #combo-display { color: var(--cyan); }
   #health-bar-wrap {
     width: 100%;
-    height: 6px;
+    height: 18px;
     background: rgba(255,255,255,.08);
-    border-radius: 3px;
+    border-radius: 4px;
     overflow: hidden;
-    margin-top: 6px;
+    margin-top: 4px;
+    border: 1px solid rgba(255,255,255,.06);
   }
   #health-bar {
     height: 100%;
     background: linear-gradient(90deg, var(--cyan), var(--gold));
-    border-radius: 3px;
+    border-radius: 4px;
     transition: width .15s;
   }
 
@@ -442,7 +445,7 @@
 
 <nav>
   <a href="index.html" class="nav-brand">JAY JABIRU</a>
-  <span style="font-family:'Space Mono',monospace;font-size:.65rem;letter-spacing:.15em;color:var(--gold);opacity:.9">V 1.17</span>
+  <span style="font-family:'Space Mono',monospace;font-size:.65rem;letter-spacing:.15em;color:var(--gold);opacity:.9">V 1.18</span>
   <a href="index.html" class="nav-back">← EXPLORE</a>
 </nav>
 
@@ -456,10 +459,19 @@
   <!-- Built-in tracks -->
   <div style="width:var(--game-w)">
     <div style="font-size:.65rem;letter-spacing:.15em;color:rgba(201,162,39,.5);font-family:'Space Mono',monospace;margin-bottom:8px">OR CHOOSE A TRACK</div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <button class="btn" onclick="loadBuiltIn('disco-2098.mp3','Disco 2098')" id="btn-t1">DISCO 2098</button>
-      <button class="btn" onclick="loadBuiltIn('dungeon-disco-short.mp3','Dungeon Disco')" id="btn-t2">DUNGEON DISCO</button>
-      <button class="btn" onclick="loadBuiltIn('space-disco-short.mp3','Space Disco')" id="btn-t3">SPACE DISCO</button>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:2px">
+        <button class="btn" onclick="loadBuiltIn('disco-2098.mp3','Disco 2098')" id="btn-t1">DISCO 2098</button>
+        <span id="dur-t1" style="font-size:.6rem;color:rgba(201,162,39,.45);font-family:'Space Mono',monospace">—:——</span>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:2px">
+        <button class="btn" onclick="loadBuiltIn('dungeon-disco-short.mp3','Dungeon Disco')" id="btn-t2">DUNGEON DISCO</button>
+        <span id="dur-t2" style="font-size:.6rem;color:rgba(201,162,39,.45);font-family:'Space Mono',monospace">—:——</span>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:2px">
+        <button class="btn" onclick="loadBuiltIn('space-disco-short.mp3','Space Disco')" id="btn-t3">SPACE DISCO</button>
+        <span id="dur-t3" style="font-size:.6rem;color:rgba(201,162,39,.45);font-family:'Space Mono',monospace">—:——</span>
+      </div>
     </div>
   </div>
 
@@ -471,32 +483,17 @@
   </div>
   <input type="file" id="file-input" accept="audio/*">
   <div id="track-name"></div>
+  <div id="track-dur" style="font-size:.65rem;color:rgba(201,162,39,.5);font-family:'Space Mono',monospace;text-align:center;min-height:1em"></div>
 
   <!-- Controls -->
   <div id="controls">
-    <select id="difficulty">
+    <select id="difficulty" onchange="updateDiffScore()">
       <option value="easy">EASY</option>
       <option value="medium" selected>MEDIUM</option>
       <option value="hard">HARD</option>
     </select>
     <button class="btn primary" id="btn-start" onclick="startGame()">PLAY</button>
     <button class="btn" id="btn-restart" onclick="restartGame()" style="display:none">RETRY</button>
-  </div>
-
-  <!-- HUD -->
-  <div id="hud">
-    <div class="hud-block">
-      <div class="hud-label">SCORE</div>
-      <div class="hud-value" id="score-display">0</div>
-    </div>
-    <div class="hud-block">
-      <div class="hud-label">COMBO</div>
-      <div class="hud-value" id="combo-display">×0</div>
-    </div>
-    <div class="hud-block" style="flex:1;margin:0 16px">
-      <div class="hud-label">HEALTH</div>
-      <div id="health-bar-wrap"><div id="health-bar" style="width:100%"></div></div>
-    </div>
   </div>
 
   <div id="visibility-error" style="
@@ -506,31 +503,26 @@
     font-size:.8rem;letter-spacing:.08em;color:#ff6666;text-align:center;
   ">⚠ Playfield not fully visible — scroll up or zoom out, then try again.</div>
 
-  <!-- Game row: diagnostic left, playfield right -->
+  <!-- Game row: HUD left · playfield centre · diag right -->
   <div style="display:flex;gap:12px;align-items:flex-start;width:100%;max-width:700px;justify-content:center">
 
-    <!-- DIAGNOSTIC TOGGLE -->
-    <div style="display:flex;flex-direction:column;align-items:center;gap:6px">
-      <button id="diag-toggle" onclick="toggleDiag()" style="
-        background:transparent;border:1px solid rgba(255,255,255,.1);
-        color:rgba(255,255,255,.2);font-family:'Space Mono',monospace;
-        font-size:.55rem;letter-spacing:.12em;padding:5px 8px;
-        border-radius:3px;cursor:pointer;transition:all .2s;
-      " title="Toggle diagnostics">⚙</button>
-
-      <div id="diag" style="
-        display:none;width:200px;
-        background:rgba(0,0,0,.85);border:1px solid #333;
-        border-radius:4px;padding:10px 12px;font-family:'Space Mono',monospace;
-        font-size:.62rem;line-height:2;color:#888;
-      ">
-        <div style="color:#f0c84a;letter-spacing:.1em;margin-bottom:4px;font-size:.65rem">⚙ DIAG</div>
-        <div>clock: <span id="d-clock" style="color:#fff">—</span></div>
-        <div>lane Δ: <span id="d-nearest" style="color:#fff">—</span></div>
-        <div>note Y: <span id="d-noty" style="color:#fff">—</span></div>
-        <div>hit Y: <span id="d-hity" style="color:#fff">—</span></div>
-        <div>key: <span id="d-key" style="color:#fff">—</span></div>
-        <div>result: <span id="d-result" style="color:#fff">—</span></div>
+    <!-- HUD (left) -->
+    <div id="hud">
+      <div class="hud-block">
+        <div class="hud-label">SCORE</div>
+        <div class="hud-value" id="score-display">0</div>
+      </div>
+      <div class="hud-block">
+        <div class="hud-label">COMBO</div>
+        <div class="hud-value" id="combo-display">×0</div>
+      </div>
+      <div class="hud-block">
+        <div class="hud-label">HEALTH</div>
+        <div id="health-bar-wrap"><div id="health-bar" style="width:100%"></div></div>
+      </div>
+      <div class="hud-block" style="margin-top:8px">
+        <div class="hud-label">DIFFICULTY</div>
+        <div id="diff-score" style="font-family:'Orbitron',sans-serif;font-size:1.1rem;font-weight:700;color:var(--gold-light)">—</div>
       </div>
     </div>
 
@@ -578,6 +570,30 @@
       ">3</div>
     </div><!-- /countdown -->
   </div><!-- /game-wrap -->
+
+    <!-- DIAGNOSTIC (right) -->
+    <div style="display:flex;flex-direction:column;align-items:center;gap:6px;padding-top:8px">
+      <button id="diag-toggle" onclick="toggleDiag()" style="
+        background:transparent;border:1px solid rgba(255,255,255,.1);
+        color:rgba(255,255,255,.2);font-family:'Space Mono',monospace;
+        font-size:.55rem;letter-spacing:.12em;padding:5px 8px;
+        border-radius:3px;cursor:pointer;transition:all .2s;
+      " title="Toggle diagnostics">⚙</button>
+      <div id="diag" style="
+        display:none;width:160px;
+        background:rgba(0,0,0,.85);border:1px solid #333;
+        border-radius:4px;padding:10px 12px;font-family:'Space Mono',monospace;
+        font-size:.58rem;line-height:2;color:#888;
+      ">
+        <div style="color:#f0c84a;letter-spacing:.1em;margin-bottom:4px;font-size:.6rem">⚙ DIAG</div>
+        <div>clock: <span id="d-clock" style="color:#fff">—</span></div>
+        <div>lane Δ: <span id="d-nearest" style="color:#fff">—</span></div>
+        <div>note Y: <span id="d-noty" style="color:#fff">—</span></div>
+        <div>hit Y: <span id="d-hity" style="color:#fff">—</span></div>
+        <div>key: <span id="d-key" style="color:#fff">—</span></div>
+        <div>result: <span id="d-result" style="color:#fff">—</span></div>
+      </div>
+    </div>
 
   </div><!-- /game row flex -->
 
@@ -681,7 +697,53 @@ let startTime = 0;
 let trackDuration = 0;
 let trackName = '';
 
-function setVolume(v) {
+function fmtDur(secs) {
+  return Math.floor(secs/60) + ':' + String(Math.floor(secs%60)).padStart(2,'0');
+}
+
+function analyseDifficulty(buffer, difficulty) {
+  // Run the same onset detection as generateChart but just count and measure
+  const sampleRate = buffer.sampleRate;
+  const data = buffer.getChannelData(0);
+  const frameSize = 1024;
+  const hopSize = 512;
+  const numFrames = Math.floor((data.length - frameSize) / hopSize);
+  const energy = new Float32Array(numFrames);
+  for (let i = 0; i < numFrames; i++) {
+    let sum = 0;
+    const offset = i * hopSize;
+    for (let j = 0; j < frameSize; j++) sum += data[offset+j]**2;
+    energy[i] = Math.sqrt(sum / frameSize);
+  }
+  const threshold = { easy:0.018, medium:0.010, hard:0.005 }[difficulty];
+  const minGap    = { easy:0.35,  medium:0.22,  hard:0.12  }[difficulty];
+  let onsets = 0, lastOnset = -999;
+  for (let i = 2; i < numFrames-1; i++) {
+    const diff = energy[i] - energy[i-1];
+    const sec = (i * hopSize) / sampleRate;
+    if (diff > threshold && energy[i] > energy[i+1] && sec - lastOnset > minGap) {
+      onsets++;
+      lastOnset = sec;
+    }
+  }
+  const duration = buffer.duration;
+  const notesPerSec = onsets / duration;
+  // Calibrate: ~0.5 n/s = easy baseline (1), ~4 n/s = hard ceiling (10)
+  const raw = (notesPerSec - 0.5) / (4.0 - 0.5) * 9 + 1;
+  return Math.min(10, Math.max(0.5, raw));
+}
+
+function updateDiffScore() {
+  if (!audioBuffer) return;
+  const diff = document.getElementById('difficulty').value;
+  const score = analyseDifficulty(audioBuffer, diff);
+  document.getElementById('diff-score').textContent = score.toFixed(2);
+  // Colour: green→yellow→red
+  const t = score / 10;
+  const r = Math.round(255 * Math.min(1, t * 2));
+  const g = Math.round(255 * Math.min(1, (1-t) * 2));
+  document.getElementById('diff-score').style.color = `rgb(${r},${g},50)`;
+}
   if (gainNode) gainNode.gain.value = parseFloat(v);
   document.getElementById('vol-pct').textContent = Math.round(v * 100) + '%';
 }
@@ -694,15 +756,22 @@ async function loadBuiltIn(filename, label) {
     gainNode.connect(audioContext.destination);
   }
   document.getElementById('track-name').textContent = '⏳ Loading ' + label + '…';
+  document.getElementById('track-dur').textContent = '';
   try {
     const resp = await fetch(filename);
     const arrayBuf = await resp.arrayBuffer();
     audioBuffer = await audioContext.decodeAudioData(arrayBuf);
     trackDuration = audioBuffer.duration;
     trackName = label;
+    const durStr = fmtDur(trackDuration);
     document.getElementById('track-name').textContent = '▶ ' + label.toUpperCase();
+    document.getElementById('track-dur').textContent = durStr;
+    // Update the duration under the correct button
+    const btnMap = { 'disco-2098.mp3':'dur-t1', 'dungeon-disco-short.mp3':'dur-t2', 'space-disco-short.mp3':'dur-t3' };
+    if (btnMap[filename]) document.getElementById(btnMap[filename]).textContent = durStr;
     document.getElementById('overlay-sub').textContent =
-      `${label.toUpperCase()} · ${Math.floor(trackDuration/60)}:${String(Math.floor(trackDuration%60)).padStart(2,'0')} · Choose difficulty and hit BEGIN`;
+      `${label.toUpperCase()} · ${durStr} · Choose difficulty and hit BEGIN`;
+    updateDiffScore();
   } catch(e) {
     document.getElementById('track-name').textContent = '⚠ Could not load ' + label;
   }
@@ -722,7 +791,10 @@ function handleFile(file) {
     try {
       audioBuffer = await audioContext.decodeAudioData(e.target.result);
       trackDuration = audioBuffer.duration;
-      document.getElementById('overlay-sub').textContent = `${trackName.toUpperCase()} · ${Math.floor(trackDuration/60)}:${String(Math.floor(trackDuration%60)).padStart(2,'0')} · Choose difficulty and hit BEGIN`;
+      document.getElementById('track-name').textContent = '▶ ' + trackName.toUpperCase();
+      document.getElementById('track-dur').textContent = fmtDur(trackDuration);
+      document.getElementById('overlay-sub').textContent = trackName.toUpperCase() + ' · ' + fmtDur(trackDuration) + ' · Choose difficulty and hit BEGIN';
+      updateDiffScore();
     } catch(err) {
       document.getElementById('track-name').textContent = '⚠ Could not decode audio';
     }

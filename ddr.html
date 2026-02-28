@@ -135,21 +135,8 @@
     line-height: 1;
   }
   #combo-display { color: var(--cyan); }
-  #health-bar-wrap {
-    width: 100%;
-    height: 18px;
-    background: rgba(255,255,255,.08);
-    border-radius: 4px;
-    overflow: hidden;
-    margin-top: 4px;
-    border: 1px solid rgba(255,255,255,.06);
-  }
-  #health-bar {
-    height: 100%;
-    background: linear-gradient(90deg, var(--cyan), var(--gold));
-    border-radius: 4px;
-    transition: width .15s;
-  }
+  #health-bar-wrap { /* styles now inline for vertical layout */ }
+  #health-bar { /* styles now inline */ }
 
   /* ── GAME CANVAS WRAPPER ── */
   #game-wrap {
@@ -445,7 +432,7 @@
 
 <nav>
   <a href="index.html" class="nav-brand">JAY JABIRU</a>
-  <span style="font-family:'Space Mono',monospace;font-size:.65rem;letter-spacing:.15em;color:var(--gold);opacity:.9">V 1.18</span>
+  <span style="font-family:'Space Mono',monospace;font-size:.65rem;letter-spacing:.15em;color:var(--gold);opacity:.9">V 1.19</span>
   <a href="index.html" class="nav-back">← EXPLORE</a>
 </nav>
 
@@ -517,12 +504,30 @@
         <div class="hud-value" id="combo-display">×0</div>
       </div>
       <div class="hud-block">
-        <div class="hud-label">HEALTH</div>
-        <div id="health-bar-wrap"><div id="health-bar" style="width:100%"></div></div>
+        <div class="hud-label">DIFF</div>
+        <div id="diff-score" style="font-family:'Orbitron',sans-serif;font-size:.95rem;font-weight:700;color:var(--gold-light);letter-spacing:.05em">—/10</div>
       </div>
-      <div class="hud-block" style="margin-top:8px">
-        <div class="hud-label">DIFFICULTY</div>
-        <div id="diff-score" style="font-family:'Orbitron',sans-serif;font-size:1.1rem;font-weight:700;color:var(--gold-light)">—</div>
+
+      <!-- Health + Volume bars side by side, growing bottom-up -->
+      <div style="display:flex;gap:6px;align-items:flex-end;margin-top:8px;height:200px">
+
+        <!-- Health bar -->
+        <div style="display:flex;flex-direction:column;align-items:center;gap:4px;height:100%">
+          <div class="hud-label" style="writing-mode:vertical-rl;transform:rotate(180deg);letter-spacing:.15em">HEALTH</div>
+          <div id="health-bar-wrap" style="flex:1;width:18px;background:rgba(255,255,255,.08);border-radius:4px;border:1px solid rgba(255,255,255,.06);display:flex;flex-direction:column;justify-content:flex-end;overflow:hidden">
+            <div id="health-bar" style="width:100%;height:100%;background:linear-gradient(0deg,var(--cyan),var(--gold));border-radius:4px;transition:height .15s"></div>
+          </div>
+        </div>
+
+        <!-- Volume bar -->
+        <div style="display:flex;flex-direction:column;align-items:center;gap:4px;height:100%">
+          <div class="hud-label" style="writing-mode:vertical-rl;transform:rotate(180deg);letter-spacing:.15em">VOL</div>
+          <div style="flex:1;width:12px;background:rgba(255,255,255,.06);border-radius:3px;border:1px solid rgba(255,255,255,.04);display:flex;flex-direction:column;justify-content:flex-end;overflow:hidden;cursor:pointer;position:relative" id="vol-bar-wrap" onclick="handleVolClick(event)">
+            <div id="vol-bar-fill" style="width:100%;height:80%;background:linear-gradient(0deg,rgba(201,162,39,.5),rgba(201,162,39,.9));border-radius:3px;transition:height .1s"></div>
+          </div>
+          <span id="vol-pct" style="font-size:.5rem;color:rgba(201,162,39,.5);font-family:'Space Mono',monospace">80%</span>
+        </div>
+
       </div>
     </div>
 
@@ -611,15 +616,6 @@
     The chart is <strong>auto-generated from your audio file</strong> — peaks, beats and transients are detected and mapped to arrows. Energy levels shape the density: quieter sections stay sparse, chorus sections hit hard.
   </div>
 
-  <!-- Volume -->
-  <div style="display:flex;align-items:center;gap:12px;width:var(--game-w)">
-    <span style="font-size:.7rem;letter-spacing:.12em;color:rgba(201,162,39,.6);font-family:'Space Mono',monospace">VOL</span>
-    <input type="range" id="volume" min="0" max="1" step="0.01" value="0.8"
-      oninput="setVolume(this.value)"
-      style="flex:1;accent-color:var(--gold);cursor:pointer">
-    <span id="vol-pct" style="font-size:.7rem;color:rgba(201,162,39,.6);font-family:'Space Mono',monospace;width:2.5em;text-align:right">80%</span>
-  </div>
-
   <!-- Legal -->
   <p style="font-size:.6rem;letter-spacing:.07em;color:rgba(232,224,204,.25);text-align:center;width:var(--game-w);line-height:1.7">
     Rhythm Stage is an original work by Jay Jabiru.<br>
@@ -673,6 +669,10 @@
 //  DRAG & DROP
 // ─────────────────────────────────────────
 const uploadArea = document.getElementById('upload-area');
+// Prevent browser from navigating when file is dropped anywhere on page
+window.addEventListener('dragover', e => e.preventDefault());
+window.addEventListener('drop', e => e.preventDefault());
+
 uploadArea.addEventListener('dragover', e => { e.preventDefault(); uploadArea.classList.add('drag-over'); });
 uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('drag-over'));
 uploadArea.addEventListener('drop', e => {
@@ -737,16 +737,27 @@ function updateDiffScore() {
   if (!audioBuffer) return;
   const diff = document.getElementById('difficulty').value;
   const score = analyseDifficulty(audioBuffer, diff);
-  document.getElementById('diff-score').textContent = score.toFixed(2);
-  // Colour: green→yellow→red
+  document.getElementById('diff-score').textContent = score.toFixed(2) + '/10';
   const t = score / 10;
   const r = Math.round(255 * Math.min(1, t * 2));
   const g = Math.round(255 * Math.min(1, (1-t) * 2));
   document.getElementById('diff-score').style.color = `rgb(${r},${g},50)`;
 }
+function setVolume(v) {
   if (gainNode) gainNode.gain.value = parseFloat(v);
-  document.getElementById('vol-pct').textContent = Math.round(v * 100) + '%';
+  const pct = Math.round(v * 100);
+  document.getElementById('vol-pct').textContent = pct + '%';
+  document.getElementById('vol-bar-fill').style.height = pct + '%';
 }
+
+function handleVolClick(e) {
+  const wrap = document.getElementById('vol-bar-wrap');
+  const rect = wrap.getBoundingClientRect();
+  const clickY = e.clientY - rect.top;
+  const v = Math.max(0, Math.min(1, 1 - clickY / rect.height));
+  setVolume(v);
+}
+
 
 async function loadBuiltIn(filename, label) {
   if (!audioContext) {
@@ -986,7 +997,7 @@ function flashReceptor(lane) {
 function updateHUD() {
   document.getElementById('score-display').textContent = score.toLocaleString();
   document.getElementById('combo-display').textContent = '×' + combo;
-  document.getElementById('health-bar').style.width = health + '%';
+  document.getElementById('health-bar').style.height = health + '%';
 }
 
 // ─────────────────────────────────────────

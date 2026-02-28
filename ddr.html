@@ -124,17 +124,17 @@
   .hud-label {
     font-size: .58rem;
     letter-spacing: .18em;
-    color: rgba(201,162,39,.45);
+    color: rgba(201,162,39,.75);
     margin-bottom: 2px;
   }
   .hud-value {
     font-family: 'Orbitron', sans-serif;
     font-size: 1.3rem;
     font-weight: 700;
-    color: var(--gold-light);
+    color: #f0e8cc;
     line-height: 1;
   }
-  #combo-display { color: var(--cyan); }
+  #combo-display { color: #5dc8ff; }
   #health-bar-wrap { /* styles now inline for vertical layout */ }
   #health-bar { /* styles now inline */ }
 
@@ -432,7 +432,7 @@
 
 <nav>
   <a href="index.html" class="nav-brand">JAY JABIRU</a>
-  <span style="font-family:'Space Mono',monospace;font-size:.65rem;letter-spacing:.15em;color:var(--gold);opacity:.9">V 1.19</span>
+  <span style="font-family:'Space Mono',monospace;font-size:.65rem;letter-spacing:.15em;color:var(--gold);opacity:.9">V 1.20</span>
   <a href="index.html" class="nav-back">← EXPLORE</a>
 </nav>
 
@@ -507,6 +507,11 @@
         <div class="hud-label">DIFF</div>
         <div id="diff-score" style="font-family:'Orbitron',sans-serif;font-size:.95rem;font-weight:700;color:var(--gold-light);letter-spacing:.05em">—/10</div>
       </div>
+      <div class="hud-block">
+        <div class="hud-label">TIME</div>
+        <div id="time-elapsed" style="font-family:'Orbitron',sans-serif;font-size:.85rem;font-weight:700;color:#e8e0cc;letter-spacing:.04em">0:00</div>
+        <div id="time-total" style="font-size:.65rem;color:rgba(232,224,204,.5);font-family:'Space Mono',monospace;letter-spacing:.04em">/ —:——</div>
+      </div>
 
       <!-- Health + Volume bars side by side, growing bottom-up -->
       <div style="display:flex;gap:6px;align-items:flex-end;margin-top:8px;height:200px">
@@ -525,7 +530,7 @@
           <div style="flex:1;width:12px;background:rgba(255,255,255,.06);border-radius:3px;border:1px solid rgba(255,255,255,.04);display:flex;flex-direction:column;justify-content:flex-end;overflow:hidden;cursor:pointer;position:relative" id="vol-bar-wrap" onclick="handleVolClick(event)">
             <div id="vol-bar-fill" style="width:100%;height:80%;background:linear-gradient(0deg,rgba(201,162,39,.5),rgba(201,162,39,.9));border-radius:3px;transition:height .1s"></div>
           </div>
-          <span id="vol-pct" style="font-size:.5rem;color:rgba(201,162,39,.5);font-family:'Space Mono',monospace">80%</span>
+          <span id="vol-pct" style="font-size:.5rem;color:rgba(201,162,39,.6);font-family:'Space Mono',monospace">80%</span>
         </div>
 
       </div>
@@ -630,181 +635,175 @@
   </div>
 
 <script>
-// ─────────────────────────────────────────
+// ─── STARS ───────────────────────────────
 (function initStars() {
   const c = document.getElementById('stars-canvas');
   const ctx = c.getContext('2d');
   let stars = [];
   function resize() {
-    c.width = window.innerWidth;
-    c.height = window.innerHeight;
-    stars = Array.from({length: 180}, () => ({
-      x: Math.random() * c.width,
-      y: Math.random() * c.height,
-      r: Math.random() * 1.4 + .2,
-      a: Math.random(),
-      s: Math.random() * .004 + .001
+    c.width = window.innerWidth; c.height = window.innerHeight;
+    stars = Array.from({length:180}, () => ({
+      x: Math.random()*c.width, y: Math.random()*c.height,
+      r: Math.random()*1.4+.2, a: Math.random(), s: Math.random()*.004+.001
     }));
   }
   function draw() {
-    ctx.clearRect(0, 0, c.width, c.height);
+    ctx.clearRect(0,0,c.width,c.height);
     stars.forEach(s => {
-      s.a += s.s;
-      if (s.a > 1) { s.a = 0; s.x = Math.random()*c.width; s.y = Math.random()*c.height; }
-      ctx.globalAlpha = s.a * .6;
-      ctx.fillStyle = '#e8e0cc';
-      ctx.beginPath();
-      ctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
-      ctx.fill();
+      s.a += s.s; if (s.a>1){s.a=0;s.x=Math.random()*c.width;s.y=Math.random()*c.height;}
+      ctx.globalAlpha = s.a*.6; ctx.fillStyle='#e8e0cc';
+      ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2); ctx.fill();
     });
-    ctx.globalAlpha = 1;
-    requestAnimationFrame(draw);
+    ctx.globalAlpha=1; requestAnimationFrame(draw);
   }
-  window.addEventListener('resize', resize);
-  resize();
-  draw();
+  window.addEventListener('resize', resize); resize(); draw();
 })();
 
-// ─────────────────────────────────────────
-//  DRAG & DROP
-// ─────────────────────────────────────────
+// ─── DRAG & DROP ─────────────────────────
 const uploadArea = document.getElementById('upload-area');
-// Prevent browser from navigating when file is dropped anywhere on page
 window.addEventListener('dragover', e => e.preventDefault());
 window.addEventListener('drop', e => e.preventDefault());
-
 uploadArea.addEventListener('dragover', e => { e.preventDefault(); uploadArea.classList.add('drag-over'); });
 uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('drag-over'));
 uploadArea.addEventListener('drop', e => {
-  e.preventDefault();
-  uploadArea.classList.remove('drag-over');
-  const file = e.dataTransfer.files[0];
-  if (file) handleFile(file);
+  e.preventDefault(); uploadArea.classList.remove('drag-over');
+  const f = e.dataTransfer.files[0]; if (f) handleFile(f);
 });
 document.getElementById('file-input').addEventListener('change', e => {
   if (e.target.files[0]) handleFile(e.target.files[0]);
 });
 
-// ─────────────────────────────────────────
-//  AUDIO ANALYSIS & CHART GENERATION
-// ─────────────────────────────────────────
-let audioBuffer = null;
-let chart = [];
-let audioContext = null;
-let gainNode = null;
-let sourceNode = null;
-let startTime = 0;
-let trackDuration = 0;
-let trackName = '';
+// ─── STATE ───────────────────────────────
+let audioBuffer=null, audioContext=null, gainNode=null, sourceNode=null;
+let startTime=0, trackDuration=0, trackName='';
+let notes=[], particles=[], score=0, combo=0, health=100;
+let stats={perfect:0,good:0,miss:0};
+let gameRunning=false, animId=null;
 
-function fmtDur(secs) {
-  return Math.floor(secs/60) + ':' + String(Math.floor(secs%60)).padStart(2,'0');
+// ─── CONSTANTS ───────────────────────────
+const LANE_COLORS = ['#f05a5a','#4da6f5','#a855f7','#c9a227'];
+const KEYS = { 'arrowleft':0, 'arrowdown':1, 'arrowup':2, 'arrowright':3 };
+const NOTE_H = 24;
+const HIT_Y_FRAC = h => h - 96;
+const TRAVEL_TIME = 2.2;
+const PERFECT_WIN = 0.08;
+const GOOD_WIN    = 0.18;
+const LABELS = ['←','↓','↑','→'];
+
+const gameCanvas = document.getElementById('game-canvas');
+const pCanvas    = document.getElementById('particle-canvas');
+const gCtx = gameCanvas.getContext('2d');
+const pCtx = pCanvas.getContext('2d');
+
+// ─── HELPERS ─────────────────────────────
+function fmtDur(s) {
+  return Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0');
+}
+function laneColor(l) { return LANE_COLORS[l]; }
+function laneX(lane, w) { return (w/4)*lane; }
+function noteWidth(w) { return (w/4)*0.78; }
+function noteY(note, now, canvasH) {
+  const hitY = HIT_Y_FRAC(canvasH);
+  const dt = note.time - now;
+  return hitY * (1 - dt/TRAVEL_TIME);
 }
 
-function analyseDifficulty(buffer, difficulty) {
-  // Run the same onset detection as generateChart but just count and measure
-  const sampleRate = buffer.sampleRate;
-  const data = buffer.getChannelData(0);
-  const frameSize = 1024;
-  const hopSize = 512;
-  const numFrames = Math.floor((data.length - frameSize) / hopSize);
-  const energy = new Float32Array(numFrames);
-  for (let i = 0; i < numFrames; i++) {
-    let sum = 0;
-    const offset = i * hopSize;
-    for (let j = 0; j < frameSize; j++) sum += data[offset+j]**2;
-    energy[i] = Math.sqrt(sum / frameSize);
+// ─── AUDIO INIT ──────────────────────────
+function ensureAudioContext() {
+  if (!audioContext) {
+    audioContext = new (window.AudioContext||window.webkitAudioContext)();
+    gainNode = audioContext.createGain();
+    gainNode.gain.value = 0.8;
+    gainNode.connect(audioContext.destination);
   }
-  const threshold = { easy:0.018, medium:0.010, hard:0.005 }[difficulty];
-  const minGap    = { easy:0.35,  medium:0.22,  hard:0.12  }[difficulty];
-  let onsets = 0, lastOnset = -999;
-  for (let i = 2; i < numFrames-1; i++) {
-    const diff = energy[i] - energy[i-1];
-    const sec = (i * hopSize) / sampleRate;
-    if (diff > threshold && energy[i] > energy[i+1] && sec - lastOnset > minGap) {
-      onsets++;
-      lastOnset = sec;
+}
+
+// ─── VOLUME ──────────────────────────────
+function setVolume(v) {
+  v = parseFloat(v);
+  if (gainNode) gainNode.gain.value = v;
+  const pct = Math.round(v*100);
+  document.getElementById('vol-pct').textContent = pct+'%';
+  document.getElementById('vol-bar-fill').style.height = pct+'%';
+}
+function handleVolClick(e) {
+  const wrap = document.getElementById('vol-bar-wrap');
+  const rect = wrap.getBoundingClientRect();
+  const v = Math.max(0, Math.min(1, 1-(e.clientY-rect.top)/rect.height));
+  setVolume(v);
+}
+
+// ─── DIFFICULTY ANALYSIS ─────────────────
+function analyseDifficulty(buffer, difficulty) {
+  const sr = buffer.sampleRate, data = buffer.getChannelData(0);
+  const frameSize=1024, hopSize=512;
+  const numFrames = Math.floor((data.length-frameSize)/hopSize);
+  const energy = new Float32Array(numFrames);
+  for (let i=0;i<numFrames;i++) {
+    let sum=0; const off=i*hopSize;
+    for (let j=0;j<frameSize;j++) sum+=data[off+j]**2;
+    energy[i]=Math.sqrt(sum/frameSize);
+  }
+  const threshold={easy:0.018,medium:0.010,hard:0.005}[difficulty];
+  const minGap={easy:0.35,medium:0.22,hard:0.12}[difficulty];
+  let onsets=0, lastOnset=-999;
+  for (let i=2;i<numFrames-1;i++) {
+    const diff=energy[i]-energy[i-1], sec=(i*hopSize)/sr;
+    if (diff>threshold && energy[i]>energy[i+1] && sec-lastOnset>minGap) {
+      onsets++; lastOnset=sec;
     }
   }
-  const duration = buffer.duration;
-  const notesPerSec = onsets / duration;
-  // Calibrate: ~0.5 n/s = easy baseline (1), ~4 n/s = hard ceiling (10)
-  const raw = (notesPerSec - 0.5) / (4.0 - 0.5) * 9 + 1;
-  return Math.min(10, Math.max(0.5, raw));
+  const nps = onsets/buffer.duration;
+  return Math.min(10, Math.max(0.50, (nps-0.5)/3.5*9+1));
 }
 
 function updateDiffScore() {
   if (!audioBuffer) return;
   const diff = document.getElementById('difficulty').value;
-  const score = analyseDifficulty(audioBuffer, diff);
-  document.getElementById('diff-score').textContent = score.toFixed(2) + '/10';
-  const t = score / 10;
-  const r = Math.round(255 * Math.min(1, t * 2));
-  const g = Math.round(255 * Math.min(1, (1-t) * 2));
-  document.getElementById('diff-score').style.color = `rgb(${r},${g},50)`;
-}
-function setVolume(v) {
-  if (gainNode) gainNode.gain.value = parseFloat(v);
-  const pct = Math.round(v * 100);
-  document.getElementById('vol-pct').textContent = pct + '%';
-  document.getElementById('vol-bar-fill').style.height = pct + '%';
+  const s = analyseDifficulty(audioBuffer, diff);
+  const el = document.getElementById('diff-score');
+  el.textContent = s.toFixed(2)+'/10';
+  const t=s/10, r=Math.round(255*Math.min(1,t*2)), g=Math.round(255*Math.min(1,(1-t)*2));
+  el.style.color = `rgb(${r},${g},50)`;
+  document.getElementById('time-total').textContent = '/ '+fmtDur(trackDuration);
 }
 
-function handleVolClick(e) {
-  const wrap = document.getElementById('vol-bar-wrap');
-  const rect = wrap.getBoundingClientRect();
-  const clickY = e.clientY - rect.top;
-  const v = Math.max(0, Math.min(1, 1 - clickY / rect.height));
-  setVolume(v);
-}
-
-
+// ─── LOAD TRACK ──────────────────────────
 async function loadBuiltIn(filename, label) {
-  if (!audioContext) {
-    audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    gainNode = audioContext.createGain();
-    gainNode.gain.value = parseFloat(document.getElementById('volume').value);
-    gainNode.connect(audioContext.destination);
-  }
-  document.getElementById('track-name').textContent = '⏳ Loading ' + label + '…';
+  ensureAudioContext();
+  document.getElementById('track-name').textContent = '⏳ '+label+'…';
   document.getElementById('track-dur').textContent = '';
   try {
-    const resp = await fetch(filename);
-    const arrayBuf = await resp.arrayBuffer();
-    audioBuffer = await audioContext.decodeAudioData(arrayBuf);
-    trackDuration = audioBuffer.duration;
-    trackName = label;
-    const durStr = fmtDur(trackDuration);
-    document.getElementById('track-name').textContent = '▶ ' + label.toUpperCase();
-    document.getElementById('track-dur').textContent = durStr;
-    // Update the duration under the correct button
-    const btnMap = { 'disco-2098.mp3':'dur-t1', 'dungeon-disco-short.mp3':'dur-t2', 'space-disco-short.mp3':'dur-t3' };
-    if (btnMap[filename]) document.getElementById(btnMap[filename]).textContent = durStr;
+    const buf = await (await fetch(filename)).arrayBuffer();
+    audioBuffer = await audioContext.decodeAudioData(buf);
+    trackDuration = audioBuffer.duration; trackName = label;
+    const dur = fmtDur(trackDuration);
+    document.getElementById('track-name').textContent = '▶ '+label.toUpperCase();
+    document.getElementById('track-dur').textContent = dur;
     document.getElementById('overlay-sub').textContent =
-      `${label.toUpperCase()} · ${durStr} · Choose difficulty and hit BEGIN`;
+      label.toUpperCase()+' · '+dur+' · Choose difficulty and hit BEGIN';
+    const map={'disco-2098.mp3':'dur-t1','dungeon-disco-short.mp3':'dur-t2','space-disco-short.mp3':'dur-t3'};
+    if (map[filename]) document.getElementById(map[filename]).textContent = dur;
     updateDiffScore();
   } catch(e) {
-    document.getElementById('track-name').textContent = '⚠ Could not load ' + label;
+    document.getElementById('track-name').textContent = '⚠ Could not load '+label;
   }
 }
 
 function handleFile(file) {
-  trackName = file.name.replace(/\.[^.]+$/, '');
-  document.getElementById('track-name').textContent = '▶ ' + trackName.toUpperCase();
+  ensureAudioContext();
+  trackName = file.name.replace(/\.[^.]+$/,'');
+  document.getElementById('track-name').textContent = '⏳ Loading…';
   const reader = new FileReader();
-  reader.onload = async (e) => {
-    if (!audioContext) {
-    audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    gainNode = audioContext.createGain();
-    gainNode.gain.value = parseFloat(document.getElementById('volume').value);
-    gainNode.connect(audioContext.destination);
-  }
+  reader.onload = async e => {
     try {
       audioBuffer = await audioContext.decodeAudioData(e.target.result);
       trackDuration = audioBuffer.duration;
-      document.getElementById('track-name').textContent = '▶ ' + trackName.toUpperCase();
-      document.getElementById('track-dur').textContent = fmtDur(trackDuration);
-      document.getElementById('overlay-sub').textContent = trackName.toUpperCase() + ' · ' + fmtDur(trackDuration) + ' · Choose difficulty and hit BEGIN';
+      const dur = fmtDur(trackDuration);
+      document.getElementById('track-name').textContent = '▶ '+trackName.toUpperCase();
+      document.getElementById('track-dur').textContent = dur;
+      document.getElementById('overlay-sub').textContent =
+        trackName.toUpperCase()+' · '+dur+' · Choose difficulty and hit BEGIN';
       updateDiffScore();
     } catch(err) {
       document.getElementById('track-name').textContent = '⚠ Could not decode audio';
@@ -813,579 +812,374 @@ function handleFile(file) {
   reader.readAsArrayBuffer(file);
 }
 
+// ─── CHART GENERATION ────────────────────
 function generateChart(buffer, difficulty) {
-  const sampleRate = buffer.sampleRate;
-  const data = buffer.getChannelData(0);
-  const frameSize = 1024;
-  const hopSize = 512;
-  const numFrames = Math.floor((data.length - frameSize) / hopSize);
-
-  // RMS energy per frame
+  const sr = buffer.sampleRate, data = buffer.getChannelData(0);
+  const frameSize=1024, hopSize=512;
+  const numFrames = Math.floor((data.length-frameSize)/hopSize);
   const energy = new Float32Array(numFrames);
-  for (let i = 0; i < numFrames; i++) {
-    let sum = 0;
-    const offset = i * hopSize;
-    for (let j = 0; j < frameSize; j++) sum += data[offset + j] ** 2;
-    energy[i] = Math.sqrt(sum / frameSize);
+  for (let i=0;i<numFrames;i++) {
+    let sum=0; const off=i*hopSize;
+    for (let j=0;j<frameSize;j++) sum+=data[off+j]**2;
+    energy[i]=Math.sqrt(sum/frameSize);
   }
-
-  // Smooth energy for section detection
-  const smoothed = new Float32Array(numFrames);
-  const smoothWin = 30;
-  for (let i = 0; i < numFrames; i++) {
-    let s = 0, cnt = 0;
-    for (let j = Math.max(0,i-smoothWin); j < Math.min(numFrames,i+smoothWin); j++) { s += energy[j]; cnt++; }
-    smoothed[i] = s / cnt;
+  const smooth = new Float32Array(numFrames);
+  const win=30;
+  for (let i=0;i<numFrames;i++) {
+    let s=0,c=0;
+    for (let j=Math.max(0,i-win);j<Math.min(numFrames,i+win);j++){s+=energy[j];c++;}
+    smooth[i]=s/c;
   }
-  const maxSmooth = Math.max(...smoothed) || 1;
-  const sectionEnergy = smoothed.map(v => v / maxSmooth); // 0..1
-
-  // Onset detection (spectral flux approximation via energy diff)
-  const onsets = [];
-  const threshold = { easy: 0.018, medium: 0.010, hard: 0.005 }[difficulty];
-  const minGap = { easy: 0.35, medium: 0.22, hard: 0.12 }[difficulty];
-  let lastOnset = -999;
-
-  for (let i = 2; i < numFrames - 1; i++) {
-    const diff = energy[i] - energy[i-1];
-    const sec = (i * hopSize) / sampleRate;
-
-    // Section density gate: easy/medium skip low-energy frames some of the time
-    const secE = sectionEnergy[i];
-    if (difficulty === 'easy' && secE < 0.25 && Math.random() > 0.3) continue;
-    if (difficulty === 'medium' && secE < 0.15 && Math.random() > 0.6) continue;
-
-    if (diff > threshold && energy[i] > energy[i+1] && sec - lastOnset > minGap) {
-      onsets.push({ time: sec, energy: energy[i], sectionE: secE });
-      lastOnset = sec;
-    }
+  const maxE = Math.max(...smooth)+1e-9;
+  const threshold={easy:0.018,medium:0.010,hard:0.005}[difficulty];
+  const minGap={easy:0.35,medium:0.22,hard:0.12}[difficulty];
+  const patterns={
+    easy:[[0,3],[1,2],[0,1,2,3]],
+    medium:[[0,1,2,3],[0,2,1,3],[3,1,2,0],[0,3,1,2]],
+    hard:[[0,1,2,3,0,2,1,3],[3,2,1,0,2,0,3,1]]
+  }[difficulty];
+  const chart=[];
+  let lastTime=-999, patIdx=0, subIdx=0, lastLane=-1;
+  for (let i=2;i<numFrames-1;i++) {
+    const diff=energy[i]-energy[i-1], sec=(i*hopSize)/sr;
+    if (sec-lastTime < minGap) continue;
+    if (diff<=threshold || energy[i]<=energy[i+1]) continue;
+    const secE=smooth[i]/maxE;
+    if (difficulty==='easy'&&secE<0.25&&Math.random()<0.7) continue;
+    if (difficulty==='medium'&&secE<0.15&&Math.random()<0.4) continue;
+    const pat=patterns[patIdx%patterns.length];
+    let lane=pat[subIdx%pat.length];
+    if (difficulty==='easy'&&lane===lastLane) lane=(lane+1)%4;
+    chart.push({time:sec, lane, hit:false, missed:false, label:LABELS[lane]});
+    lastTime=sec; lastLane=lane;
+    subIdx++; if(subIdx>=pat.length){subIdx=0;patIdx++;}
   }
-
-  // Map onsets → chart notes with lane assignment
-  const arrows = ['←','↓','↑','→'];
-  const notes = [];
-  let lastLane = -1;
-  let patternIdx = 0;
-  // Pattern sequences for musicality
-  const patterns = {
-    easy:   [[0,3],[1,2],[0,1,2,3]],
-    medium: [[0,1,2,3],[0,2,1,3],[3,1,2,0],[0,3,1,2]],
-    hard:   [[0,1,2,3,0,2,1,3],[3,2,1,0,2,0,3,1],[0,3,2,1,0,2,3,1]]
-  };
-  const pat = patterns[difficulty];
-  let seqI = 0, seqJ = 0;
-
-  onsets.forEach(onset => {
-    // Pick lane from pattern, avoid same lane twice on easy
-    let lane;
-    const seq = pat[seqI % pat.length];
-    lane = seq[seqJ % seq.length];
-    if (difficulty === 'easy' && lane === lastLane) lane = (lane + 2) % 4;
-    seqJ++;
-    if (seqJ >= seq.length) { seqJ = 0; seqI++; }
-    lastLane = lane;
-
-    notes.push({
-      time: onset.time,
-      lane,
-      label: arrows[lane],
-      hit: false,
-      missed: false
-    });
-  });
-
-  return notes;
+  return chart;
 }
 
-// ─────────────────────────────────────────
-//  GAME STATE
-// ─────────────────────────────────────────
-let score = 0;
-let combo = 0;
-let health = 100;
-let gameRunning = false;
-let animId = null;
-let notes = [];
-let particles = [];
-let stats = { perfect: 0, good: 0, miss: 0 };
-
-const LANE_COLORS = ['#f05a5a','#4da6f5','#a855f7','#c9a227'];
-const KEYS = { 'arrowleft':0, 'arrowdown':1, 'arrowup':2, 'arrowright':3 };
-const LANE_W = 80;
-const NOTE_H = 24;
-const HIT_Y_FRAC = (h) => h - 96;
-const TRAVEL_TIME = 2.2;
-const PERFECT_WIN = 0.08;
-const GOOD_WIN    = 0.18;
-function laneColor(lane) { return LANE_COLORS[lane]; }
-
-const gameCanvas = document.getElementById('game-canvas');
-const pCanvas    = document.getElementById('particle-canvas');
-const gCtx = gameCanvas.getContext('2d');
-const pCtx = pCanvas.getContext('2d');
-
+// ─── CANVAS ──────────────────────────────
 function resizeCanvases() {
-  const wrap = document.getElementById('game-wrap');
-  const rect = wrap.getBoundingClientRect();
-  const w = rect.width || wrap.offsetWidth || 380;
-  const h = rect.height || wrap.offsetHeight || 600;
-  gameCanvas.width  = pCanvas.width  = Math.floor(w);
-  gameCanvas.height = pCanvas.height = Math.floor(h);
+  const w = gameCanvas.parentElement.clientWidth || 320;
+  const h = gameCanvas.parentElement.clientHeight || 600;
+  gameCanvas.width = pCanvas.width = w;
+  gameCanvas.height = pCanvas.height = h;
 }
 
-function laneX(lane, canvasW) {
-  const lw = canvasW / 4;
-  const noteW = lw * 0.78;
-  return lane * lw + (lw - noteW) / 2;
-}
-
-function noteWidth(canvasW) {
-  return (canvasW / 4) * 0.78;
-}
-
-function noteY(note, now, canvasH) {
-  const hitY = HIT_Y_FRAC(canvasH);
-  const dt = note.time - now;           // positive = note in future, negative = past
-  const progress = 1 - (dt / TRAVEL_TIME); // 0 = just spawned at top, 1 = at hitY
-  return progress * hitY;
-}
-
-// ─────────────────────────────────────────
-//  PARTICLES
-// ─────────────────────────────────────────
+// ─── PARTICLES ───────────────────────────
 function spawnParticles(x, y, color, count) {
-  for (let i = 0; i < count; i++) {
-    const angle = Math.random() * Math.PI * 2;
-    const speed = Math.random() * 4 + 1;
-    particles.push({
-      x, y,
-      vx: Math.cos(angle) * speed,
-      vy: Math.sin(angle) * speed - 2,
-      life: 1,
-      decay: Math.random() * 0.04 + 0.02,
-      r: Math.random() * 4 + 2,
-      color
-    });
+  for (let i=0;i<count;i++) {
+    const a=Math.random()*Math.PI*2, sp=Math.random()*3+1;
+    particles.push({x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,
+      life:1, color, r:Math.random()*3+1});
   }
 }
 
-// ─────────────────────────────────────────
-//  JUDGMENT DISPLAY
-// ─────────────────────────────────────────
-let judgmentTimeout = null;
+// ─── JUDGMENT ────────────────────────────
 function showJudgment(text, color) {
   const el = document.getElementById('judgment');
-  el.textContent = text;
-  el.style.color = color;
-  el.classList.add('show');
-  if (judgmentTimeout) clearTimeout(judgmentTimeout);
-  judgmentTimeout = setTimeout(() => el.classList.remove('show'), 400);
+  el.textContent=text; el.style.color=color; el.style.opacity='1';
+  el.style.transform='translateY(0)'; el.style.transition='none';
+  requestAnimationFrame(()=>{
+    el.style.transition='opacity .6s, transform .6s';
+    el.style.opacity='0'; el.style.transform='translateY(-30px)';
+  });
 }
 
-// ─────────────────────────────────────────
-//  RECEPTOR FLASH
-// ─────────────────────────────────────────
+// ─── RECEPTOR FLASH ──────────────────────
 function flashReceptor(lane) {
-  const r = document.querySelector(`.receptor[data-lane="${lane}"]`);
-  r.classList.add('lit');
-  setTimeout(() => r.classList.remove('lit'), 100);
+  const el = document.querySelector(`.receptor[data-lane="${lane}"]`);
+  if (!el) return;
+  el.style.opacity='1'; el.style.transform='scale(1.2)';
+  setTimeout(()=>{el.style.opacity='';el.style.transform='';},120);
 }
 
-// ─────────────────────────────────────────
-//  UPDATE DISPLAYS
-// ─────────────────────────────────────────
+// ─── HUD ─────────────────────────────────
 function updateHUD() {
   document.getElementById('score-display').textContent = score.toLocaleString();
-  document.getElementById('combo-display').textContent = '×' + combo;
-  document.getElementById('health-bar').style.height = health + '%';
+  document.getElementById('combo-display').textContent = '×'+combo;
+  document.getElementById('health-bar').style.height = health+'%';
 }
 
-// ─────────────────────────────────────────
-//  KEY HANDLER
-// ─────────────────────────────────────────
+// ─── DIAG TOGGLE ─────────────────────────
 function toggleDiag() {
-  const panel = document.getElementById('diag');
-  const btn   = document.getElementById('diag-toggle');
-  const open  = panel.style.display === 'none';
-  panel.style.display = open ? 'block' : 'none';
-  btn.style.color     = open ? 'rgba(255,255,255,.5)' : 'rgba(255,255,255,.2)';
-  btn.style.borderColor = open ? 'rgba(255,255,255,.3)' : 'rgba(255,255,255,.1)';
+  const panel=document.getElementById('diag');
+  const btn=document.getElementById('diag-toggle');
+  const open=panel.style.display==='none'||panel.style.display==='';
+  panel.style.display=open?'block':'none';
+  btn.style.color=open?'rgba(255,255,255,.6)':'rgba(255,255,255,.2)';
+  btn.style.borderColor=open?'rgba(255,255,255,.35)':'rgba(255,255,255,.1)';
 }
 
+// ─── SCROLL LOCK ─────────────────────────
 function lockScroll() {
   document.body.classList.add('scroll-locked');
-  document.getElementById('scroll-freeze').style.display = 'block';
+  document.getElementById('scroll-freeze').style.display='flex';
 }
-
 function unlockScroll() {
   document.body.classList.remove('scroll-locked');
-  document.getElementById('scroll-freeze').style.display = 'none';
+  document.getElementById('scroll-freeze').style.display='none';
 }
-
 function stopAndUnfreeze() {
-  if (gameRunning) endGame();
-  unlockScroll();
+  gameRunning=false; unlockScroll();
+  if (animId) cancelAnimationFrame(animId);
+  try { sourceNode&&sourceNode.stop(); } catch(e){}
 }
 
-// Also prevent arrow keys from scrolling during gameplay
-window.addEventListener('keydown', e => {
-  if (gameRunning && ['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)) {
-    e.preventDefault();
-  }
-}, { passive: false });
-
+// ─── KEY HANDLER ─────────────────────────
 function onKeyDown(e) {
   if (!gameRunning) return;
   const lane = KEYS[e.key.toLowerCase()];
-  if (lane === undefined) return;
+  if (lane===undefined) return;
   e.preventDefault();
   flashReceptor(lane);
 
   const now = audioContext.currentTime - startTime;
-  const canvasH = gameCanvas.height;
-  const ly = HIT_Y_FRAC(canvasH);
+  const ly = HIT_Y_FRAC(gameCanvas.height);
 
-  // Find closest unhit note in this lane
-  let best = null, bestDist = Infinity;
+  let best=null, bestDist=Infinity;
   notes.forEach(n => {
-    if (n.lane !== lane || n.hit || n.missed) return;
-    const dist = Math.abs(n.time - now);
-    if (dist < bestDist) { bestDist = dist; best = n; }
+    if (n.lane!==lane||n.hit||n.missed) return;
+    const d=Math.abs(n.time-now);
+    if (d<bestDist){bestDist=d;best=n;}
   });
 
-  const keyLabel = ['←','↓','↑','→'][lane];
+  const keyLabel=LABELS[lane];
   document.getElementById('d-key').textContent =
-    `${keyLabel} at ${now.toFixed(3)}s` + (best ? ` | nearest Δ=${(bestDist*1000).toFixed(0)}ms` : ' | no note in lane');
+    keyLabel+' @ '+now.toFixed(3)+'s'+(best?' Δ='+(bestDist*1000).toFixed(0)+'ms':' no note');
 
-  if (!best) {
-    document.getElementById('d-result').textContent = 'no note in lane';
-    return;
-  }
+  if (!best) { document.getElementById('d-result').textContent='no note in lane'; return; }
 
-  if (bestDist <= PERFECT_WIN) {
-    best.hit = true;
-    combo++;
-    const pts = 300 * Math.min(combo, 10);
-    score += pts;
-    health = Math.min(100, health + 2);
-    stats.perfect++;
-    showJudgment('PERFECT', '#f0c84a');
-    document.getElementById('d-result').style.color = '#f0c84a';
-    document.getElementById('d-result').textContent = `PERFECT Δ=${(bestDist*1000).toFixed(0)}ms`;
-    const px = laneX(lane, gameCanvas.width) + noteWidth(gameCanvas.width) / 2;
-    spawnParticles(px, ly, laneColor(lane), 18);
-  } else if (bestDist <= GOOD_WIN) {
-    best.hit = true;
-    combo++;
-    score += 100;
-    health = Math.min(100, health + 1);
-    stats.good++;
-    showJudgment('GOOD', '#4da6f5');
-    document.getElementById('d-result').style.color = '#4da6f5';
-    document.getElementById('d-result').textContent = `GOOD Δ=${(bestDist*1000).toFixed(0)}ms`;
-    const px = laneX(lane, gameCanvas.width) + noteWidth(gameCanvas.width) / 2;
-    spawnParticles(px, ly, laneColor(lane), 8);
+  if (bestDist<=PERFECT_WIN) {
+    best.hit=true; combo++; score+=300*Math.min(combo,10); health=Math.min(100,health+2);
+    stats.perfect++; showJudgment('PERFECT','#f0c84a');
+    document.getElementById('d-result').style.color='#f0c84a';
+    document.getElementById('d-result').textContent='PERFECT Δ='+(bestDist*1000).toFixed(0)+'ms';
+    spawnParticles(laneX(lane,gameCanvas.width)+noteWidth(gameCanvas.width)/2, ly, laneColor(lane), 18);
+  } else if (bestDist<=GOOD_WIN) {
+    best.hit=true; combo++; score+=100; health=Math.min(100,health+1);
+    stats.good++; showJudgment('GOOD','#4da6f5');
+    document.getElementById('d-result').style.color='#4da6f5';
+    document.getElementById('d-result').textContent='GOOD Δ='+(bestDist*1000).toFixed(0)+'ms';
+    spawnParticles(laneX(lane,gameCanvas.width)+noteWidth(gameCanvas.width)/2, ly, laneColor(lane), 8);
   } else {
-    document.getElementById('d-result').style.color = '#ff6666';
-    document.getElementById('d-result').textContent = `TOO ${best.time > now ? 'EARLY' : 'LATE'} Δ=${(bestDist*1000).toFixed(0)}ms (need <180ms)`;
+    document.getElementById('d-result').style.color='#ff6666';
+    document.getElementById('d-result').textContent=
+      'TOO '+(best.time>now?'EARLY':'LATE')+' Δ='+(bestDist*1000).toFixed(0)+'ms';
   }
   updateHUD();
 }
 document.addEventListener('keydown', onKeyDown);
+window.addEventListener('keydown', e => {
+  if (gameRunning&&['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)) e.preventDefault();
+},{passive:false});
 
-// ─────────────────────────────────────────
-//  GAME LOOP
-// ─────────────────────────────────────────
+// ─── GAME LOOP ───────────────────────────
 function gameLoop() {
   if (!gameRunning) return;
-
   try {
     const now = audioContext.currentTime - startTime;
-    const canvasW = gameCanvas.width;
-    const canvasH = gameCanvas.height;
+    const canvasW = gameCanvas.width, canvasH = gameCanvas.height;
+    const hitY = HIT_Y_FRAC(canvasH);
 
-    // Miss detection — only show judgment for first miss per frame
-    let missedThisFrame = false;
+    // Miss detection
+    let missedThisFrame=false;
     notes.forEach(n => {
-      if (!n.hit && !n.missed && n.time < now - GOOD_WIN) {
-        n.missed = true;
-        combo = 0;
-        health = Math.max(0, health - 8);
-        stats.miss++;
-        if (!missedThisFrame) {
-          showJudgment('MISS', '#ff4444');
-          missedThisFrame = true;
-        }
+      if (!n.hit&&!n.missed&&n.time<now-GOOD_WIN) {
+        n.missed=true; combo=0; health=Math.max(0,health-8); stats.miss++;
+        if (!missedThisFrame){showJudgment('MISS','#ff4444');missedThisFrame=true;}
         updateHUD();
       }
     });
+    if (health<=0) { endGame(); return; }
 
-  // Clear
-  gCtx.clearRect(0, 0, canvasW, canvasH);
-  pCtx.clearRect(0, 0, canvasW, canvasH);
+    // Clear
+    gCtx.clearRect(0,0,canvasW,canvasH);
+    pCtx.clearRect(0,0,canvasW,canvasH);
 
-  // hitY used throughout the loop
-  const hitY = HIT_Y_FRAC(canvasH);
-
-  // Target zone glow behind receptors
-  for (let i = 0; i < 4; i++) {
-    const tx = laneX(i, canvasW);
-    const tw = noteWidth(canvasW);
-    const ty = hitY - NOTE_H / 2;
-    gCtx.fillStyle = LANE_COLORS[i] + '18';
-    gCtx.fillRect(tx, ty - 4, tw, NOTE_H + 8);
-    gCtx.strokeStyle = LANE_COLORS[i] + '55';
-    gCtx.lineWidth = 1;
-    gCtx.strokeRect(tx, ty - 4, tw, NOTE_H + 8);
-  }
-
-  // Lane highlight lines
-  for (let i = 0; i < 4; i++) {
-    const lc = ['rgba(240,90,90,.03)','rgba(77,166,245,.03)','rgba(168,85,247,.03)','rgba(201,162,39,.03)'][i];
-    gCtx.fillStyle = lc;
-    gCtx.fillRect(i * (canvasW/4), 0, canvasW/4, canvasH);
-  }
-
-  // Notes
-  notes.forEach(n => {
-    if (n.hit || n.missed) return;
-    const y = noteY(n, now, canvasH);
-    if (y < -NOTE_H || y > canvasH + NOTE_H) return;
-
-    const x = laneX(n.lane, canvasW);
-    const w = noteWidth(canvasW);
-    const h = NOTE_H;
-    const r = 6;
-    const col = laneColor(n.lane);
-
-    gCtx.save();
-    gCtx.shadowColor = col;
-    gCtx.shadowBlur = 12;
-
-    // Rounded rect
-    gCtx.beginPath();
-    gCtx.moveTo(x+r, y); gCtx.lineTo(x+w-r, y);
-    gCtx.quadraticCurveTo(x+w,y,x+w,y+r);
-    gCtx.lineTo(x+w,y+h-r); gCtx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
-    gCtx.lineTo(x+r,y+h); gCtx.quadraticCurveTo(x,y+h,x,y+h-r);
-    gCtx.lineTo(x,y+r); gCtx.quadraticCurveTo(x,y,x+r,y);
-    gCtx.closePath();
-
-    gCtx.fillStyle = col + '44';
-    gCtx.fill();
-    gCtx.strokeStyle = col;
-    gCtx.lineWidth = 2;
-    gCtx.stroke();
-
-    // Arrow text
-    gCtx.font = `bold ${h+2}px Arial`;
-    gCtx.fillStyle = col;
-    gCtx.textAlign = 'center';
-    gCtx.textBaseline = 'middle';
-    gCtx.fillText(n.label, x+w/2, y+h/2+1);
-    gCtx.restore();
-  });
-
-  // Particles
-  particles = particles.filter(p => p.life > 0);
-  particles.forEach(p => {
-    p.x += p.vx; p.y += p.vy;
-    p.vy += 0.15;
-    p.life -= p.decay;
-    pCtx.globalAlpha = p.life;
-    pCtx.fillStyle = p.color;
-    pCtx.beginPath();
-    pCtx.arc(p.x, p.y, p.r * p.life, 0, Math.PI*2);
-    pCtx.fill();
-  });
-  pCtx.globalAlpha = 1;
-
-  // End check
-  if (now > trackDuration + 2 || (health <= 0)) {
-    endGame();
-    return;
-  }
-
-    // ── DIAGNOSTICS ──
-    const nearestUnhit = notes
-      .filter(n => !n.hit && !n.missed)
-      .sort((a,b) => Math.abs(a.time - now) - Math.abs(b.time - now))[0];
-    if (nearestUnhit) {
-      const diff = (nearestUnhit.time - now) * 1000;
-      const ny = noteY(nearestUnhit, now, canvasH);
-      document.getElementById('d-clock').textContent = now.toFixed(3) + 's';
-      document.getElementById('d-nearest').textContent =
-        `lane=${nearestUnhit.lane} Δ=${diff.toFixed(0)}ms (${diff > 0 ? 'future' : 'PAST'})`;
-      document.getElementById('d-noty').textContent = ny.toFixed(1) + 'px';
-      document.getElementById('d-hity').textContent = hitY.toFixed(1) + 'px';
+    // Target zone boxes
+    for (let i=0;i<4;i++) {
+      const tx=laneX(i,canvasW), tw=noteWidth(canvasW);
+      const ty=hitY-NOTE_H/2;
+      gCtx.fillStyle=laneColor(i)+'18';
+      gCtx.fillRect(tx,ty-4,tw,NOTE_H+8);
+      gCtx.strokeStyle=laneColor(i)+'55';
+      gCtx.lineWidth=1;
+      gCtx.strokeRect(tx,ty-4,tw,NOTE_H+8);
     }
-    // ─────────────────
 
-    animId = requestAnimationFrame(gameLoop);
+    // Hit line
+    gCtx.save();
+    const grad=gCtx.createLinearGradient(0,0,canvasW,0);
+    grad.addColorStop(0,'#f05a5a'); grad.addColorStop(0.33,'#4da6f5');
+    grad.addColorStop(0.66,'#a855f7'); grad.addColorStop(1,'#c9a227');
+    gCtx.shadowColor='#fff'; gCtx.shadowBlur=8;
+    gCtx.strokeStyle=grad; gCtx.lineWidth=4;
+    gCtx.beginPath(); gCtx.moveTo(0,hitY); gCtx.lineTo(canvasW,hitY); gCtx.stroke();
+    gCtx.restore();
 
+    // Receptors
+    document.querySelectorAll('.receptor').forEach((el,i)=>{
+      el.style.left=(laneX(i,canvasW)+noteWidth(canvasW)/2)+'px';
+      el.style.top=hitY+'px';
+    });
+
+    // Notes
+    notes.forEach(n => {
+      if (n.hit||n.missed) return;
+      const y=noteY(n,now,canvasH);
+      if (y<-NOTE_H||y>canvasH+NOTE_H) return;
+      const x=laneX(n.lane,canvasW);
+      const w=noteWidth(canvasW);
+      const h=NOTE_H;
+      const r=Math.max(0,Math.min(6,w/2-1,h/2-1));
+      const col=laneColor(n.lane);
+      gCtx.save();
+      gCtx.shadowColor=col; gCtx.shadowBlur=12;
+      gCtx.beginPath();
+      if (gCtx.roundRect) {
+        gCtx.roundRect(x,y,w,h,r);
+      } else {
+        gCtx.moveTo(x+r,y); gCtx.lineTo(x+w-r,y);
+        gCtx.quadraticCurveTo(x+w,y,x+w,y+r);
+        gCtx.lineTo(x+w,y+h-r); gCtx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+        gCtx.lineTo(x+r,y+h); gCtx.quadraticCurveTo(x,y+h,x,y+h-r);
+        gCtx.lineTo(x,y+r); gCtx.quadraticCurveTo(x,y,x+r,y);
+        gCtx.closePath();
+      }
+      gCtx.fillStyle=col+'44'; gCtx.fill();
+      gCtx.strokeStyle=col; gCtx.lineWidth=2; gCtx.stroke();
+      gCtx.font=`bold ${h+2}px Arial`;
+      gCtx.fillStyle=col; gCtx.textAlign='center'; gCtx.textBaseline='middle';
+      gCtx.fillText(n.label,x+w/2,y+h/2+1);
+      gCtx.restore();
+    });
+
+    // Particles
+    particles.forEach(p=>{
+      p.x+=p.vx; p.y+=p.vy; p.vy+=0.05; p.life-=0.03;
+      if (p.life<=0) return;
+      pCtx.globalAlpha=p.life;
+      pCtx.fillStyle=p.color;
+      pCtx.beginPath(); pCtx.arc(p.x,p.y,p.r,0,Math.PI*2); pCtx.fill();
+    });
+    pCtx.globalAlpha=1;
+    particles=particles.filter(p=>p.life>0);
+
+    // Time display
+    document.getElementById('time-elapsed').textContent = fmtDur(Math.max(0,now));
+
+    // Diagnostics
+    const nearest=notes.filter(n=>!n.hit&&!n.missed)
+      .sort((a,b)=>Math.abs(a.time-now)-Math.abs(b.time-now))[0];
+    if (nearest) {
+      const d=(nearest.time-now)*1000;
+      document.getElementById('d-clock').textContent=now.toFixed(3)+'s';
+      document.getElementById('d-nearest').textContent=
+        'lane='+nearest.lane+' Δ='+d.toFixed(0)+'ms ('+(d>0?'future':'PAST')+')';
+      document.getElementById('d-noty').textContent=noteY(nearest,now,canvasH).toFixed(1)+'px';
+      document.getElementById('d-hity').textContent=hitY.toFixed(1)+'px';
+    }
+
+    animId=requestAnimationFrame(gameLoop);
   } catch(err) {
-    console.error('gameLoop crash:', err);
-    document.getElementById('d-result').style.color = '#ff4444';
-    document.getElementById('d-result').textContent = 'LOOP ERR: ' + err.message;
-    animId = requestAnimationFrame(gameLoop); // keep running despite error
+    console.error('gameLoop crash:',err);
+    document.getElementById('d-result').style.color='#ff4444';
+    document.getElementById('d-result').textContent='LOOP ERR: '+err.message;
+    animId=requestAnimationFrame(gameLoop);
   }
 }
 
-// ─────────────────────────────────────────
-//  START / END
-// ─────────────────────────────────────────
+// ─── START / LAUNCH / RESTART / END ──────
 function startGame() {
-  if (!audioBuffer) {
-    alert('Please upload a music file first.');
-    return;
-  }
-
-  // ── STEP 1: scroll game-wrap into view ──
-  const wrap = document.getElementById('game-wrap');
-  wrap.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
-  // ── STEP 2: after scroll settles, check visibility ──
-  setTimeout(() => {
-    const rect = wrap.getBoundingClientRect();
-    const fullyVisible = (
-      rect.top >= 0 &&
-      rect.bottom <= window.innerHeight &&
-      rect.left >= 0 &&
-      rect.right <= window.innerWidth
-    );
-
-    const errEl = document.getElementById('visibility-error');
-
-    if (!fullyVisible) {
-      // Beep
+  if (!audioBuffer) { alert('Please upload or select a music file first.'); return; }
+  const wrap=document.getElementById('game-wrap');
+  wrap.scrollIntoView({behavior:'smooth',block:'center'});
+  setTimeout(()=>{
+    const rect=wrap.getBoundingClientRect();
+    const visible=rect.top>=0&&rect.bottom<=window.innerHeight&&rect.left>=0&&rect.right<=window.innerWidth;
+    const errEl=document.getElementById('visibility-error');
+    if (!visible) {
       try {
-        const ctx2 = new AudioContext();
-        const osc = ctx2.createOscillator();
-        const gain = ctx2.createGain();
-        osc.connect(gain); gain.connect(ctx2.destination);
-        osc.frequency.value = 220;
-        gain.gain.setValueAtTime(.4, ctx2.currentTime);
-        gain.gain.exponentialRampToValueAtTime(.001, ctx2.currentTime + .4);
-        osc.start(); osc.stop(ctx2.currentTime + .4);
-      } catch(e) {}
-
-      errEl.style.display = 'block';
-      setTimeout(() => { errEl.style.display = 'none'; }, 4000);
-      return; // abort launch
+        const ac2=new AudioContext(), osc=ac2.createOscillator(), g2=ac2.createGain();
+        osc.connect(g2); g2.connect(ac2.destination);
+        osc.frequency.value=220; g2.gain.setValueAtTime(.4,ac2.currentTime);
+        g2.gain.exponentialRampToValueAtTime(.001,ac2.currentTime+.4);
+        osc.start(); osc.stop(ac2.currentTime+.4);
+      } catch(e){}
+      errEl.style.display='block';
+      setTimeout(()=>{errEl.style.display='none';},4000);
+      return;
     }
-
-    errEl.style.display = 'none';
-
-    // ── STEP 3: lock scroll ──
+    errEl.style.display='none';
     lockScroll();
-
-    // ── STEP 4: countdown 3 2 1 GO ──
-    const cdEl  = document.getElementById('countdown');
-    const numEl = document.getElementById('countdown-num');
-    cdEl.style.display = 'flex';
-
-    const steps = ['3','2','1','GO'];
-    const colors = ['#f0c84a','#f0c84a','#f0c84a','#00d4ff'];
-    let i = 0;
-
-    function tick() {
-      numEl.textContent = steps[i];
-      numEl.style.color = colors[i];
-      numEl.style.transform = 'scale(1.3)';
-      numEl.style.opacity = '1';
-      setTimeout(() => {
-        numEl.style.transform = 'scale(1)';
-        numEl.style.opacity = '.4';
-      }, 600);
-
+    const cdEl=document.getElementById('countdown');
+    const numEl=document.getElementById('countdown-num');
+    cdEl.style.display='flex';
+    const steps=['3','2','1','GO'], colors=['#f0c84a','#f0c84a','#f0c84a','#00d4ff'];
+    let i=0;
+    function tick(){
+      numEl.textContent=steps[i]; numEl.style.color=colors[i];
+      numEl.style.transform='scale(1.3)'; numEl.style.opacity='1';
+      setTimeout(()=>{numEl.style.transform='scale(1)';numEl.style.opacity='.4';},600);
       i++;
-      if (i < steps.length) {
-        setTimeout(tick, 900);
-      } else {
-        // countdown done — launch
-        setTimeout(() => {
-          cdEl.style.display = 'none';
-          launchGame();
-        }, 400);
-      }
+      if (i<steps.length) setTimeout(tick,900);
+      else setTimeout(()=>{cdEl.style.display='none'; launchGame();},400);
     }
     tick();
-
-  }, 600); // wait for smooth scroll to settle
+  },600);
 }
 
 function launchGame() {
-  if (sourceNode) { try { sourceNode.stop(); } catch(e){} }
-
+  if (sourceNode){try{sourceNode.stop();}catch(e){}}
   resizeCanvases();
-
-  const diff = document.getElementById('difficulty').value;
-  notes = generateChart(audioBuffer, diff);
-  particles = [];
-  score = 0; combo = 0; health = 100;
-  stats = { perfect:0, good:0, miss:0 };
+  notes=generateChart(audioBuffer, document.getElementById('difficulty').value);
+  particles=[]; score=0; combo=0; health=100; stats={perfect:0,good:0,miss:0};
   updateHUD();
-
-  // Hide overlay
   document.getElementById('overlay').classList.add('hidden');
-  document.getElementById('btn-start').style.display = 'none';
-  document.getElementById('btn-restart').style.display = 'inline-block';
-
-  // Play audio
-  if (audioContext.state === 'suspended') audioContext.resume();
-  sourceNode = audioContext.createBufferSource();
-  sourceNode.buffer = audioBuffer;
+  document.getElementById('btn-start').style.display='none';
+  document.getElementById('btn-restart').style.display='inline-block';
+  if (audioContext.state==='suspended') audioContext.resume();
+  sourceNode=audioContext.createBufferSource();
+  sourceNode.buffer=audioBuffer;
   sourceNode.connect(gainNode);
-  startTime = audioContext.currentTime;
+  startTime=audioContext.currentTime;
   sourceNode.start(0);
-  sourceNode.onended = () => { if (gameRunning) endGame(); };
-
-  gameRunning = true;
+  sourceNode.onended=()=>{if(gameRunning)endGame();};
+  gameRunning=true;
   if (animId) cancelAnimationFrame(animId);
   gameLoop();
 }
 
 function restartGame() {
-  gameRunning = false;
-  unlockScroll();
+  gameRunning=false; unlockScroll();
   if (animId) cancelAnimationFrame(animId);
-  try { sourceNode && sourceNode.stop(); } catch(e) {}
-  // Reset overlay to show BEGIN again so startGame flow triggers properly
+  try{sourceNode&&sourceNode.stop();}catch(e){}
   document.getElementById('overlay').classList.remove('hidden');
-  document.getElementById('overlay-title').textContent = 'READY?';
-  document.getElementById('overlay-sub').textContent = trackName.toUpperCase();
-  document.getElementById('overlay-score').style.display = 'none';
-  document.getElementById('overlay-stats').style.display = 'none';
-  document.getElementById('overlay-btn').textContent = 'PLAY AGAIN';
-  document.getElementById('overlay-btn').onclick = startGame;
+  document.getElementById('overlay-title').textContent='READY?';
+  document.getElementById('overlay-sub').textContent=trackName.toUpperCase();
+  document.getElementById('overlay-score').style.display='none';
+  document.getElementById('overlay-stats').style.display='none';
+  document.getElementById('overlay-btn').textContent='PLAY AGAIN';
+  document.getElementById('overlay-btn').onclick=startGame;
 }
 
 function endGame() {
-  gameRunning = false;
-  unlockScroll();
+  gameRunning=false; unlockScroll();
   if (animId) cancelAnimationFrame(animId);
-  try { sourceNode && sourceNode.stop(); } catch(e) {}
-
-  const overlay = document.getElementById('overlay');
-  const total = stats.perfect + stats.good + stats.miss;
-  const acc = total > 0 ? Math.round((stats.perfect + stats.good*0.5) / total * 100) : 0;
-
-  document.getElementById('overlay-title').textContent = health <= 0 ? 'STAGE FAILED' : 'CLEAR';
-  document.getElementById('overlay-sub').textContent = health <= 0 ? 'Health depleted. Try again.' : trackName.toUpperCase();
-  document.getElementById('overlay-score').style.display = 'block';
-  document.getElementById('overlay-score').textContent = score.toLocaleString();
-  document.getElementById('overlay-stats').style.display = 'block';
-  document.getElementById('overlay-stats').innerHTML =
-    `PERFECT ${stats.perfect} &nbsp;·&nbsp; GOOD ${stats.good} &nbsp;·&nbsp; MISS ${stats.miss}<br>ACCURACY ${acc}%`;
-  document.getElementById('overlay-btn').textContent = 'PLAY AGAIN';
-  document.getElementById('overlay-btn').onclick = restartGame;
+  const total=stats.perfect+stats.good+stats.miss;
+  const acc=total?Math.round((stats.perfect+stats.good)/total*100):0;
+  const overlay=document.getElementById('overlay');
   overlay.classList.remove('hidden');
+  document.getElementById('overlay-title').textContent=health<=0?'STAGE FAILED':'CLEAR!';
+  document.getElementById('overlay-sub').textContent=health<=0?'Health depleted. Try again.':'Track complete!';
+  const scoreEl=document.getElementById('overlay-score');
+  scoreEl.style.display='block'; scoreEl.textContent=score.toLocaleString();
+  const statsEl=document.getElementById('overlay-stats');
+  statsEl.style.display='block';
+  statsEl.innerHTML=`PERFECT ${stats.perfect} &nbsp;·&nbsp; GOOD ${stats.good} &nbsp;·&nbsp; MISS ${stats.miss}<br>ACCURACY ${acc}%`;
+  document.getElementById('overlay-btn').textContent='PLAY AGAIN';
+  document.getElementById('overlay-btn').onclick=restartGame;
 }
-
-// Initial resize — defer to ensure layout is painted
-window.addEventListener('load', () => { resizeCanvases(); });
-setTimeout(resizeCanvases, 100);
-window.addEventListener('resize', resizeCanvases);
 </script>
 </body>
 </html>
